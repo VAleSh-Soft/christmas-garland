@@ -9,7 +9,7 @@
 #define LED_ON 0 // Количество светодиодов (0- светодиоды не используются, максимум 2 светодиода
 #define KEY_ON 3 // Количество кнопок подключенных к библиотеке shButton (0- библиотека отключена, максимум 4 кнопки)
 
-#define LOG_ON 0               // Включить отладочный вывод через Serial;  1 - включить лог, 0 - выключить
+#define LOG_ON 1               // Включить отладочный вывод через Serial;  1 - включить лог, 0 - выключить
 #define SERIAL_BAUDRATE 115200 // скорость работы Serial
 
 // ==== Настройка FastLED ============================
@@ -113,7 +113,7 @@
 
 // ==== Параметры кнопок =============================
 
-#if defined(KEY_ON)
+#if KEY_ON
 #include <shButton.h> // https://github.com/VAleSh-Soft/shButton
 shButton btn1(BTN1_PIN);
 #if KEY_ON > 1
@@ -189,16 +189,16 @@ shButton btn4(BTN4_PIN);
 
 // ==== набор команд на кнопках ======================
 
-// ---- для одной кнопки (BTN1) ----------------------
 #if KEY_ON == 1
+// ---- для одной кнопки (BTN1) ----------------------
 
 #define Command_Next_mode_Demo BTN1_1        // Следующий эффект. Оставляет демонстрационный режим
 #define Command_Glitter BTN1_2               // Включить/выключить сверкание
 #define Command_Brightness_plus_R BTN1_PRESS // Увеличить максимальную яркость, при достижения максимума начать с минимума
 #endif
 
-// ---- для двух кнопок (BTN1, BTN2) -----------------
 #if KEY_ON == 2
+// ---- для двух кнопок (BTN1, BTN2) -----------------
 
 #define Command_Previous_mode_Demo BTN1_1   // Предыдущий эффект. Оставляет демонстрационный режим
 #define Command_Glitter BTN1_2              // Включить/выключить сверкание
@@ -209,8 +209,8 @@ shButton btn4(BTN4_PIN);
 #define Command_Brightness_plus BTN2_PRESS // Увеличить максимальную яркость и остановится если достигли максимума
 #endif
 
-// ---- для трех кнопок (BTN1, BTN2, BTN3) -----------
 #if KEY_ON == 3
+// ---- для трех кнопок (BTN1 .. BTN3) ---------------
 
 #define Command_Previous_mode_Demo BTN1_1   // Предыдущий эффект. Оставляет демонстрационный режим
 #define Command_Brightness_minus BTN1_PRESS // Уменьшить максимальную яркость и остановится если достигли минимума
@@ -222,11 +222,12 @@ shButton btn4(BTN4_PIN);
 #define Command_Brightness_plus BTN3_PRESS // Увеличить максимальную яркость и остановится если достигли максимума
 #endif
 
-// ---- для четырех кнопок (BTN1, BTN2, BTN3,  BTN4) -
 #if KEY_ON == 4
+// ---- для четырех кнопок (BTN1 .. BTN4) ------------
 
 #endif
 
+#if LED_ON
 // ==== Команды связанные со светодиодами ============
 #define LED1_On digitalWrite(LED1_PIN, HIGH);       // Включить светодиод 1
 #define LED1_Off digitalWrite(LED1_PIN, LOW);       // Выключить светодиод 1
@@ -238,6 +239,18 @@ shButton btn4(BTN4_PIN);
 #define LED2_FleshH(x) Led2_flesh = 4 * x;          // Мигнуть быстро x раз 2 светодиодом    (1-15)
 #define LED2_Flesh(x) Led2_flesh = 64 + 8 * x;      // Мигнуть x раз 2 светодиодом           (1-7)
 #define LED2_FleshL(x) Led2_flesh = 128 + 16 * x;   // Мигнуть медленно x раз 2 светодиодом  (1-7)
+#endif
+
+#if LOG_ON
+// ==== макросы вывода в Serial ======================
+#define CTG_PRINT(x) Serial.print(x)
+#define CTG_PRINTLN(x) Serial.println(x)
+#define CTG_PRINTLN_2(x, y) Serial.println(x, y)
+#else
+#define CTG_PRINT(x)
+#define CTG_PRINTLN(x)
+#define CTG_PRINTLN_2(x, y)
+#endif
 
 // ==== Переменные ===================================
 
@@ -262,4 +275,3 @@ shButton btn4(BTN4_PIN);
 #define qsubd(x, b) ((x > b) ? wavebright : 0)
 // Беззнаковый макрос вычитания. если результат меньше 0, то присвоить 0
 #define qsuba(x, b) ((x > b) ? x - b : 0)
-

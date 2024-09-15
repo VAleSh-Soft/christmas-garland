@@ -136,16 +136,16 @@ void top()
 void BtnHandler()
 {
 
-#if defined(KEY_ON)
+#if KEY_ON
   {
     switch (btn1.getButtonState())
     {
     case BTN_ONECLICK:
       Protocol = 1;
       Command = BTN1_1;
-#if LOG_ON == 1
-      Serial.println(F("BTN1 Click"));
-#endif
+
+      CTG_PRINTLN(F("BTN1 Click"));
+
 #if LED_ON > 0
       LED1_FleshH(1); // мигнуть светодиодом 1
 #endif
@@ -153,9 +153,9 @@ void BtnHandler()
     case BTN_DBLCLICK:
       Protocol = 1;
       Command = BTN1_2;
-#if LOG_ON == 1
-      Serial.println(F("BTN1 DblClick"));
-#endif
+
+      CTG_PRINTLN(F("BTN1 DblClick"));
+
 #if LED_ON > 0
       LED1_FleshH(2); // мигнуть 2 раза светодиодом 1
 #endif
@@ -163,9 +163,9 @@ void BtnHandler()
     case BTN_LONGCLICK:
       Protocol = 1;
       Command = BTN1_PRESS;
-#if LOG_ON == 1
-      Serial.println(F("BTN1 Step"));
-#endif
+
+      CTG_PRINTLN(F("BTN1 Step"));
+
 #if LED_ON > 0
       LED1_FleshL(1); // мигнуть  светодиодом 1
 #endif
@@ -179,9 +179,9 @@ void BtnHandler()
     case BTN_ONECLICK:
       Protocol = 1;
       Command = BTN2_1;
-#if LOG_ON == 1
-      Serial.println(F("BTN2 Click"));
-#endif
+
+      CTG_PRINTLN(F("BTN2 Click"));
+
 #if LED_ON > 0
       LED1_FleshH(1); // мигнуть светодиодом 1
 #endif
@@ -189,9 +189,9 @@ void BtnHandler()
     case BTN_DBLCLICK:
       Protocol = 1;
       Command = BTN2_2;
-#if LOG_ON == 1
-      Serial.println(F("BTN2 DblClick"));
-#endif
+
+      CTG_PRINTLN(F("BTN2 DblClick"));
+
 #if LED_ON > 0
       LED1_FleshH(2); // мигнуть 2 раза светодиодом 1
 #endif
@@ -199,9 +199,9 @@ void BtnHandler()
     case BTN_LONGCLICK:
       Protocol = 1;
       Command = BTN2_PRESS;
-#if LOG_ON == 1
-      Serial.println(F("BTN2 Step"));
-#endif
+
+      CTG_PRINTLN(F("BTN2 Step"));
+
 #if LED_ON > 0
       LED1_FleshL(1); // мигнуть  светодиодом 1
 #endif
@@ -215,9 +215,9 @@ void BtnHandler()
     case BTN_ONECLICK:
       Protocol = 1;
       Command = BTN3_1;
-#if LOG_ON == 1
-      Serial.println(F("BTN3 Click"));
-#endif
+
+      CTG_PRINTLN(F("BTN3 Click"));
+
 #if LED_ON > 0
       LED1_FleshH(1); // мигнуть светодиодом 1
 #endif
@@ -225,9 +225,9 @@ void BtnHandler()
     case BTN_DBLCLICK:
       Protocol = 1;
       Command = BTN3_2;
-#if LOG_ON == 1
-      Serial.println(F("BTN3 DblClick"));
-#endif
+
+      CTG_PRINTLN(F("BTN3 DblClick"));
+
 #if LED_ON > 0
       LED1_FleshH(2); // мигнуть 2 раза светодиодом 1
 #endif
@@ -235,9 +235,9 @@ void BtnHandler()
     case BTN_LONGCLICK:
       Protocol = 1;
       Command = BTN3_PRESS;
-#if LOG_ON == 1
-      Serial.println(F("BTN3 Step"));
-#endif
+
+      CTG_PRINTLN(F("BTN3 Step"));
+
 #if LED_ON > 0
       LED1_FleshL(1); // мигнуть  светодиодом 1
 #endif
@@ -251,9 +251,9 @@ void BtnHandler()
     case BTN_ONECLICK:
       Protocol = 1;
       Command = BTN4_1;
-#if LOG_ON == 1
-      Serial.println(F("BTN4 Click"));
-#endif
+
+      CTG_PRINTLN(F("BTN4 Click"));
+
 #if LED_ON > 0
       LED1_FleshH(1); // мигнуть светодиодом 1
 #endif
@@ -261,9 +261,9 @@ void BtnHandler()
     case BTN_DBLCLICK:
       Protocol = 1;
       Command = BTN4_2;
-#if LOG_ON == 1
-      Serial.println(F("BTN4 DblClick"));
-#endif
+
+      CTG_PRINTLN(F("BTN4 DblClick"));
+
 #if LED_ON > 0
       LED1_FleshH(2); // мигнуть 2 раза светодиодом 1
 #endif
@@ -271,9 +271,9 @@ void BtnHandler()
     case BTN_LONGCLICK:
       Protocol = 1;
       Command = BTN4_PRESS;
-#if LOG_ON == 1
-      Serial.println(F("BTN4 Step"));
-#endif
+
+      CTG_PRINTLN(F("BTN4 Step"));
+
 #if LED_ON > 0
       LED1_FleshL(1); // мигнуть  светодиодом 1
 #endif

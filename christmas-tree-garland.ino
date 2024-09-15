@@ -28,7 +28,7 @@ uint8_t Led2_flesh = 0; // Управление мигания светодио�
 #endif
 #endif
 
-#if defined(KEY_ON)
+#if KEY_ON
 uint8_t IR_New_Mode = 0;   // Выбор эффекта
 uint32_t IR_Time_Mode = 0; // время последнего нажатия
 #endif
@@ -174,11 +174,11 @@ long summ = 0;
 #include "src/candles.h"
 #include "src/colorwave.h"
 
-#if defined(KEY_ON)
+#if KEY_ON
 #include "src/getirl.h"
 #endif
 
-#if defined(RUNNING_FIRE)
+#if RUNNING_FIRE
 #include "src/running_fire.h"
 #endif
 
@@ -188,7 +188,7 @@ void setup()
 {
   pinMode(COLOR_ORDER_PIN, INPUT_PULLUP);
 
-#if defined(KEY_ON)
+#if KEY_ON
   btn1.setVirtualClickOn(true);
   btn1.setLongClickMode(LCM_CLICKSERIES);
 #if KEY_ON > 1
@@ -213,13 +213,13 @@ void setup()
   LED1_On; // Включим светодиод
 #endif
 
-#if LOG_ON == 1
+#if LOG_ON
   Serial.begin(SERIAL_BAUDRATE); // Setup serial baud rate
-
-  Serial.println(F(" "));
-  Serial.println(F("---SETTING UP---"));
-
 #endif
+
+  CTG_PRINTLN(F(" "));
+  CTG_PRINTLN(F("---SETTING UP---"));
+
 
 #if SAVE_EEPROM > 0
 
@@ -342,31 +342,29 @@ void setup()
   random16_set_seed(4832); // Рандомайзер
   random16_add_entropy(analogRead(2));
 
-#if LOG_ON == 1
-  Serial.print(F("Initial delay: "));
-  Serial.print(meshdelay * 100);
-  Serial.println(F("ms delay."));
-  Serial.print(F("Initial strand length: "));
-  Serial.print(NUM_LEDS);
-  Serial.println(F(" LEDs"));
-  Serial.println(F("EXTEND Setup"));
+  CTG_PRINT(F("Initial delay: "));
+  CTG_PRINT(meshdelay * 100);
+  CTG_PRINTLN(F("ms delay."));
+  CTG_PRINT(F("Initial strand length: "));
+  CTG_PRINT(NUM_LEDS);
+  CTG_PRINTLN(F(" LEDs"));
+  CTG_PRINTLN(F("EXTEND Setup"));
   if (ExtFlag.RedGreen)
-    Serial.println(F("RGB LEDS"));
+    CTG_PRINTLN(F("RGB LEDS"));
   else
-    Serial.println(F("GRB LEDS"));
+    CTG_PRINTLN(F("GRB LEDS"));
   if (ExtFlag.Glitter)
-    Serial.println(F("Glitter On"));
+    CTG_PRINTLN(F("Glitter On"));
   else
-    Serial.println(F("Glitter Off"));
+    CTG_PRINTLN(F("Glitter Off"));
   if (ExtFlag.Background)
-    Serial.println(F("Background On"));
+    CTG_PRINTLN(F("Background On"));
   else
-    Serial.println(F("Background Off"));
+    CTG_PRINTLN(F("Background Off"));
   if (ExtFlag.Candle)
-    Serial.println(F("Candle On"));
+    CTG_PRINTLN(F("Candle On"));
   else
-    Serial.println(F("Candle Off"));
-#endif
+    CTG_PRINTLN(F("Candle Off"));
 
 #if BLACKSTART == 1
   solid = CRGB::Black; // Запуск с пустого поля
@@ -380,14 +378,13 @@ void setup()
   gCurrentPalette = gGradientPalettes[0];
   gTargetPalette = gGradientPalettes[0];
   strobe_mode(ledMode, 1); // инициализация первой последовательности
-#if LOG_ON == 1
+
   if (DEMO_MODE)
   {
-    Serial.print(F("DEMO MODE "));
-    Serial.println(DEMO_MODE);
+    CTG_PRINT(F("DEMO MODE "));
+    CTG_PRINTLN(DEMO_MODE);
   }
-  Serial.println(F("---SETUP COMPLETE---"));
-#endif
+  CTG_PRINTLN(F("---SETUP COMPLETE---"));
 
   LED1_Off; // Выключим светодиод
 }
@@ -395,7 +392,7 @@ void setup()
 void loop()
 {
 
-#if defined(KEY_ON)
+#if KEY_ON
   getirl(); // Обработка кнопок
 #endif
 
@@ -433,10 +430,10 @@ void loop()
           gCurrentPaletteNumber++;
         else
           gCurrentPaletteNumber = 0;
-#if LOG_ON == 1
-        Serial.print(F("New Palette: "));
-        Serial.println(gCurrentPaletteNumber);
-#endif
+
+        CTG_PRINT(F("New Palette: "));
+        CTG_PRINTLN(gCurrentPaletteNumber);
+
       }
       gTargetPalette = gGradientPalettes[gCurrentPaletteNumber]; // We're just ensuring that the gTargetPalette WILL be assigned.
     }
@@ -493,9 +490,8 @@ void loop()
         ledMode = newMode;
         StepMode = MAX_LEDS - TOP_LENGTH;
 
-#if LOG_ON == 1
-        Serial.println(F("End SetMode"));
-#endif
+        CTG_PRINTLN(F("End SetMode"));
+        
       }
       nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, PALETTE_SPEED);
     }
@@ -523,7 +519,7 @@ void loop()
 
   BtnHandler(); // Обработчик нажатий кнопок
 
-#if defined(KEY_ON)
+#if KEY_ON
   if ((IR_Time_Mode > 0) && // Идет отчет времени
       ((millis() - IR_Time_Mode) >= 2000))
   { // И прошло больше 2 секунд
@@ -544,11 +540,10 @@ void strobe_mode(uint8_t mode, bool mc)
   {
     fill_solid(leds, NUM_LEDS - TOP_LENGTH, CRGB(0, 0, 0)); // Clean up the array for the first time through. Don't show display though, so you may have a smooth transition.
 
-#if LOG_ON == 1
-    Serial.print(F("Mode: "));
-    Serial.println(mode);
-    Serial.println(millis());
-#endif
+    CTG_PRINT(F("Mode: "));
+    CTG_PRINTLN(mode);
+    CTG_PRINTLN(millis());
+
 #if PALETTE_TIME > 0
     if (palchg == 0)
       palchg = 3;
@@ -1113,11 +1108,11 @@ void strobe_mode(uint8_t mode, bool mc)
   if (mc)
   {
     if (palchg == 0)
-      Serial.println(F("Change palette off"));
+      CTG_PRINTLN(F("Change palette off"));
     else if (palchg == 1)
-      Serial.println(F("Change palette Stop"));
+      CTG_PRINTLN(F("Change palette Stop"));
     else if (palchg == 3)
-      Serial.println(F("Change palette ON"));
+      CTG_PRINTLN(F("Change palette ON"));
   }
 #endif
 }
@@ -1161,15 +1156,14 @@ void demo_check()
       rand_spark = random8(3) + 1;
 #endif
 
-#if LOG_ON == 1
-      Serial.println(F("Start SetMode"));
-#endif
+      CTG_PRINTLN(F("Start SetMode"));
+
 #else
       gTargetPalette = gGradientPalettes[gCurrentPaletteNumber]; // Применим палитру
-#if LOG_ON == 1
-      Serial.print(F("New Palette: "));
-      Serial.println(gCurrentPaletteNumber);
-#endif
+
+      CTG_PRINT(F("New Palette: "));
+      CTG_PRINTLN(gCurrentPaletteNumber);
+
       switch (demorun)
       {
       case 2:

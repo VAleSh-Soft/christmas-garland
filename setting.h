@@ -6,6 +6,7 @@
  */
 
 // ==== Подключенная периферия =======================
+
 #define LED_ON 0 // Количество светодиодов (0- светодиоды не используются, максимум 2 светодиода
 #define KEY_ON 3 // Количество кнопок подключенных к библиотеке shButton (0- библиотека отключена, максимум 4 кнопки)
 
@@ -13,9 +14,11 @@
 #define SERIAL_BAUDRATE 115200 // скорость работы Serial
 
 // ==== Настройка FastLED ============================
+
 #define MAX_LEDS 104 // Максимальное количество светодиодов,  очень влияет на память
 
 #define CHIPSET WS2812B // Тип микросхемы светодиодов в гирлянде
+#define EORDER GRB // очередность цветов в ципе; закомментируйте, если хотите выбирать очередность переключателем
 
 #define POWER_V 5   // напряжение блока питания в Вольтах
 #define POWER_I 500 // Ток блока питания в миллиАмперах
@@ -23,10 +26,14 @@
 // ==== Пины для подключения периферии ===============
 
 #define LED_DATA_PIN 6 // Номер пина куда подключена гирлянда
-// #define LED_CLK_PIN 11 // Номер пина для подключения линии тактирования, применяется для светодиодов WS2801, APA102 и т.д.
+// #define LED_CLK_PIN 11 // Номер пина для подключения линии тактирования, применяется для светодиодов с четырехпроводным подключение (WS2801, APA102 и т.д.)
 // ЕСЛИ НЕ ИСПОЛЬЗУЕТСЯ ЗАКОМЕНТИРОВАТЬ
 
+#ifndef EORDER
+
 #define COLOR_ORDER_PIN 7 // Пин для переключателя очередности цвета светодиодов  RGB или GRB
+
+#endif
 
 #define LED1_PIN 26 // Номер пина, куда подключен 1 светодиод
 #define LED2_PIN 25 // Номер пина, куда подключен 2 светодиод
@@ -37,7 +44,15 @@
 #define BTN4_PIN 9 // Номер пина, куда подключена кнопка 4
 // кнопки замыкаются на землю, используется внутренняя подтяжка МК
 
+// ==== Индексы настроек в EEPROM ====================
+#define STARTMODE 10 // Расположение в EEPROM номера режима с которого будет старт (байт)
+#define STRANDLEN 11 // Расположение в EEPROM длины гирлянды (2 байта)
+#define STRANDEL 13  // Расположение в EEPROM задержки (байт)
+#define EXTFLAG 14   // Расположение в EEPROM расширенных флагов
+#define ISINIT 15    // Расположение в EEPROM байта корректности записи
+
 // ==== Настройка эффектов ===========================
+
 #define BLACKSTART 1 // Первый запуск делать с черного экрана 0- начинать с эффекта, 1- начинать с черного экрана
 
 #define GLITER_ON 1 // Включить блеск 0 - блеск отключен, 1- блеск включен
@@ -91,6 +106,7 @@
 #define TOP_FADING 5        // Затухание
 
 // ==== эффект бегущий огонь из 80-90 годов ==========
+
 #define RUNNING_FIRE 0 // 1 Включить эффекты бегущего огня, начинаются с 43 команды
                        // Программы бегущего огня
                        // описание параметров
@@ -130,36 +146,16 @@ shButton btn4(BTN4_PIN);
 // Команды связанные с действиями кнопки, менять не надо, просто используем
 #define BTN1_1 1000       // кнопка 1 клик
 #define BTN1_2 1001       // кнопка 1 два клика
-#define BTN1_3 1002       // кнопка 1 три клика
-#define BTN1_4 1003       // кнопка 1 четыре клика
 #define BTN1_PRESS 1005   // кнопка 1 удержание
-#define BTN1_1_PRESS 1006 // кнопка 1 один клик + удержание
-#define BTN1_2_PRESS 1007 // кнопка 1 два клика + удержание
-#define BTN1_3_PRESS 1008 // кнопка 1 три клика + удержание
 #define BTN2_1 1100       // кнопка 2 клик
 #define BTN2_2 1101       // кнопка 2 два клика
-#define BTN2_3 1102       // кнопка 2 три клика
-#define BTN2_4 1103       // кнопка 2 четыре клика
 #define BTN2_PRESS 1105   // кнопка 2 удержание
-#define BTN2_1_PRESS 1106 // кнопка 2 один клик + удержание
-#define BTN2_2_PRESS 1107 // кнопка 2 два клика + удержание
-#define BTN2_3_PRESS 1108 // кнопка 2 три клика + удержание
 #define BTN3_1 1200       // кнопка 3 клик
 #define BTN3_2 1201       // кнопка 3 два клика
-#define BTN3_3 1202       // кнопка 3 три клика
-#define BTN3_4 1203       // кнопка 3 четыре клика
 #define BTN3_PRESS 1205   // кнопка 3 удержание
-#define BTN3_1_PRESS 1206 // кнопка 3 один клик + удержание
-#define BTN3_2_PRESS 1207 // кнопка 3 два клика + удержание
-#define BTN3_3_PRESS 1208 // кнопка 3 три клика + удержание
 #define BTN4_1 1300       // кнопка 4 клик
 #define BTN4_2 1301       // кнопка 4 два клика
-#define BTN4_3 1302       // кнопка 4 три клика
-#define BTN4_4 1303       // кнопка 4 четыре клика
 #define BTN4_PRESS 1305   // кнопка 4 удержание
-#define BTN4_1_PRESS 1306 // кнопка 4 один клик + удержание
-#define BTN4_2_PRESS 1307 // кнопка 4 два клика + удержание
-#define BTN4_3_PRESS 1308 // кнопка 4 три клика + удержание
 
 // ==== Все команды которые обрабатывает скетч =======
 
@@ -275,3 +271,126 @@ shButton btn4(BTN4_PIN);
 #define qsubd(x, b) ((x > b) ? wavebright : 0)
 // Беззнаковый макрос вычитания. если результат меньше 0, то присвоить 0
 #define qsuba(x, b) ((x > b) ? x - b : 0)
+
+#if LED_ON > 0
+uint8_t Led1_flesh = 0x0; // Управление мигания светодиодом 1
+#if LED_ON > 1
+uint8_t Led2_flesh = 0; // Управление мигания светодиодом 2
+#endif
+#endif
+
+#if KEY_ON
+uint8_t IR_New_Mode = 0;   // Выбор эффекта
+uint32_t IR_Time_Mode = 0; // время последнего нажатия
+#endif
+
+#if MAX_LEDS < 255
+uint8_t NUM_LEDS; // Количество светодиодов, которые мы на самом деле используем, и мы можем изменить его только на длину нити
+uint8_t KolLed;
+#else
+uint16_t NUM_LEDS; // Количество светодиодов, которые мы на самом деле используем, и мы можем изменить его только на длину нити
+uint16_t KolLed;
+#endif
+
+uint8_t max_bright = 255; // Определение общей яркости; возможно изменение на лету
+
+struct CRGB leds[MAX_LEDS]; // инициализация массива светодиодов
+
+CRGBPalette16 gCurrentPalette; // Использование палитры вместо прямых назначений CHSV или CRGB.
+CRGBPalette16 gTargetPalette;  // Поддержка плавной смены палитры
+CRGB solid = CRGB::Black;      // Цвет закраски
+
+extern const TProgmemRGBGradientPalettePtr gGradientPalettes[]; // для фиксированных палитр в gradient_palettes.h.
+
+extern const uint8_t gGradientPaletteCount; // Общее количество фиксированных палитр
+uint8_t gCurrentPaletteNumber = 0;          // Текущий номер палитры из списка палитр.
+uint8_t currentPatternIndex = 0;            // Порядковый номер текущего шаблона
+uint32_t demo_time = 0;                     // время демо режима
+
+TBlendType currentBlending = LINEARBLEND; // NOBLEND или LINEARBLEND
+
+#define INITVAL 0x55     // Это значение проверяем в бите корректности EEPROM
+#define INITMODE 0       // с этого режима будет старт, по умолчанию 0 (старт с - с черного цвета)
+#define INITLEN MAX_LEDS // Размер гирлянды при старте
+#define INITDEL 0        // размер задержки при старте в миллисекундах
+
+uint16_t meshdelay; // Timer for the notamesh. Works with INITDEL.
+
+uint8_t ledMode = 0; // номер текущего режима
+#if CHANGE_ON == 1
+uint8_t newMode = 0; // номер нового режима
+#if MAX_LEDS < 255
+uint8_t StepMode = MAX_LEDS; // Текущий шаг перехода от нового режима к старому
+#else
+uint16_t StepMode = MAX_LEDS; // Текущий шаг перехода от нового режима к старому
+#endif
+#endif
+
+uint8_t demorun = DEMO_MODE;
+#if RUNNING_FIRE > 0
+#define maxMode 122 // Maximum number of modes.
+#else
+#define maxMode 42 // Maximum number of modes.
+#endif
+
+uint8_t Protocol = 0; // Temporary variables to save latest IR input
+uint32_t Command = 0;
+
+// ==== Общие переменные =============================
+
+uint8_t allfreq = 32; // Меняет частоту. Переменная для эффектов one_sin_pal и two_sin.
+uint8_t bgclr = 0;    // Общий цвет фона. Переменная для эффектов matrix_pal и one_sin_pal.
+uint8_t bgbri = 0;    // Общая фоновая яркость. Переменная для эффектов matrix_pal и one_sin_pal.
+
+// Структура хранения расширенных настроек
+#pragma pack(push, 1)
+typedef union
+{
+  struct
+  {
+    bool RedGreen : 1;   // Очередность  Цветов  RGB
+    bool Glitter : 1;    // Флаг включения блеска
+    bool Background : 1; // Флаг включения заполнения фона
+    bool Candle : 1;     // Флаг включения свечей
+    bool DemoRand : 1;   // Флаг случайный перебор эффектов
+    bool rezerv0 : 1;    // Зарезервировано
+    bool rezerv1 : 1;    // Зарезервировано
+    bool rezerv2 : 1;    // Зарезервировано
+  };
+  unsigned char Byte;
+} ExtendedFlags;
+#pragma pack(pop)
+
+ExtendedFlags ExtFlag; // Флаги расширенных настроек
+
+#define GLITTER ExtFlag.Glitter
+#define BACKGROUND ExtFlag.Background
+#define CANDLE ExtFlag.Candle
+
+uint8_t palchg = 3;       // Управление палитрой  3 - менять палитру автоматически иначе нет
+uint8_t startindex = 0;   // С какого цвета начинать. Переменная для эффектов one_sin_pal.
+uint8_t thisbeat;         // Переменная для эффектов juggle_pal.
+uint8_t thiscutoff = 192; // Если яркость ниже этой, то яркость = 0. Переменная для эффектов one_sin_pal и two_sin.
+uint16_t thisdelay = 0;   // Задержка delay
+uint8_t thisdiff = 1;     // Шаг изменения палитры. Переменная для эффектов confetti_pal, juggle_pal и rainbow_march.
+int8_t thisdir = 1;       // Направление движения эффекта. принимает значение -1 или 1.
+uint8_t thisfade = 224;   // Скорость затухания. Переменная для эффектов confetti_pal и juggle_pal.
+uint8_t thishue = 0;      // Оттенок Переменная для эффектов two_sin.
+uint8_t thisindex = 0;    // Указатель ан элемент палитры
+uint8_t thisinc = 1;      // Изменение начального цвета после каждого прохода. Переменная для эффектов confetti_pal и one_sin_pal.
+int thisphase = 0;        // Изменение фазы. Переменная для эффектов one_sin_pal, plasma и two_sin.
+uint8_t thisrot = 1;      // Измение скорости вращения волны. В настоящее время 0.
+int8_t thisspeed = 4;     // Изменение стандартной скорости
+uint8_t wavebright = 255; // Вы можете изменить яркость волн / полос, катящихся по экрану.
+
+#ifdef MY_MODE
+const PROGMEM uint8_t my_mode[] = {MY_MODE};   // массив выбранных режимов
+const uint8_t my_mode_count = sizeof(my_mode); // колличество выбрано режимов
+uint8_t cur_my_mode = 0;                       // Указатель на текущий режим
+#endif
+
+#if CHANGE_SPARK == 4
+uint8_t rand_spark = 0;
+#endif
+
+long summ = 0;

@@ -12,146 +12,6 @@
 
 // ===================================================
 
-void strobe_mode(uint8_t newMode, bool mc);
-void demo_check();
-
-#if LED_ON > 0
-void ledsFlash(uint8_t led_idx, uint8_t &count);
-#endif
-
-// ===================================================
-
-#if LED_ON > 0
-uint8_t Led1_flesh = 0x0; // Управление мигания светодиодом 1
-#if LED_ON > 1
-uint8_t Led2_flesh = 0; // Управление мигания светодиодом 2
-#endif
-#endif
-
-#if KEY_ON
-uint8_t IR_New_Mode = 0;   // Выбор эффекта
-uint32_t IR_Time_Mode = 0; // время последнего нажатия
-#endif
-
-#if MAX_LEDS < 255
-uint8_t NUM_LEDS; // Количество светодиодов, которые мы на самом деле используем, и мы можем изменить его только на длину нити
-uint8_t KolLed;
-#else
-uint16_t NUM_LEDS; // Количество светодиодов, которые мы на самом деле используем, и мы можем изменить его только на длину нити
-uint16_t KolLed;
-#endif
-
-uint8_t max_bright = 255; // Определение общей яркости; возможно изменение на лету
-
-struct CRGB leds[MAX_LEDS]; // инициализация массива светодиодов
-
-CRGBPalette16 gCurrentPalette; // Использование палитры вместо прямых назначений CHSV или CRGB.
-CRGBPalette16 gTargetPalette;  // Поддержка плавной смены палитры
-CRGB solid = CRGB::Black;      // Цвет закраски
-
-extern const TProgmemRGBGradientPalettePtr gGradientPalettes[]; // для фиксированных палитр в gradient_palettes.h.
-
-extern const uint8_t gGradientPaletteCount; // Общее количество фиксированных палитр
-uint8_t gCurrentPaletteNumber = 0;          // Текущий номер палитры из списка палитр.
-uint8_t currentPatternIndex = 0;            // Порядковый номер текущего шаблона
-uint32_t demo_time = 0;                     // время демо режима
-
-TBlendType currentBlending = LINEARBLEND; // NOBLEND или LINEARBLEND
-
-// Индексы настроек в EEPROM
-#define STARTMODE 0 // Расположение в EEPROM номера режима с которого будет старт (байт)
-#define STRANDLEN 1 // Расположение в EEPROM длины гирлянды (2 байта)
-#define STRANDEL 3  // Расположение в EEPROM задержки (байт)
-#define EXTFLAG 4   // Расположение в EEPROM расширенных флагов
-#define ISINIT 5    // Расположение в EEPROM байта корректности записи
-
-#define INITVAL 0x55     // Это значение проверяем в бите корректности EEPROM
-#define INITMODE 0       // с этого режима будет старт, по умолчанию 0 (старт с - с черного цвета)
-#define INITLEN MAX_LEDS // Размер гирлянды при старте
-#define INITDEL 0        // размер задержки при старте в миллисекундах
-
-uint16_t meshdelay; // Timer for the notamesh. Works with INITDEL.
-
-uint8_t ledMode = 0; // номер текущего режима
-#if CHANGE_ON == 1
-uint8_t newMode = 0; // номер нового режима
-#if MAX_LEDS < 255
-uint8_t StepMode = MAX_LEDS; // Текущий шаг перехода от нового режима к старому
-#else
-uint16_t StepMode = MAX_LEDS; // Текущий шаг перехода от нового режима к старому
-#endif
-#endif
-
-uint8_t demorun = DEMO_MODE;
-#if RUNNING_FIRE > 0
-#define maxMode 122 // Maximum number of modes.
-#else
-#define maxMode 42 // Maximum number of modes.
-#endif
-
-uint8_t Protocol = 0; // Temporary variables to save latest IR input
-uint32_t Command = 0;
-
-// ==== Общие переменные =============================
-uint8_t allfreq = 32; // Меняет частоту. Переменная для эффектов one_sin_pal и two_sin.
-uint8_t bgclr = 0;    // Общий цвет фона. Переменная для эффектов matrix_pal и one_sin_pal.
-uint8_t bgbri = 0;    // Общая фоновая яркость. Переменная для эффектов matrix_pal и one_sin_pal.
-
-// Структура хранения расширенных настроек
-#pragma pack(push, 1)
-typedef union
-{
-  struct
-  {
-    bool RedGreen : 1;   // Очередность  Цветов  RGB
-    bool Glitter : 1;    // Флаг включения блеска
-    bool Background : 1; // Флаг включения заполнения фона
-    bool Candle : 1;     // Флаг включения свечей
-    bool DemoRand : 1;   // Флаг случайный перебор эффектов
-    bool rezerv0 : 1;    // Зарезервировано
-    bool rezerv1 : 1;    // Зарезервировано
-    bool rezerv2 : 1;    // Зарезервировано
-  };
-  unsigned char Byte;
-} ExtendedFlags;
-#pragma pack(pop)
-
-ExtendedFlags ExtFlag; // Флаги расширенных настроек
-
-#define GLITTER ExtFlag.Glitter
-#define BACKGROUND ExtFlag.Background
-#define CANDLE ExtFlag.Candle
-
-uint8_t palchg = 3;       // Управление палитрой  3 - менять палитру автоматически иначе нет
-uint8_t startindex = 0;   // С какого цвета начинать. Переменная для эффектов one_sin_pal.
-uint8_t thisbeat;         // Переменная для эффектов juggle_pal.
-uint8_t thiscutoff = 192; // Если яркость ниже этой, то яркость = 0. Переменная для эффектов one_sin_pal и two_sin.
-uint16_t thisdelay = 0;   // Задержка delay
-uint8_t thisdiff = 1;     // Шаг изменения палитры. Переменная для эффектов confetti_pal, juggle_pal и rainbow_march.
-int8_t thisdir = 1;       // Направление движения эффекта. принимает значение -1 или 1.
-uint8_t thisfade = 224;   // Скорость затухания. Переменная для эффектов confetti_pal и juggle_pal.
-uint8_t thishue = 0;      // Оттенок Переменная для эффектов two_sin.
-uint8_t thisindex = 0;    // Указатель ан элемент палитры
-uint8_t thisinc = 1;      // Изменение начального цвета после каждого прохода. Переменная для эффектов confetti_pal и one_sin_pal.
-int thisphase = 0;        // Изменение фазы. Переменная для эффектов one_sin_pal, plasma и two_sin.
-uint8_t thisrot = 1;      // Измение скорости вращения волны. В настоящее время 0.
-int8_t thisspeed = 4;     // Изменение стандартной скорости
-uint8_t wavebright = 255; // Вы можете изменить яркость волн / полос, катящихся по экрану.
-
-#ifdef MY_MODE
-const PROGMEM uint8_t my_mode[] = {MY_MODE};   // массив выбранных режимов
-const uint8_t my_mode_count = sizeof(my_mode); // колличество выбрано режимов
-uint8_t cur_my_mode = 0;                       // Указатель на текущий режим
-#endif
-
-#if CHANGE_SPARK == 4
-uint8_t rand_spark = 0;
-#endif
-
-long summ = 0;
-
-// ==== Функции отображения ==========================
-
 // Функции поддержки
 #include "src/addings.h"
 
@@ -175,6 +35,7 @@ long summ = 0;
 #include "src/colorwave.h"
 
 #if KEY_ON
+// Работа с кнопками
 #include "src/getirl.h"
 #endif
 
@@ -184,9 +45,20 @@ long summ = 0;
 
 // ===================================================
 
+void strobe_mode(uint8_t newMode, bool mc);
+void demo_check();
+
+#if LED_ON > 0
+void ledsFlash(uint8_t led_idx, uint8_t &count);
+#endif
+
+// ===================================================
+
 void setup()
 {
+#ifndef EORDER
   pinMode(COLOR_ORDER_PIN, INPUT_PULLUP);
+#endif
 
 #if KEY_ON
   btn1.setVirtualClickOn(true);
@@ -239,11 +111,6 @@ void setup()
 #if SAVE_EEPROM == 1
   ExtFlag.Byte = EEPROM.read(EXTFLAG); // Прочитаем расширенные настройки
 #else
-  ExtFlag.RedGreen = digitalRead(COLOR_ORDER_PIN) ? 1 : 0;
-  // if (COLOR_ORDER == RGB)
-  //   ExtFlag.RedGreen = 1;
-  // else
-  //   ExtFlag.RedGreen = 0;
   ExtFlag.Glitter = GLITER_ON;    // Флаг включения блеска
   ExtFlag.Background = BACKGR_ON; // Флаг включения заполнения фона
   ExtFlag.Candle = CANDLE_ON;     // Флаг включения свечей
@@ -262,11 +129,6 @@ void setup()
 #endif
     EEPROM.write(STRANDEL, INITDEL); // сохраним в EPROM задержку (байт)
 
-    ExtFlag.RedGreen = digitalRead(COLOR_ORDER_PIN) ? 1 : 0;
-    // if (COLOR_ORDER == RGB)
-    //   ExtFlag.RedGreen = 1;
-    // else
-    //   ExtFlag.RedGreen = 0;
     ExtFlag.Glitter = GLITER_ON;         // Флаг включения блеска
     ExtFlag.Background = BACKGR_ON;      // Флаг включения заполнения фона
     ExtFlag.Candle = CANDLE_ON;          // Флаг включения свечей
@@ -282,12 +144,11 @@ void setup()
     meshdelay = INITDEL;
   }
 #else
-  // ExtFlag.RedGreen = digitalRead(COLOR_ORDER_PIN) ? 1 : 0;
+#ifndef EORDER
+  ExtFlag.RedGreen = digitalRead(COLOR_ORDER_PIN);
+#else
   ExtFlag.RedGreen = 0;
-  // if (COLOR_ORDER == RGB)
-  //   ExtFlag.RedGreen = 1;
-  // else
-  //   ExtFlag.RedGreen = 0;
+#endif
   ExtFlag.Glitter = GLITER_ON;    // Флаг включения блеска
   ExtFlag.Background = BACKGR_ON; // Флаг включения заполнения фона
   ExtFlag.Candle = CANDLE_ON;     // Флаг включения свечей
@@ -320,6 +181,17 @@ void setup()
 
   LEDS.setBrightness(max_bright);
 
+#ifdef EORDER
+// очередность цветов задана явно макросом EORDER
+
+#if LED_CLK_PIN
+    LEDS.addLeds<CHIPSET, LED_DATA_PIN, LED_CLK_PIN, EORDER>(leds, MAX_LEDS);
+#else
+    LEDS.addLeds<CHIPSET, LED_DATA_PIN, EORDER>(leds, MAX_LEDS); // Для светодиодов WS2812B
+#endif
+
+#else
+// очередность цветов определяется положением переключателя или сохраненным в EEPROM значением (только RGB или GRB)
   if (ExtFlag.RedGreen)
   {
 #if LED_CLK_PIN
@@ -336,6 +208,7 @@ void setup()
     LEDS.addLeds<CHIPSET, LED_DATA_PIN, GRB>(leds, MAX_LEDS); // Для светодиодов WS2812B
 #endif
   }
+#endif
 
   LEDS.setMaxPowerInVoltsAndMilliamps(POWER_V, POWER_I); // Настройка блока питания
 
@@ -386,7 +259,9 @@ void setup()
   }
   CTG_PRINTLN(F("---SETUP COMPLETE---"));
 
+#if LED_ON
   LED1_Off; // Выключим светодиод
+#endif
 }
 
 void loop()

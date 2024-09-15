@@ -33,7 +33,9 @@ void getirl()
 
     if ((ledMode < 220) || (ledMode >= 230) || (demorun < 100))
     {
+#if LED_ON > 1
       LED2_Off; // Выключить светодиод
+#endif
 
       CTG_PRINT(F("Command: 0x"));
       CTG_PRINTLN_2(Command, HEX);

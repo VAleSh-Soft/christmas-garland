@@ -136,7 +136,7 @@ void top()
 void BtnHandler()
 {
 
-#if KEY_ON > 0
+#if defined(KEY_ON)
   {
     switch (btn1.getButtonState())
     {

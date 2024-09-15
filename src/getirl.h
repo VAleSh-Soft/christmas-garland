@@ -1,6 +1,10 @@
 
-//----------------- IR Receiver and Button Command Processing ---------------------------------------------
-#if (KEY_ON > 0)
+// ==== Работа с кнопками ============================
+#if defined(KEY_ON)
+
+void bootme();
+void meshwait();
+void getirl();
 
 void SetMode(uint8_t Mode)
 {
@@ -300,10 +304,10 @@ void getirl()
       case Command_Glitter: //  Включить/выключить сверкание
         if (Protocol == 1)
         { // отключить повтор
-          glitter = !glitter;
+          GLITTER = !GLITTER;
 #if LOG_ON == 1
           Serial.print(F("Glitter "));
-          Serial.println(glitter);
+          Serial.println(GLITTER);
 #endif
         }
         break;
@@ -313,10 +317,10 @@ void getirl()
       case Command_BackGround: //  Включить/выключить заполнение фона
         if (Protocol == 1)
         { // отключить повтор
-          background = !background;
+          BACKGROUND = !BACKGROUND;
 #if LOG_ON == 1
           Serial.print(F("BackGround "));
-          Serial.println(background);
+          Serial.println(BACKGROUND);
 #endif
         }
         break;
@@ -327,11 +331,11 @@ void getirl()
 #if CANDLE_KOL > 0
         if (Protocol == 1)
         { // отключить повтор
-          candle = !candle;
+          CANDLE = !CANDLE;
           PolCandle = random8(CANDLE_KOL);
 #if LOG_ON == 1
           Serial.print(F("Candle "));
-          Serial.println(candle);
+          Serial.println(CANDLE);
 #endif
         }
 #endif

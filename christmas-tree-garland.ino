@@ -10,6 +10,17 @@
 #include <EEPROM.h> // This is included with base install
 #endif
 
+// ===================================================
+
+void strobe_mode(uint8_t newMode, bool mc);
+void demo_check();
+
+#if LED_ON > 0
+void ledsFlash(uint8_t led_idx, uint8_t &count);
+#endif
+
+// ===================================================
+
 #if LED_ON > 0
 uint8_t Led1_flesh = 0x0; // Управление мигания светодиодом 1
 #if LED_ON > 1
@@ -17,7 +28,7 @@ uint8_t Led2_flesh = 0; // Управление мигания светодио�
 #endif
 #endif
 
-#if (KEY_ON > 0)
+#if defined(KEY_ON)
 uint8_t IR_New_Mode = 0;   // Выбор эффекта
 uint32_t IR_Time_Mode = 0; // время последнего нажатия
 #endif
@@ -107,9 +118,9 @@ typedef union
 
 ExtendedFlags ExtFlag; // Флаги расширенных настроек
 
-#define glitter ExtFlag.Glitter
-#define background ExtFlag.Background
-#define candle ExtFlag.Candle
+#define GLITTER ExtFlag.Glitter
+#define BACKGROUND ExtFlag.Background
+#define CANDLE ExtFlag.Candle
 
 uint8_t palchg = 3;       // Управление палитрой  3 - менять палитру автоматически иначе нет
 uint8_t startindex = 0;   // С какого цвета начинать. Переменная для эффектов one_sin_pal.
@@ -139,12 +150,6 @@ uint8_t rand_spark = 0;
 
 long summ = 0;
 
-void strobe_mode(uint8_t newMode, bool mc);
-void bootme();
-void meshwait();
-void getirl();
-void demo_check();
-
 // ==== Функции отображения ==========================
 
 // Функции поддержки
@@ -168,9 +173,12 @@ void demo_check();
 #include "src/fire.h"
 #include "src/candles.h"
 #include "src/colorwave.h"
-#include "src/getirl.h"
 
-#if RUNNING_FIRE == 1
+#if defined(KEY_ON)
+#include "src/getirl.h"
+#endif
+
+#if defined(RUNNING_FIRE)
 #include "src/running_fire.h"
 #endif
 
@@ -180,7 +188,7 @@ void setup()
 {
   pinMode(COLOR_ORDER_PIN, INPUT_PULLUP);
 
-#if KEY_ON > 0
+#if defined(KEY_ON)
   btn1.setVirtualClickOn(true);
   btn1.setLongClickMode(LCM_CLICKSERIES);
 #if KEY_ON > 1
@@ -387,7 +395,7 @@ void setup()
 void loop()
 {
 
-#if (KEY_ON > 0)
+#if defined(KEY_ON)
   getirl(); // Обработка кнопок
 #endif
 
@@ -497,25 +505,25 @@ void loop()
 #if TOP_LENGTH > 0
   top(); // Обработка конца гирлянды
 #endif
-  if (glitter)
+  if (GLITTER)
   {
     addglitter(10); // блеск, если включен
   }
 #if CANDLE_KOL > 0
-  if (candle)
+  if (CANDLE)
   {
     addcandle();
   }
 #endif
 
-  if (background)
+  if (BACKGROUND)
   {
     addbackground(); // Включить заполнение черного цвета фоном
   }
 
   BtnHandler(); // Обработчик нажатий кнопок
 
-#if ((KEY_ON > 0))
+#if defined(KEY_ON)
   if ((IR_Time_Mode > 0) && // Идет отчет времени
       ((millis() - IR_Time_Mode) >= 2000))
   { // И прошло больше 2 секунд
@@ -1194,3 +1202,64 @@ void demo_check()
     }
   }
 }
+
+#if LED_ON > 0
+// мигание светодиодом
+void ledsFlash(uint8_t led_idx, uint8_t &count)
+{
+#if LED_ON == 1
+  if (led_idx > 1)
+  {
+    return;
+  }
+#endif
+  if (led_idx > 2 || led_idx == 0)
+  {
+    return;
+  }
+
+  uint8_t _pin = (led_idx == 1) ? LED1_PIN : LED2_PIN;
+
+  if (count > 0)
+  {
+    count--;
+    if (count >= 128)
+    {
+      if (count & 8)
+      {
+        digitalWrite(_pin, HIGH);
+      }
+      else
+      {
+        digitalWrite(_pin, LOW);
+      }
+      if (count == 128)
+        count = 0;
+    }
+    else if (count >= 64)
+    {
+      if (count & 4)
+      {
+        digitalWrite(_pin, HIGH);
+      }
+      else
+      {
+        digitalWrite(_pin, LOW);
+      }
+      if (count == 64)
+        count = 0;
+    }
+    else
+    {
+      if (count & 2)
+      {
+        digitalWrite(_pin, HIGH);
+      }
+      else
+      {
+        digitalWrite(_pin, LOW);
+      }
+    }
+  }
+}
+#endif

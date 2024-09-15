@@ -6,7 +6,7 @@
  */
 
 // ==== Подключенная периферия =======================
-#define LED_ON 2 // Количество светодиодов (0- светодиоды не используются, максимум 2 светодиода
+#define LED_ON 0 // Количество светодиодов (0- светодиоды не используются, максимум 2 светодиода
 #define KEY_ON 3 // Количество кнопок подключенных к библиотеке shButton (0- библиотека отключена, максимум 4 кнопки)
 
 #define LOG_ON 0               // Включить отладочный вывод через Serial;  1 - включить лог, 0 - выключить
@@ -113,7 +113,7 @@
 
 // ==== Параметры кнопок =============================
 
-#if KEY_ON > 0
+#if defined(KEY_ON)
 #include <shButton.h> // https://github.com/VAleSh-Soft/shButton
 shButton btn1(BTN1_PIN);
 #if KEY_ON > 1
@@ -263,65 +263,3 @@ shButton btn4(BTN4_PIN);
 // Беззнаковый макрос вычитания. если результат меньше 0, то присвоить 0
 #define qsuba(x, b) ((x > b) ? x - b : 0)
 
-// ==== Функции ======================================
-
-#if LED_ON > 0
-// мигание светодиодом
-void ledsFlash(uint8_t led_idx, uint8_t &count)
-{
-#if LED_ON == 1
-  if (led_idx > 1)
-  {
-    return;
-  }
-#endif
-  if (led_idx > 2 || led_idx == 0)
-  {
-    return;
-  }
-
-  uint8_t _pin = (led_idx == 1) ? LED1_PIN : LED2_PIN;
-
-  if (count > 0)
-  {
-    count--;
-    if (count >= 128)
-    {
-      if (count & 8)
-      {
-        digitalWrite(_pin, HIGH);
-      }
-      else
-      {
-        digitalWrite(_pin, LOW);
-      }
-      if (count == 128)
-        count = 0;
-    }
-    else if (count >= 64)
-    {
-      if (count & 4)
-      {
-        digitalWrite(_pin, HIGH);
-      }
-      else
-      {
-        digitalWrite(_pin, LOW);
-      }
-      if (count == 64)
-        count = 0;
-    }
-    else
-    {
-      if (count & 2)
-      {
-        digitalWrite(_pin, HIGH);
-      }
-      else
-      {
-        digitalWrite(_pin, LOW);
-      }
-    }
-  }
-}
-#endif

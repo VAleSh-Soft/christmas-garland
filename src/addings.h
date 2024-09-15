@@ -154,7 +154,7 @@ void BtnHandler()
       Protocol = 1;
       Command = BTN1_2;
 #if LOG_ON == 1
-      Serial.println(F("BTN1 2Click"));
+      Serial.println(F("BTN1 DblClick"));
 #endif
 #if LED_ON > 0
       LED1_FleshH(2); // мигнуть 2 раза светодиодом 1
@@ -190,7 +190,7 @@ void BtnHandler()
       Protocol = 1;
       Command = BTN2_2;
 #if LOG_ON == 1
-      Serial.println(F("BTN2 2Click"));
+      Serial.println(F("BTN2 DblClick"));
 #endif
 #if LED_ON > 0
       LED1_FleshH(2); // мигнуть 2 раза светодиодом 1
@@ -226,7 +226,7 @@ void BtnHandler()
       Protocol = 1;
       Command = BTN3_2;
 #if LOG_ON == 1
-      Serial.println(F("BTN3 2Click"));
+      Serial.println(F("BTN3 DblClick"));
 #endif
 #if LED_ON > 0
       LED1_FleshH(2); // мигнуть 2 раза светодиодом 1
@@ -262,7 +262,7 @@ void BtnHandler()
       Protocol = 1;
       Command = BTN4_2;
 #if LOG_ON == 1
-      Serial.println(F("BTN4 2Click"));
+      Serial.println(F("BTN4 DblClick"));
 #endif
 #if LED_ON > 0
       LED1_FleshH(2); // мигнуть 2 раза светодиодом 1

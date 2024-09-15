@@ -11,8 +11,8 @@
 #define COLOR_ORDER_PIN 7 // Пин для переключателя очередности цвета светодиодов  RGB или GRB
 #define CHIPSET WS2812B   // Тип микросхемы светодиодов в гирлянде
 
-#define LED_DT 6 // Номер пина куда подключена гирлянда
-// #define LED_CK        11          // Номер пина для подключения тактов, применяется для светодиодов WS2801 или APA102
+#define LED_DATA_PIN 6 // Номер пина куда подключена гирлянда
+// #define LED_CLK_PIN 11 // Номер пина для подключения линии тактирования, применяется для светодиодов WS2801, APA102 и т.д.
 // ЕСЛИ НЕ ИСПОЛЬЗУЕТСЯ ЗАКОМЕНТИРОВАТЬ
 
 #define POWER_V 5   // напряжение блока питания в Вольтах
@@ -82,7 +82,7 @@
 #define SERIAL_BAUDRATE 115200 // Or 115200.
 
 // ==== Настройка эффектов ===========================
-//////////////////////////////////////////////////////////////////////////////////////
+//
 
 #define BLACKSTART 1 // Первый запуск делать с черного экрана 0- начинать с эффекта, 1- начинать с черного экрана
 
@@ -574,18 +574,18 @@ void setup()
 
   if (ExtFlag.RedGreen)
   {
-#if LED_CK
-    LEDS.addLeds<CHIPSET, LED_DT, LED_CK, RGB>(leds, MAX_LEDS);
+#if LED_CLK_PIN
+    LEDS.addLeds<CHIPSET, LED_DATA_PIN, LED_CLK_PIN, RGB>(leds, MAX_LEDS);
 #else
-    LEDS.addLeds<CHIPSET, LED_DT, RGB>(leds, MAX_LEDS); // Для светодиодов WS2812B
+    LEDS.addLeds<CHIPSET, LED_DATA_PIN, RGB>(leds, MAX_LEDS); // Для светодиодов WS2812B
 #endif
   }
   else
   {
-#if LED_CK
-    LEDS.addLeds<CHIPSET, LED_DT, LED_CK, GRB>(leds, MAX_LEDS);
+#if LED_CLK_PIN
+    LEDS.addLeds<CHIPSET, LED_DATA_PIN, LED_CLK_PIN, GRB>(leds, MAX_LEDS);
 #else
-    LEDS.addLeds<CHIPSET, LED_DT, GRB>(leds, MAX_LEDS); // Для светодиодов WS2812B
+    LEDS.addLeds<CHIPSET, LED_DATA_PIN, GRB>(leds, MAX_LEDS); // Для светодиодов WS2812B
 #endif
   }
 

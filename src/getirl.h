@@ -1,3 +1,8 @@
+#pragma once
+
+#if SAVE_EEPROM > 0
+#include "_eeprom.h"
+#endif
 
 // ==== Работа с кнопками ============================
 #if KEY_ON
@@ -224,11 +229,11 @@ void getirl()
           NUM_LEDS++; // Новое значение
 #if SAVE_EEPROM > 0
 #if MAX_LEDS < 255
-        EEPROM.write(STRANDLEN, NUM_LEDS); // Сохранить в память
-        EEPROM.write(STRANDLEN + 1, 0);    // Сохранить в память
+        write_eeprom_8(STRANDLEN, NUM_LEDS); // Сохранить в память
+        write_eeprom_8(STRANDLEN + 1, 0);    // Сохранить в память
 #else
-        EEPROM.write(STRANDLEN, (uint16_t)(NUM_LEDS) & 0x00ff); // Сохранить в память
-        EEPROM.write(STRANDLEN + 1, (uint16_t)(NUM_LEDS) >> 8); // Сохранить в память
+        write_eeprom_8(STRANDLEN, (uint16_t)(NUM_LEDS) & 0x00ff); // Сохранить в память
+        write_eeprom_8(STRANDLEN + 1, (uint16_t)(NUM_LEDS) >> 8); // Сохранить в память
 #endif
 #if !defined(__AVR__)
         EEPROM.commit();
@@ -249,11 +254,11 @@ void getirl()
           NUM_LEDS--; // Новое значение
 #if SAVE_EEPROM > 0
 #if MAX_LEDS < 255
-        EEPROM.write(STRANDLEN, NUM_LEDS); // Сохранить в память
-        EEPROM.write(STRANDLEN + 1, 0);    // Сохранить в память
+        write_eeprom_8(STRANDLEN, NUM_LEDS); // Сохранить в память
+        write_eeprom_8(STRANDLEN + 1, 0);    // Сохранить в память
 #else
-        EEPROM.write(STRANDLEN, (uint16_t)(NUM_LEDS) & 0x00ff); // Сохранить в память
-        EEPROM.write(STRANDLEN + 1, (uint16_t)(NUM_LEDS) >> 8); // Сохранить в память
+        write_eeprom_8(STRANDLEN, (uint16_t)(NUM_LEDS) & 0x00ff); // Сохранить в память
+        write_eeprom_8(STRANDLEN + 1, (uint16_t)(NUM_LEDS) >> 8); // Сохранить в память
 #endif
 #if !defined(__AVR__)
         EEPROM.commit();
@@ -957,7 +962,7 @@ void getirl()
         if (Protocol == 1)
         { // отключить повтор
 #if SAVE_EEPROM > 0
-          EEPROM.write(STARTMODE, ledMode);
+          write_eeprom_8(STARTMODE, ledMode);
 #if !defined(__AVR__)
           EEPROM.commit();
 #endif
@@ -976,7 +981,7 @@ void getirl()
         if (meshdelay > 0)
           meshdelay--; // Новое значение
 #if SAVE_EEPROM > 0
-        EEPROM.write(STRANDEL, meshdelay);
+        write_eeprom_8(STRANDEL, meshdelay);
 #if !defined(__AVR__)
         EEPROM.commit();
 #endif
@@ -996,7 +1001,7 @@ void getirl()
         if (meshdelay < 100)
           meshdelay++; // Новое значение
 #if SAVE_EEPROM > 0
-        EEPROM.write(STRANDEL, meshdelay);
+        write_eeprom_8(STRANDEL, meshdelay);
 #if !defined(__AVR__)
         EEPROM.commit();
 #endif
@@ -1201,16 +1206,16 @@ void getirl()
         //                                    SetOn(demorun);
 #if SAVE_EEPROM > 0
 #if MAX_LEDS < 255
-        EEPROM.write(STRANDLEN, NUM_LEDS); // Сохранить в память
-        EEPROM.write(STRANDLEN + 1, 0);    // Сохранить в память
+        write_eeprom_8(STRANDLEN, NUM_LEDS); // Сохранить в память
+        write_eeprom_8(STRANDLEN + 1, 0);    // Сохранить в память
 #else
-        EEPROM.write(STRANDLEN, (uint16_t)(NUM_LEDS) & 0x00ff); // Сохранить в память
-        EEPROM.write(STRANDLEN + 1, (uint16_t)(NUM_LEDS) >> 8); // Сохранить в память
+        write_eeprom_8(STRANDLEN, (uint16_t)(NUM_LEDS) & 0x00ff); // Сохранить в память
+        write_eeprom_8(STRANDLEN + 1, (uint16_t)(NUM_LEDS) >> 8); // Сохранить в память
 #endif
         if (ledMode == 221)
           ExtFlag.RedGreen = !ExtFlag.RedGreen;
 
-        EEPROM.write(EXTFLAG, ExtFlag.Byte); // сохраним в EPROM расширенные настройки
+        write_eeprom_8(EXTFLAG, ExtFlag.Byte); // сохраним в EPROM расширенные настройки
 #if !defined(__AVR__)
         EEPROM.commit();
 #endif

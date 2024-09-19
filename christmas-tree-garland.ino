@@ -6,14 +6,15 @@
 
 #include "setting.h"
 
-#if SAVE_EEPROM > 0
-#include <EEPROM.h> // This is included with base install
-#endif
-
 // ===================================================
 
 // Функции поддержки
 #include "src/addings.h"
+
+#if SAVE_EEPROM > 0
+#include "src/_eeprom.h"
+#endif
+
 
 // Эффекты
 #include "src/confetti_pal.h"
@@ -98,43 +99,43 @@ void setup()
 #if !defined(__AVR__)
   EEPROM.begin(ISINIT + 1);
 #endif
-  ledMode = EEPROM.read(STARTMODE);  // Расположение в EEPROM номера режима с которого будет старт (байт)
-  NUM_LEDS = EEPROM.read(STRANDLEN); // Расположение в EEPROM длины гирлянды (2 байта)
+  ledMode = read_eeprom_8(STARTMODE);  // Расположение в EEPROM номера режима с которого будет старт (байт)
+  NUM_LEDS = read_eeprom_8(STRANDLEN); // Расположение в EEPROM длины гирлянды (2 байта)
 #if MAX_LEDS < 255
-  if (EEPROM.read(STRANDLEN + 1)) // Почемуто светодиодов болше чем размер переменной
-    NUM_LEDS = MAX_LEDS;          // Need to ensure NUM_LEDS < MAX_LEDS elsewhere.
+  if (read_eeprom_8(STRANDLEN + 1)) // Если почемуто светодиодов болше чем размер переменной
+    NUM_LEDS = MAX_LEDS;          
 #else
-  NUM_LEDS += (uint16_t)EEPROM.read(STRANDLEN + 1) << 8; // Need to ensure NUM_LEDS < MAX_LEDS elsewhere.
+  NUM_LEDS += (uint16_t)read_eeprom_8(STRANDLEN + 1) << 8; 
 #endif
-  meshdelay = EEPROM.read(STRANDEL); // Расположение в EEPROM задержки (байт)
+  meshdelay = read_eeprom_8(STRANDEL); // Расположение в EEPROM задержки (байт)
 
 #if SAVE_EEPROM == 1
-  ExtFlag.Byte = EEPROM.read(EXTFLAG); // Прочитаем расширенные настройки
+  ExtFlag.Byte = read_eeprom_8(EXTFLAG); // Прочитаем расширенные настройки
 #else
   ExtFlag.Glitter = GLITER_ON;    // Флаг включения блеска
   ExtFlag.Background = BACKGR_ON; // Флаг включения заполнения фона
   ExtFlag.Candle = CANDLE_ON;     // Флаг включения свечей
 #endif
 
-  if ((EEPROM.read(ISINIT) != INITVAL) || // проверка правильности в EEPROM байта корректности записи
+  if ((read_eeprom_8(ISINIT) != INITVAL) || // проверка правильности в EEPROM байта корректности записи
       (NUM_LEDS > MAX_LEDS) ||
       ((ledMode > maxMode) && (ledMode != 100)))
   {                                    // Не корректен
-    EEPROM.write(STARTMODE, INITMODE); // сохраним в EEPROM номера режима с которого будет старт (байт)
+    write_eeprom_8(STARTMODE, INITMODE); // сохраним в EEPROM номера режима с которого будет старт (байт)
 #if MAX_LEDS < 255
-    EEPROM.write(STRANDLEN, INITLEN); // сохраним в EEPROM длины гирлянды (2 байта)
+    write_eeprom_8(STRANDLEN, INITLEN); // сохраним в EEPROM длины гирлянды (2 байта)
 #else
-    EEPROM.write(STRANDLEN, (uint16_t)(INITLEN) & 0x00ff);
-    EEPROM.write(STRANDLEN + 1, (uint16_t)(INITLEN) >> 8);
+    write_eeprom_8(STRANDLEN, (uint16_t)(INITLEN) & 0x00ff);
+    write_eeprom_8(STRANDLEN + 1, (uint16_t)(INITLEN) >> 8);
 #endif
-    EEPROM.write(STRANDEL, INITDEL); // сохраним в EPROM задержку (байт)
+    write_eeprom_8(STRANDEL, INITDEL); // сохраним в EPROM задержку (байт)
 
     ExtFlag.Glitter = GLITER_ON;         // Флаг включения блеска
     ExtFlag.Background = BACKGR_ON;      // Флаг включения заполнения фона
     ExtFlag.Candle = CANDLE_ON;          // Флаг включения свечей
-    EEPROM.write(EXTFLAG, ExtFlag.Byte); // сохраним в EPROM расширенные настройки
+    write_eeprom_8(EXTFLAG, ExtFlag.Byte); // сохраним в EPROM расширенные настройки
 
-    EEPROM.write(ISINIT, INITVAL); // сохраним в EEPROM байта корректности записи
+    write_eeprom_8(ISINIT, INITVAL); // сохраним в EEPROM байта корректности записи
 #if !defined(__AVR__)
     EEPROM.commit();
 #endif

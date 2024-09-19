@@ -406,15 +406,15 @@ void loop()
   }
 #endif
 
-  FastLED.show(); // Power managed display of LED's.
+  FastLED.show(); 
 }
 
 void strobe_mode(uint8_t mode, bool mc)
-{ // mc stands for 'Mode Change', where mc = 0 is strobe the routine, while mc = 1 is change the routine
+{ //mc == 0 - работа, mc == 1 - смена режима
 
   if (mc)
   {
-    fill_solid(leds, NUM_LEDS - TOP_LENGTH, CRGB(0, 0, 0)); // Clean up the array for the first time through. Don't show display though, so you may have a smooth transition.
+    fill_solid(leds, NUM_LEDS - TOP_LENGTH, CRGB(0, 0, 0)); // очистить гирлянду при смене режима
 
     CTG_PRINT(F("Mode: "));
     CTG_PRINTLN(mode);
@@ -430,7 +430,7 @@ void strobe_mode(uint8_t mode, bool mc)
   }
 
   switch (mode)
-  { // First time through a new mode, so let's initialize the variables for a given display.
+  { // При старте нового режима инициализируются его переменные
   case 0:
     if (mc)
     {
@@ -1074,7 +1074,7 @@ void demo_check()
 }
 
 #if LED_ON > 0
-// мигание светодиодом
+// мигание индикаторным светодиодом
 void ledsFlash(uint8_t led_idx, uint8_t &count)
 {
 #if LED_ON == 1

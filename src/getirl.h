@@ -52,6 +52,9 @@ void getirl()
       case Command_Brightness_plus: //  Увеличить максимальную яркость и остановится если достигли максимума
         max_bright = min((max_bright < 5) ? max_bright + 1 : max_bright / 2 * 3, 255);
         LEDS.setBrightness(max_bright);
+#if SAVE_EEPROM > 0
+        write_eeprom_8(EEPROM_INDEX_FOR_BRIGHT, max_bright);
+#endif
 
         CTG_PRINT(F("Brightness+ "));
         CTG_PRINTLN(max_bright);
@@ -66,6 +69,9 @@ void getirl()
         else
           max_bright = min((max_bright < 5) ? max_bright + 1 : max_bright / 2 * 3, 255);
         LEDS.setBrightness(max_bright);
+#if SAVE_EEPROM > 0
+        write_eeprom_8(EEPROM_INDEX_FOR_BRIGHT, max_bright);
+#endif
 
         CTG_PRINT(F("Brightness+ "));
         CTG_PRINTLN(max_bright);
@@ -77,6 +83,9 @@ void getirl()
       case Command_Brightness_minus: //  Уменьшить максимальную яркость и остановится если достигли максимума
         max_bright = max((max_bright < 5) ? max_bright - 1 : max_bright / 3 * 2, 1);
         LEDS.setBrightness(max_bright);
+#if SAVE_EEPROM > 0
+        write_eeprom_8(EEPROM_INDEX_FOR_BRIGHT, max_bright);
+#endif
 
         CTG_PRINT(F("Brightness- "));
         CTG_PRINTLN(max_bright);
@@ -91,6 +100,9 @@ void getirl()
         else
           max_bright = max((max_bright < 5) ? max_bright - 1 : max_bright / 3 * 2, 1);
         LEDS.setBrightness(max_bright);
+#if SAVE_EEPROM > 0
+        write_eeprom_8(EEPROM_INDEX_FOR_BRIGHT, max_bright);
+#endif
 
         CTG_PRINT(F("Brightness- "));
         CTG_PRINTLN(max_bright);
@@ -136,14 +148,13 @@ void getirl()
 
 #if Command_Start_Stop
       case Command_Start_Stop: //  Старт/Стоп
-        if (TestOff(demorun))
+        if (demorun >= 100)
         {
           SetOn(demorun);
           ledMode = newMode;
           LEDS.setBrightness(max_bright);
 
           CTG_PRINTLN(F("Start"));
-
         }
         else
         {
@@ -154,7 +165,6 @@ void getirl()
           FastLED.setBrightness(0);
 
           CTG_PRINTLN(F("Stop"));
-
         }
         break;
 #endif
@@ -229,14 +239,11 @@ void getirl()
           NUM_LEDS++; // Новое значение
 #if SAVE_EEPROM > 0
 #if MAX_LEDS < 255
-        write_eeprom_8(STRANDLEN, NUM_LEDS); // Сохранить в память
-        write_eeprom_8(STRANDLEN + 1, 0);    // Сохранить в память
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, NUM_LEDS); // Сохранить в память
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, 0);    // Сохранить в память
 #else
-        write_eeprom_8(STRANDLEN, (uint16_t)(NUM_LEDS) & 0x00ff); // Сохранить в память
-        write_eeprom_8(STRANDLEN + 1, (uint16_t)(NUM_LEDS) >> 8); // Сохранить в память
-#endif
-#if !defined(__AVR__)
-        EEPROM.commit();
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(NUM_LEDS) & 0x00ff); // Сохранить в память
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(NUM_LEDS) >> 8); // Сохранить в память
 #endif
 #endif
 
@@ -254,14 +261,11 @@ void getirl()
           NUM_LEDS--; // Новое значение
 #if SAVE_EEPROM > 0
 #if MAX_LEDS < 255
-        write_eeprom_8(STRANDLEN, NUM_LEDS); // Сохранить в память
-        write_eeprom_8(STRANDLEN + 1, 0);    // Сохранить в память
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, NUM_LEDS); // Сохранить в память
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, 0);    // Сохранить в память
 #else
-        write_eeprom_8(STRANDLEN, (uint16_t)(NUM_LEDS) & 0x00ff); // Сохранить в память
-        write_eeprom_8(STRANDLEN + 1, (uint16_t)(NUM_LEDS) >> 8); // Сохранить в память
-#endif
-#if !defined(__AVR__)
-        EEPROM.commit();
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(NUM_LEDS) & 0x00ff); // Сохранить в память
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(NUM_LEDS) >> 8); // Сохранить в память
 #endif
 #endif
 
@@ -278,7 +282,6 @@ void getirl()
           thisdir = thisdir * -1;
 
           CTG_PRINTLN(F("Rotate"));
-
         }
         break;
 #endif
@@ -313,7 +316,6 @@ void getirl()
 
           CTG_PRINT(F("Glitter "));
           CTG_PRINTLN(GLITTER);
-
         }
         break;
 #endif
@@ -326,7 +328,6 @@ void getirl()
 
           CTG_PRINT(F("BackGround "));
           CTG_PRINTLN(BACKGROUND);
-
         }
         break;
 #endif
@@ -341,7 +342,6 @@ void getirl()
 
           CTG_PRINT(F("Candle "));
           CTG_PRINTLN(CANDLE);
-
         }
 #endif
         break;
@@ -357,7 +357,6 @@ void getirl()
             SetMode(maxMode - 1);
 
           CTG_PRINTLN(F("Previous mode"));
-
         }
         break;
 #endif
@@ -373,7 +372,6 @@ void getirl()
           SetOn(demorun);
 
           CTG_PRINTLN(F("Previous mode + Demo"));
-
         }
         break;
 #endif
@@ -388,7 +386,6 @@ void getirl()
             SetMode(newMode + 1);
 
           CTG_PRINTLN(F("Next mode"));
-
         }
         break;
 #endif
@@ -404,7 +401,6 @@ void getirl()
           SetOn(demorun);
 
           CTG_PRINTLN(F("Next mode + Demo"));
-
         }
         break;
 #endif
@@ -418,7 +414,6 @@ void getirl()
 
           CTG_PRINT(F("Press 0 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -432,7 +427,6 @@ void getirl()
 
           CTG_PRINT(F("Press 1 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -446,7 +440,6 @@ void getirl()
 
           CTG_PRINT(F("Press 2 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -460,7 +453,6 @@ void getirl()
 
           CTG_PRINT(F("Press 3 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -474,7 +466,6 @@ void getirl()
 
           CTG_PRINT(F("Press 4 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -488,7 +479,6 @@ void getirl()
 
           CTG_PRINT(F("Press 5 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -502,7 +492,6 @@ void getirl()
 
           CTG_PRINT(F("Press 6 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -516,7 +505,6 @@ void getirl()
 
           CTG_PRINT(F("Press 7 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -530,7 +518,6 @@ void getirl()
 
           CTG_PRINT(F("Press 8 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -544,7 +531,6 @@ void getirl()
 
           CTG_PRINT(F("Press 9 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -560,7 +546,6 @@ void getirl()
 
           CTG_PRINT(F("Press +10 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -574,7 +559,6 @@ void getirl()
 
           CTG_PRINT(F("Press 0 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -588,7 +572,6 @@ void getirl()
 
           CTG_PRINT(F("Press 1 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -602,7 +585,6 @@ void getirl()
 
           CTG_PRINT(F("Press 2 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -616,7 +598,6 @@ void getirl()
 
           CTG_PRINT(F("Press 3 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -630,7 +611,6 @@ void getirl()
 
           CTG_PRINT(F("Press 4 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -644,7 +624,6 @@ void getirl()
 
           CTG_PRINT(F("Press 5 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -658,7 +637,6 @@ void getirl()
 
           CTG_PRINT(F("Press 6 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -672,7 +650,6 @@ void getirl()
 
           CTG_PRINT(F("Press 7 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -686,7 +663,6 @@ void getirl()
 
           CTG_PRINT(F("Press 8 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -700,7 +676,6 @@ void getirl()
 
           CTG_PRINT(F("Press 9 Mode: "));
           CTG_PRINTLN(IR_New_Mode);
-
         }
         break;
 #endif
@@ -962,10 +937,7 @@ void getirl()
         if (Protocol == 1)
         { // отключить повтор
 #if SAVE_EEPROM > 0
-          write_eeprom_8(STARTMODE, ledMode);
-#if !defined(__AVR__)
-          EEPROM.commit();
-#endif
+          write_eeprom_8(EEPROM_INDEX_FOR_STARTMODE, ledMode);
 
           CTG_PRINTLN(F("Save Mode"));
 
@@ -981,10 +953,7 @@ void getirl()
         if (meshdelay > 0)
           meshdelay--; // Новое значение
 #if SAVE_EEPROM > 0
-        write_eeprom_8(STRANDEL, meshdelay);
-#if !defined(__AVR__)
-        EEPROM.commit();
-#endif
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDEL, meshdelay);
 #endif
 
         CTG_PRINT(F("Delay "));
@@ -1001,10 +970,7 @@ void getirl()
         if (meshdelay < 100)
           meshdelay++; // Новое значение
 #if SAVE_EEPROM > 0
-        write_eeprom_8(STRANDEL, meshdelay);
-#if !defined(__AVR__)
-        EEPROM.commit();
-#endif
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDEL, meshdelay);
 #endif
 
         CTG_PRINT(F("Delay "));
@@ -1037,7 +1003,6 @@ void getirl()
 
           CTG_PRINT(F("Palette- "));
           CTG_PRINTLN(gCurrentPaletteNumber);
-
         }
         break;
 #endif
@@ -1055,7 +1020,6 @@ void getirl()
 
           CTG_PRINT(F("Palette+ "));
           CTG_PRINTLN(gCurrentPaletteNumber);
-
         }
         break;
 #endif
@@ -1184,7 +1148,7 @@ void getirl()
     }
     else
     { //        Режим настройки
-    
+
       CTG_PRINT(F("Setup Command: 0x"));
       CTG_PRINTLN_2(Command, HEX);
 
@@ -1202,22 +1166,21 @@ void getirl()
 #if Setup_Command_Setup_Mode_Off3
       case Setup_Command_Setup_Mode_Off3: //  Выйти из режима настройки
 #endif
-        //                                    ledMode = newMode;
-        //                                    SetOn(demorun);
+                                          //                                    ledMode = newMode;
+                                          //                                    SetOn(demorun);
 #if SAVE_EEPROM > 0
 #if MAX_LEDS < 255
-        write_eeprom_8(STRANDLEN, NUM_LEDS); // Сохранить в память
-        write_eeprom_8(STRANDLEN + 1, 0);    // Сохранить в память
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, NUM_LEDS); // Сохранить в память
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, 0);    // Сохранить в память
 #else
-        write_eeprom_8(STRANDLEN, (uint16_t)(NUM_LEDS) & 0x00ff); // Сохранить в память
-        write_eeprom_8(STRANDLEN + 1, (uint16_t)(NUM_LEDS) >> 8); // Сохранить в память
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(NUM_LEDS) & 0x00ff); // Сохранить в память
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(NUM_LEDS) >> 8); // Сохранить в память
 #endif
         if (ledMode == 221)
           ExtFlag.RedGreen = !ExtFlag.RedGreen;
 
-        write_eeprom_8(EXTFLAG, ExtFlag.Byte); // сохраним в EPROM расширенные настройки
-#if !defined(__AVR__)
-        EEPROM.commit();
+#if SAVE_EEPROM == 1
+        write_eeprom_8(EEPROM_INDEX_FOR_EXTFLAG, ExtFlag.Byte); // сохраним в EPROM расширенные настройки
 #endif
 #endif
 
@@ -1235,7 +1198,7 @@ void getirl()
       case Setup_Command_Length_Garland_plus: //  Увеличить количество светодиодов в гирлянде
         if (NUM_LEDS < MAX_LEDS)
           NUM_LEDS++; // Новое значение
-          
+
         CTG_PRINT(F("Length Garland Plus: "));
         CTG_PRINTLN(NUM_LEDS);
 
@@ -1293,7 +1256,7 @@ void getirl()
         ledMode = 220;              // Новое значение
 
         CTG_PRINTLN(F("Red Green Blue"));
-        
+
         break;
 #endif
 

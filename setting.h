@@ -226,6 +226,15 @@ shButton btn4(BTN4_PIN);
 #if KEY_ON == 4
 // ---- для четырех кнопок (BTN1 .. BTN4) ------------
 
+#define Command_Previous_mode_Demo BTN1_1   // Предыдущий эффект. Оставляет демонстрационный режим
+#define Command_Brightness_minus BTN1_PRESS // Уменьшить максимальную яркость и остановится если достигли минимума
+
+#define Command_Glitter BTN2_1 // Включить/выключить сверкание
+
+#define Command_Candle BTN3_1  // Включить/выключить свечки
+
+#define Command_Next_mode_Demo BTN4_1      // Следующий эффект. Оставляет демонстрационный режим
+#define Command_Brightness_plus BTN4_PRESS // Увеличить максимальную яркость и остановится если достигли максимума
 #endif
 
 #if LED_ON

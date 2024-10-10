@@ -201,40 +201,42 @@ shButton btn4(BTN4_PIN);
 #if KEY_ON == 2
 // ---- для двух кнопок (BTN1, BTN2) -----------------
 
-#define Command_Previous_mode_Demo BTN1_1   // Предыдущий эффект. Оставляет демонстрационный режим
-#define Command_Glitter BTN1_2              // Включить/выключить сверкание
-#define Command_Brightness_minus BTN1_PRESS // Уменьшить максимальную яркость и остановится если достигли минимума
+#define Command_Next_mode_Demo BTN1_1      // Следующий эффект. Оставляет демонстрационный режим
+#define Command_Candle BTN1_2              // Включить/выключить свечки
+#define Command_Brightness_plus BTN1_PRESS // Увеличить максимальную яркость и остановится если достигли максимума
 
-#define Command_Next_mode_Demo BTN2_1      // Следующий эффект. Оставляет демонстрационный режим
-#define Command_Candle BTN2_2              // Включить/выключить свечки
-#define Command_Brightness_plus BTN2_PRESS // Увеличить максимальную яркость и остановится если достигли максимума
+#define Command_Previous_mode_Demo BTN2_1   // Предыдущий эффект. Оставляет демонстрационный режим
+#define Command_Glitter BTN2_2              // Включить/выключить сверкание
+#define Command_Brightness_minus BTN2_PRESS // Уменьшить максимальную яркость и остановится если достигли минимума
 #endif
 
 #if KEY_ON == 3
 // ---- для трех кнопок (BTN1 .. BTN3) ---------------
 
-#define Command_Previous_mode_Demo BTN1_1   // Предыдущий эффект. Оставляет демонстрационный режим
-#define Command_Brightness_minus BTN1_PRESS // Уменьшить максимальную яркость и остановится если достигли минимума
+#define Command_Next_mode_Demo BTN1_1      // Следующий эффект. Оставляет демонстрационный режим
+#define Command_Brightness_plus BTN1_PRESS // Увеличить максимальную яркость и остановится если достигли максимума
 
-#define Command_Glitter BTN2_1 // Включить/выключить сверкание
-#define Command_Candle BTN2_2  // Включить/выключить свечки
+#define Command_Glitter BTN2_1        // Включить/выключить сверкание
+#define Command_Candle BTN2_2         // Включить/выключить свечки
+#define Command_Start_Stop BTN2_PRESS // Включить/выключить гирлянду
 
-#define Command_Next_mode_Demo BTN3_1      // Следующий эффект. Оставляет демонстрационный режим
-#define Command_Brightness_plus BTN3_PRESS // Увеличить максимальную яркость и остановится если достигли максимума
+#define Command_Previous_mode_Demo BTN3_1   // Предыдущий эффект. Оставляет демонстрационный режим
+#define Command_Brightness_minus BTN3_PRESS // Уменьшить максимальную яркость и остановится если достигли минимума
 #endif
 
 #if KEY_ON == 4
 // ---- для четырех кнопок (BTN1 .. BTN4) ------------
 
-#define Command_Previous_mode_Demo BTN1_1   // Предыдущий эффект. Оставляет демонстрационный режим
-#define Command_Brightness_minus BTN1_PRESS // Уменьшить максимальную яркость и остановится если достигли минимума
+#define Command_Next_mode_Demo BTN1_1      // Следующий эффект. Оставляет демонстрационный режим
+#define Command_Brightness_plus BTN1_PRESS // Увеличить максимальную яркость и остановится если достигли максимума
 
 #define Command_Glitter BTN2_1 // Включить/выключить сверкание
+#define Command_Start_Stop BTN2_PRESS // Включить/выключить гирлянду
 
-#define Command_Candle BTN3_1  // Включить/выключить свечки
+#define Command_Candle BTN3_1 // Включить/выключить свечки
 
-#define Command_Next_mode_Demo BTN4_1      // Следующий эффект. Оставляет демонстрационный режим
-#define Command_Brightness_plus BTN4_PRESS // Увеличить максимальную яркость и остановится если достигли максимума
+#define Command_Previous_mode_Demo BTN4_1   // Следующий эффект. Оставляет демонстрационный режим
+#define Command_Brightness_minus BTN4_PRESS // Увеличить максимальную яркость и остановится если достигли максимума
 #endif
 
 #if LED_ON

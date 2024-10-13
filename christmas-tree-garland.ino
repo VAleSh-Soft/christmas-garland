@@ -399,17 +399,6 @@ void loop()
 
   BtnHandler(); // Обработчик нажатий кнопок
 
-#if KEY_ON
-  if ((IR_Time_Mode > 0) && // Идет отчет времени
-      ((millis() - IR_Time_Mode) >= 2000))
-  { // И прошло больше 2 секунд
-    IR_Time_Mode = 0;
-    if (IR_New_Mode <= maxMode)
-      SetMode(IR_New_Mode);
-    IR_New_Mode = 0;
-  }
-#endif
-
   FastLED.show(); 
 }
 

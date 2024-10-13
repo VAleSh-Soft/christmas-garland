@@ -267,9 +267,9 @@ shButton btn4(BTN4_PIN);
 // ==== Переменные ===================================
 
 // Установить флаг OFF
-void SetOff(uint8_t x);
+void SetOff(uint8_t &x);
 // Установить флаг ON
-void SetOn(uint8_t x);
+void SetOn(uint8_t &x);
 
 int qsubd(size_t x, size_t b);
 int qsuba(size_t x, size_t b);
@@ -399,13 +399,13 @@ long summ = 0;
 
 // ===================================================
 
-void SetOff(uint8_t x)
+void SetOff(uint8_t &x)
 {
   if (x < 100)
     x += 100;
 }
 
-void SetOn(uint8_t x)
+void SetOn(uint8_t &x)
 {
   if (x >= 100)
     x -= 100;

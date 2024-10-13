@@ -80,7 +80,7 @@ void getirl()
 #endif
 
 #if Command_Brightness_minus
-      case Command_Brightness_minus: //  Уменьшить максимальную яркость и остановится если достигли максимума
+      case Command_Brightness_minus: //  Уменьшить максимальную яркость и остановится если достигли минимума
         max_bright = max((max_bright < 5) ? max_bright - 1 : max_bright / 3 * 2, 1);
         LEDS.setBrightness(max_bright);
 #if SAVE_EEPROM > 0
@@ -1156,18 +1156,18 @@ void getirl()
       {
 
 #if Setup_Command_Setup_Mode_Off
-      case Setup_Command_Setup_Mode_Off: //  Выйти из режима настройки
+      case Setup_Command_Setup_Mode_Off: // Выйти из режима настройки
 #if Setup_Command_Setup_Mode_Off1
-      case Setup_Command_Setup_Mode_Off1: //  Выйти из режима настройки
+      case Setup_Command_Setup_Mode_Off1: // Выйти из режима настройки
 #endif
 #if Setup_Command_Setup_Mode_Off2
-      case Setup_Command_Setup_Mode_Off2: //  Выйти из режима настройки
+      case Setup_Command_Setup_Mode_Off2: // Выйти из режима настройки
 #endif
 #if Setup_Command_Setup_Mode_Off3
-      case Setup_Command_Setup_Mode_Off3: //  Выйти из режима настройки
+      case Setup_Command_Setup_Mode_Off3: // Выйти из режима настройки
 #endif
-                                          //                                    ledMode = newMode;
-                                          //                                    SetOn(demorun);
+                                          // ledMode = newMode;
+                                          // SetOn(demorun);
 #if SAVE_EEPROM > 0
 #if MAX_LEDS < 255
         write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, NUM_LEDS); // Сохранить в память

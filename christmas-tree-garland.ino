@@ -61,20 +61,27 @@ void setup()
   pinMode(COLOR_ORDER_PIN, INPUT_PULLUP);
 #endif
 
-#if KEY_ON
+#if KEY_ON > 0
   btn1.setVirtualClickOn(true);
   btn1.setLongClickMode(LCM_CLICKSERIES);
 #if KEY_ON > 1
   btn2.setVirtualClickOn(true);
-  btn2.setLongClickMode(LCM_CLICKSERIES);
 #endif
 #if KEY_ON > 2
   btn3.setVirtualClickOn(true);
-  btn3.setLongClickMode(LCM_CLICKSERIES);
 #endif
 #if KEY_ON > 3
   btn4.setVirtualClickOn(true);
+#endif
+#if KEY_ON == 2
+  btn2.setLongClickMode(LCM_CLICKSERIES);
+#elif KEY_ON == 3
+  btn3.setLongClickMode(LCM_CLICKSERIES);
+  btn2.setLongClickMode(LCM_ONLYONCE);
+#elif KEY_ON > 3
   btn4.setLongClickMode(LCM_CLICKSERIES);
+  btn2.setLongClickMode(LCM_ONLYONCE);
+  btn3.setLongClickMode(LCM_ONLYONCE);
 #endif
 #endif
 

@@ -1,6 +1,8 @@
 #ifndef ADDINGS_H
 #define ADDINGS_H
 
+#include "_leds.h"
+
 #if CANDLE_KOL > 0
 // ==== Свечи ========================================
 DEFINE_GRADIENT_PALETTE(candle_Pal){
@@ -23,7 +25,7 @@ void addcandle()
     for (uint16_t x = 0; x < kol; x++)
     {
       if (poz < NUM_LEDS)
-        leds[poz] = ColorFromPalette(myPal, random8(255));
+        leds[poz] = set_new_eorder(ColorFromPalette(myPal, random8(255)));
       poz += CANDLE_KOL;
     }
   }
@@ -85,8 +87,8 @@ void sparkler(uint8_t n) // Бенгальский огонь
       break; // 1 яркий
     case 3:
       leds[KolLed] = CRGB::White;
-      leds[KolLed - 1] = CRGB::Red;
-      leds[KolLed - 2] = CRGB::Violet;
+      leds[KolLed - 1] = set_new_eorder(CRGB::Red);
+      leds[KolLed - 2] = set_new_eorder(CRGB::Violet);
       break; // Метеорит
     }
   }
@@ -97,7 +99,7 @@ void sparkler(uint8_t n) // Бенгальский огонь
 void top()
 {
 #if TOP_EFFECT == 0
-  fill_solid(&leds[NUM_LEDS - TOP_LENGTH], TOP_LENGTH, TOP_COLOR);
+  fill_solid(&leds[NUM_LEDS - TOP_LENGTH], TOP_LENGTH, set_new_eorder(TOP_COLOR));
 #else
 #if MAX_LEDS < 255
   static uint8_t x;
@@ -110,22 +112,22 @@ void top()
   { // Sets the original delay time.
 #if TOP_EFFECT == 1
 #if TOP_LENGTH < 255
-    leds[NUM_LEDS - TOP_LENGTH + random8(0, TOP_LENGTH)] = TOP_COLOR;
+    leds[NUM_LEDS - TOP_LENGTH + random8(0, TOP_LENGTH)] = set_new_eorder(TOP_COLOR);
 #else
-    leds[NUM_LEDS - TOP_LENGTH + random16(0, TOP_LENGTH)] = TOP_COLOR;
+    leds[NUM_LEDS - TOP_LENGTH + random16(0, TOP_LENGTH)] = set_new_eorder(TOP_COLOR);
 #endif
 #elif TOP_EFFECT == 2
     if ((x <= NUM_LEDS - TOP_LENGTH) || (x >= NUM_LEDS))
       x = NUM_LEDS - 1;
     else
       x--;
-    leds[x] = TOP_COLOR;
+    leds[x] = set_new_eorder(TOP_COLOR);
 #else
     if ((x < NUM_LEDS - TOP_LENGTH) || (x >= NUM_LEDS - 1))
       x = NUM_LEDS - TOP_LENGTH;
     else
       x++;
-    leds[x] = TOP_COLOR;
+    leds[x] = set_new_eorder(TOP_COLOR);
 #endif
   }
 #endif

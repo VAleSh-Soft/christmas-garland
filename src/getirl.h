@@ -775,7 +775,7 @@ void getirl()
         SetOff(demorun);
         ledMode = 255;
         palchg = 0;
-        solid = CRGB::Red;
+        solid = set_new_eorder(CRGB::Red);
 
         CTG_PRINTLN(F("Solid_Red"));
 
@@ -787,7 +787,7 @@ void getirl()
         SetOff(demorun);
         ledMode = 255;
         palchg = 0;
-        solid = CRGB::Orange;
+        solid = set_new_eorder(CRGB::Orange);
 
         CTG_PRINTLN(F("Solid_Orange"));
 
@@ -799,7 +799,7 @@ void getirl()
         SetOff(demorun);
         ledMode = 255;
         palchg = 0;
-        solid = CRGB::Yellow;
+        solid = set_new_eorder(CRGB::Yellow);
 
         CTG_PRINTLN(F("Solid_Yellow"));
 
@@ -811,7 +811,7 @@ void getirl()
         SetOff(demorun);
         ledMode = 255;
         palchg = 0;
-        solid = CRGB::Green;
+        solid = set_new_eorder(CRGB::Green);
 
         CTG_PRINTLN(F("Solid_Green"));
 
@@ -823,7 +823,7 @@ void getirl()
         SetOff(demorun);
         ledMode = 255;
         palchg = 0;
-        solid = CRGB::SkyBlue;
+        solid = set_new_eorder(CRGB::SkyBlue);
 
         CTG_PRINTLN(F("Solid_SkyBlue"));
 
@@ -835,7 +835,7 @@ void getirl()
         SetOff(demorun);
         ledMode = 255;
         palchg = 0;
-        solid = CRGB::Blue;
+        solid = set_new_eorder(CRGB::Blue);
 
         CTG_PRINTLN(F("Solid_Blue"));
 
@@ -847,7 +847,7 @@ void getirl()
         SetOff(demorun);
         ledMode = 255;
         palchg = 0;
-        solid = CRGB::Violet;
+        solid = set_new_eorder(CRGB::Violet);
 
         CTG_PRINTLN(F("Solid_Violet"));
 

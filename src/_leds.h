@@ -23,7 +23,7 @@ struct CRGB leds[MAX_LEDS]; // инициализация массива све�
 
 CRGBPalette16 gCurrentPalette; // Использование палитры вместо прямых назначений CHSV или CRGB.
 CRGBPalette16 gTargetPalette;  // Поддержка плавной смены палитры
-CRGB solid = CRGB::Black;      // Цвет закраски
+CRGB solid = CRGB::Black;      // Цвет заливки
 
 extern const TProgmemRGBGradientPalettePtr gGradientPalettes[]; // для фиксированных палитр в gradient_palettes.h.
 
@@ -89,6 +89,7 @@ CRGB set_new_eorder(CRGB _col)
 #endif
 }
 
+// инициализация FastLED
 void fastled_init()
 {
 #if defined(EORDER)
@@ -112,6 +113,7 @@ void fastled_init()
   LEDS.setMaxPowerInVoltsAndMilliamps(5, 500);
 }
 
+// вывод цветности гирлянды в Сериал
 void print_eorder()
 {
   CTG_PRINT(F("LEDS EORDER: "));

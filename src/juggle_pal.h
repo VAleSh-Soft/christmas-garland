@@ -1,6 +1,8 @@
 #ifndef JUGGLE_PAL_H
 #define JUGGLE_PAL_H
 
+#include "_leds.h"
+
 /* This is adapted from a routine created by Mark Kriegsman */
 
 /*  Usage - juggle_pal();
@@ -23,7 +25,11 @@ void juggle_pal()
     fadeToBlackBy(leds, KolLed, thisfade); // Затухание к черному
     for (uint8_t i = 0; i < numdots; i++)
     {
-      leds[beatsin16(thisbeat + i + numdots, 0, KolLed - 1)] += ColorFromPalette(gCurrentPalette, thisindex, 255, currentBlending); // Munge the values and pick a colour from the palette
+      leds[beatsin16(thisbeat + i + numdots, 0, KolLed - 1)] +=
+          set_new_eorder(ColorFromPalette(gCurrentPalette,
+                                          thisindex,
+                                          255,
+                                          currentBlending)); // Munge the values and pick a colour from the palette
       thisindex += thisdiff;
     }
   }

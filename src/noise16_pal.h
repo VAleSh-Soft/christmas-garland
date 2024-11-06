@@ -1,6 +1,8 @@
 #ifndef NOISE16_PAL_H
 #define NOISE16_PAL_H
 
+#include "_leds.h"
+
 // noise16 variables -----------------------------------------------------------------------
 
 uint32_t x, hue_time;    // x & hue_time values

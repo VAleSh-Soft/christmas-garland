@@ -1,6 +1,8 @@
 #ifndef RUNNING_FIRE_H
 #define RUNNING_FIRE_H
 
+#include "_leds.h"
+
 const PROGMEM uint8_t prog_run_fire[] = {PROG_RUN_FIRE};    // массив программ
 const uint16_t prog_run_fire_count = sizeof(prog_run_fire); // размер программы
 
@@ -69,7 +71,7 @@ void running_fire(uint8_t prog, uint8_t effect, uint8_t clear)
       if (!tek_clear)
         leds[i] = CRGB::Black;               // очистим
       if (tek_bit & (0x01 << (i % kol_bit))) // установим
-        leds[i] = ColorFromPalette(gCurrentPalette, x, 255, currentBlending);
+        leds[i] = set_new_eorder(ColorFromPalette(gCurrentPalette, x, 255, currentBlending));
     }
   }
   if (tek_step2 < 10)

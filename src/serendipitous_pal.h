@@ -1,6 +1,8 @@
 #ifndef SERENDIPITOUS_PAL_H
 #define SERENDIPITOUS_PAL_H
 
+#include "_leds.h"
+
 /*  This is from Serendipitous Circles from the August 1977 and April 1978 issues of Byte Magazine. I didn't do a very good job of it, but am at least getting some animation and the routine is very short.
  */
 
@@ -36,7 +38,7 @@ void serendipitous_pal()
   if (KolLed >= 10)
   {
     thisindex = (sin8(X) + cos8(Y)) / 2;
-    leds[X % (KolLed)] = ColorFromPalette(gCurrentPalette, thisindex, 255, currentBlending);
+    leds[X % (KolLed)] = set_new_eorder(ColorFromPalette(gCurrentPalette, thisindex, 255, currentBlending));
     fadeToBlackBy(leds, KolLed, 16); // 8 bit, 1 = slow, 255 = fast
   }
 } // serendipitous_pal()

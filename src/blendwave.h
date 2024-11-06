@@ -1,6 +1,8 @@
 #ifndef BLENDWARE_H
 #define BLENDWARE_H
 
+#include "_leds.h"
+
 void blendwave()
 {
   CRGB clr1;
@@ -26,8 +28,8 @@ void blendwave()
     loc1 = beatsin16(10, 0, KolLed - 1);
 #endif
 
-    fill_gradient_RGB(leds, 0, clr2, loc1, clr1);
-    fill_gradient_RGB(leds, loc1, clr2, KolLed - 1, clr1);
+    fill_gradient_RGB(leds, 0, set_new_eorder(clr2), loc1, set_new_eorder(clr1));
+    fill_gradient_RGB(leds, loc1, set_new_eorder(clr2), KolLed - 1, set_new_eorder(clr1));
   }
 } // blendwave()
 

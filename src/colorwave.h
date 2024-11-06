@@ -1,6 +1,8 @@
 #ifndef COLORWAVE_H
 #define COLORWAVE_H
 
+#include "_leds.h"
+
 // ColorWavesWithPalettes
 // Animated shifting color waves, with several cross-fading color palettes.
 // by Mark Kriegsman, August 2015
@@ -67,7 +69,7 @@ void colorwaves()
       // index = triwave8( index);
       index = scale8(index, 240);
 
-      CRGB newcolor = ColorFromPalette(gCurrentPalette, index, bri8);
+      CRGB newcolor = set_new_eorder(ColorFromPalette(gCurrentPalette, index, bri8));
       if (thisdir == 1) // направление
         nblend(leds[(KolLed - 1) - i], newcolor, 128);
       else

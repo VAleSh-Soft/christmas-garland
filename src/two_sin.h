@@ -1,6 +1,7 @@
 #ifndef TWO_SIN_H
 #define TWO_SIN_H
 
+#include "_leds.h"
 /* Usage - two_sin();
  *
  * Loads of variables to play with
@@ -36,8 +37,8 @@ void two_sin()
       int thisbright = qsuba(cubicwave8((k * allfreq) + thisphase), thiscutoff);       // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
       int thatbright = qsuba(cubicwave8((k * allfreq) + 128 + thatphase), thatcutoff); // This wave is 180 degrees out of phase (with the value of 128).
 
-      leds[k] = ColorFromPalette(gCurrentPalette, thishue, thisbright, currentBlending);
-      leds[k] += ColorFromPalette(gCurrentPalette, thathue, thatbright, currentBlending);
+      leds[k] = set_new_eorder(ColorFromPalette(gCurrentPalette, thishue, thisbright, currentBlending));
+      leds[k] += set_new_eorder(ColorFromPalette(gCurrentPalette, thathue, thatbright, currentBlending));
     }
   }
 } // two_sin()

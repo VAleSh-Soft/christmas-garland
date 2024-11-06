@@ -1,6 +1,8 @@
 #ifndef THREE_SIN_PAL_H
 #define THREE_SIN_PAL_H
 
+#include "_leds.h"
+
 // three_sin_pal variables ---------------------------------------------------------------------
 
 int wave1;
@@ -28,7 +30,7 @@ void three_sin_pal()
     for (k = 0; k < KolLed; k++)
     {
       uint8_t tmp = sin8(mul1 * k + wave1) + sin8(mul1 * k + wave2) + sin8(mul1 * k + wave3);
-      leds[k] = ColorFromPalette(gCurrentPalette, tmp, 255, currentBlending);
+      leds[k] = set_new_eorder(ColorFromPalette(gCurrentPalette, tmp, 255, currentBlending));
     }
   }
 } // three_sin_pal()

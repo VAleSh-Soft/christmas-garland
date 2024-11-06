@@ -1,6 +1,8 @@
 #ifndef MATRIX_PAL_H
 #define MATRIX_PAL_H
 
+#include "_leds.h"
+
 /* Usage - matrix_pal();
  *
  *  This is one of the few routines I have with pixel counting.
@@ -27,16 +29,16 @@ void matrix_pal()
     if (random8(90) > 80)
     {
       if (thisdir == -1)
-        leds[0] = ColorFromPalette(gCurrentPalette, thisindex, 255, currentBlending); // Foreground matrix colour
+        leds[0] = set_new_eorder(ColorFromPalette(gCurrentPalette, thisindex, 255, currentBlending)); // Foreground matrix colour
       else
-        leds[KolLed - 1] = ColorFromPalette(gCurrentPalette, thisindex, 255, currentBlending);
+        leds[KolLed - 1] = set_new_eorder(ColorFromPalette(gCurrentPalette, thisindex, 255, currentBlending));
     }
     else
     {
       if (thisdir == -1)
-        leds[0] = CHSV(bgclr, 255, bgbri); // Background colour
+        leds[0] = set_new_eorder(CHSV(bgclr, 255, bgbri)); // Background colour
       else
-        leds[KolLed - 1] = CHSV(bgclr, 255, bgbri);
+        leds[KolLed - 1] = set_new_eorder(CHSV(bgclr, 255, bgbri));
     }
 
 #if MAX_LEDS < 255

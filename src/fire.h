@@ -1,6 +1,8 @@
 #ifndef FIRE_H
 #define FIRE_H
 
+#include "_leds.h"
+
 void fire()
 { // The fill_rainbow call doesn't support brightness levels
   if (KolLed >= 10)
@@ -35,13 +37,13 @@ void fire()
 #endif
 
 #if (TOP_POSITION == 0) || (TOP_POSITION == 2)
-      fill_gradient_RGB(leds, 0, CRGB::White, k1, CRGB::Yellow); // Градинет
-      fill_gradient_RGB(leds, k1, CRGB::Yellow, k2, CRGB::Red);
-      fill_gradient_RGB(leds, k2, CRGB::Red, k3, CRGB::Black);
+      fill_gradient_RGB(leds, 0, set_new_eorder(CRGB::White), k1, set_new_eorder(CRGB::Yellow)); // Градинет
+      fill_gradient_RGB(leds, k1, set_new_eorder(CRGB::Yellow), k2, set_new_eorder(CRGB::Red));
+      fill_gradient_RGB(leds, k2, set_new_eorder(CRGB::Red), k3, set_new_eorder(CRGB::Black));
       if (k3 < k4)
-        fill_gradient_RGB(leds, k3, CRGB::Black, k4, CRGB::Black);
+        fill_gradient_RGB(leds, k3, set_new_eorder(CRGB::Black), k4, set_new_eorder(CRGB::Black));
       for (uint8_t y = 0; y < x; y++)
-        leds[random16(k2, KolLed - 1)] = CRGB::Red;
+        leds[random16(k2, KolLed - 1)] = set_new_eorder(CRGB::Red);
 #endif
 
 #if TOP_POSITION == 0
@@ -62,13 +64,13 @@ void fire()
       k3 = KolLed - 1 - k3;
 #endif
 
-      fill_gradient_RGB(leds, k1, CRGB::White, k4, CRGB::Yellow); // Градиент
-      fill_gradient_RGB(leds, k2, CRGB::Yellow, k1, CRGB::Red);
-      fill_gradient_RGB(leds, k3, CRGB::Red, k2, CRGB::Black);
+      fill_gradient_RGB(leds, k1, set_new_eorder(CRGB::White), k4, set_new_eorder(CRGB::Yellow)); // Градиент
+      fill_gradient_RGB(leds, k2, set_new_eorder(CRGB::Yellow), k1, set_new_eorder(CRGB::Red));
+      fill_gradient_RGB(leds, k3, set_new_eorder(CRGB::Red), k2, set_new_eorder(CRGB::Black));
       if (k3 > 0)
-        fill_gradient_RGB(leds, 0, CRGB::Black, k3, CRGB::Black);
+        fill_gradient_RGB(leds, 0,set_new_eorder( CRGB::Black), k3, set_new_eorder(CRGB::Black));
       for (uint8_t y = 0; y < x; y++)
-        leds[random16(k2)] = CRGB::Red;
+        leds[random16(k2)] = set_new_eorder(CRGB::Red);
 #endif
 
 #if TOP_POSITION == 0

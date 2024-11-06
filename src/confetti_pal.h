@@ -1,6 +1,8 @@
 #ifndef CONFETTI_PAL_H
 #define CONFETTI_PAL_H
 
+#include "_leds.h"
+
 /* This is adapted from the confetti routine created by Mark Kriegsman */
 
 /*  Usage - confetti_pal();
@@ -24,8 +26,11 @@ void confetti_pal()
 #else
     uint16_t pos = random16(KolLed);
 #endif
-    leds[pos] = ColorFromPalette(gCurrentPalette, thisindex + random8(thisdiff) / 4, 255, currentBlending); // Munge the values and pick a colour from the palette
-    thisindex = thisindex + thisinc;                                                                        // base palette counter increments here.
+    leds[pos] = set_new_eorder(ColorFromPalette(gCurrentPalette,
+                                                thisindex + random8(thisdiff) / 4,
+                                                255,
+                                                currentBlending)); // Munge the values and pick a colour from the palette
+    thisindex = thisindex + thisinc;                               // base palette counter increments here.
   }
 } // confetti_pal()
 

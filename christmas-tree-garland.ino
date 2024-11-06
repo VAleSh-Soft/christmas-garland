@@ -850,12 +850,12 @@ void strobe_mode(uint8_t mode, bool mc)
   case 220:
     fill_solid(leds, MAX_LEDS, CRGB::Black);
     fill_solid(leds, NUM_LEDS, CRGB(255, 255, 255));
-    leds[0] = CRGB::Red;
+    leds[0] = set_new_eorder(CRGB::Red);
     break; // Зажечь гирлянду длиной NUM_LEDS (регулировка длины гирлянды)
   case 221:
     fill_solid(leds, MAX_LEDS, CRGB::Black);
     fill_solid(leds, NUM_LEDS, CRGB(255, 255, 255));
-    leds[0] = CRGB::Green;
+    leds[0] = set_new_eorder(CRGB::Green);
     break; // Зажечь гирлянду длиной NUM_LEDS (регулировка длины гирлянды)
   case 255:
     if (mc)

@@ -136,7 +136,7 @@ void top()
 void BtnHandler()
 {
 
-#if KEY_ON
+#if BUTTONS_NUM
   {
     switch (btn1.getButtonState())
     {
@@ -172,7 +172,7 @@ void BtnHandler()
       break;
     }
   }
-#if KEY_ON > 1
+#if BUTTONS_NUM > 1
   {
     switch (btn2.getButtonState())
     {
@@ -208,7 +208,7 @@ void BtnHandler()
       break;
     }
   }
-#if KEY_ON > 2
+#if BUTTONS_NUM > 2
   {
     switch (btn3.getButtonState())
     {
@@ -244,7 +244,7 @@ void BtnHandler()
       break;
     }
   }
-#if KEY_ON > 3
+#if BUTTONS_NUM > 3
   {
     switch (btn4.getButtonState())
     {

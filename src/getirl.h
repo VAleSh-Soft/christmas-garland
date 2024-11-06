@@ -5,7 +5,7 @@
 #endif
 
 // ==== Работа с кнопками ============================
-#if KEY_ON
+#if BUTTONS_NUM
 
 void bootme();
 void meshwait();
@@ -114,7 +114,7 @@ void getirl()
       case Command_Reset: //  Сброс всех настроек
         ledMode = 0;
         strobe_mode(ledMode, 1);
-        FastLED.show();
+        LEDS.show();
         bootme();
 
         CTG_PRINTLN(F("Reset"));
@@ -128,7 +128,7 @@ void getirl()
         ledMode = 255;
         palchg = 0;
         solid = CRGB::Black;
-        FastLED.setBrightness(0);
+        LEDS.setBrightness(0);
 
         CTG_PRINTLN(F("Stop"));
 
@@ -162,7 +162,7 @@ void getirl()
           ledMode = 255;
           palchg = 0;
           solid = CRGB::Black;
-          FastLED.setBrightness(0);
+          LEDS.setBrightness(0);
 
           CTG_PRINTLN(F("Stop"));
         }
@@ -312,10 +312,10 @@ void getirl()
       case Command_Glitter: //  Включить/выключить сверкание
         if (Protocol == 1)
         { // отключить повтор
-          GLITTER = !GLITTER;
+          ExtFlag.Glitter = !ExtFlag.Glitter;
 
           CTG_PRINT(F("Glitter "));
-          CTG_PRINTLN(GLITTER);
+          CTG_PRINTLN(ExtFlag.Glitter);
         }
         break;
 #endif
@@ -324,10 +324,10 @@ void getirl()
       case Command_BackGround: //  Включить/выключить заполнение фона
         if (Protocol == 1)
         { // отключить повтор
-          BACKGROUND = !BACKGROUND;
+          ExtFlag.Background = !ExtFlag.Background;
 
           CTG_PRINT(F("BackGround "));
-          CTG_PRINTLN(BACKGROUND);
+          CTG_PRINTLN(ExtFlag.Background);
         }
         break;
 #endif
@@ -337,11 +337,11 @@ void getirl()
 #if CANDLE_KOL > 0
         if (Protocol == 1)
         { // отключить повтор
-          CANDLE = !CANDLE;
+          ExtFlag.Candle = !ExtFlag.Candle;
           PolCandle = random8(CANDLE_KOL);
 
           CTG_PRINT(F("Candle "));
-          CTG_PRINTLN(CANDLE);
+          CTG_PRINTLN(ExtFlag.Candle);
         }
 #endif
         break;
@@ -901,8 +901,6 @@ void getirl()
         write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(NUM_LEDS) & 0x00ff); // Сохранить в память
         write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(NUM_LEDS) >> 8); // Сохранить в память
 #endif
-        if (ledMode == 221)
-          ExtFlag.RedGreen = !ExtFlag.RedGreen;
 
 #if SAVE_EEPROM == 1
         write_eeprom_8(EEPROM_INDEX_FOR_EXTFLAG, ExtFlag.Byte); // сохраним в EPROM расширенные настройки
@@ -910,10 +908,9 @@ void getirl()
 #endif
 
         CTG_PRINTLN(F("Setup Mode Off "));
-        CTG_PRINT(F("Led:"));
+        CTG_PRINT(F("Leds num: "));
         CTG_PRINTLN(NUM_LEDS);
-        CTG_PRINT(F("RGB:"));
-        CTG_PRINTLN(ExtFlag.RedGreen);
+        print_eorder();
         CTG_PRINTLN(F("Reset "));
 
         bootme();
@@ -1017,7 +1014,7 @@ void meshwait()
   CTG_PRINT(meshdelay * 100);
   CTG_PRINTLN(F("ms delay."));
 
-  FastLED.delay(meshdelay * 100); // Here's our notamesh wait upon keypress. Oh god I'm so sorry there's a delay statement here. At least it's only used upon mode change keypress.
+  LEDS.delay(meshdelay * 100); // Here's our notamesh wait upon keypress. Oh god I'm so sorry there's a delay statement here. At least it's only used upon mode change keypress.
 
 } // meshwait()
 

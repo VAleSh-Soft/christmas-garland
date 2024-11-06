@@ -5,6 +5,7 @@
 #endif
 
 #include "setting.h"
+#include "src/_leds.h"
 
 // ===================================================
 
@@ -14,7 +15,6 @@
 #if SAVE_EEPROM > 0
 #include "src/_eeprom.h"
 #endif
-
 
 // Эффекты
 #include "src/confetti_pal.h"
@@ -35,7 +35,7 @@
 #include "src/candles.h"
 #include "src/colorwave.h"
 
-#if KEY_ON
+#if BUTTONS_NUM
 // Работа с кнопками
 #include "src/getirl.h"
 #endif
@@ -57,28 +57,24 @@ void ledsFlash(uint8_t led_idx, uint8_t &count);
 
 void setup()
 {
-#ifndef EORDER
-  pinMode(COLOR_ORDER_PIN, INPUT_PULLUP);
-#endif
-
-#if KEY_ON > 0
+#if BUTTONS_NUM > 0
   btn1.setVirtualClickOn(true);
   btn1.setLongClickMode(LCM_CLICKSERIES);
-#if KEY_ON > 1
+#if BUTTONS_NUM > 1
   btn2.setVirtualClickOn(true);
 #endif
-#if KEY_ON > 2
+#if BUTTONS_NUM > 2
   btn3.setVirtualClickOn(true);
 #endif
-#if KEY_ON > 3
+#if BUTTONS_NUM > 3
   btn4.setVirtualClickOn(true);
 #endif
-#if KEY_ON == 2
+#if BUTTONS_NUM == 2
   btn2.setLongClickMode(LCM_CLICKSERIES);
-#elif KEY_ON == 3
+#elif BUTTONS_NUM == 3
   btn3.setLongClickMode(LCM_CLICKSERIES);
   btn2.setLongClickMode(LCM_ONLYONCE);
-#elif KEY_ON > 3
+#elif BUTTONS_NUM > 3
   btn4.setLongClickMode(LCM_CLICKSERIES);
   btn2.setLongClickMode(LCM_ONLYONCE);
   btn3.setLongClickMode(LCM_ONLYONCE);
@@ -100,63 +96,11 @@ void setup()
   CTG_PRINTLN(F(" "));
   CTG_PRINTLN(F("---SETTING UP---"));
 
-
 #if SAVE_EEPROM > 0
-
-  max_bright = read_eeprom_8(EEPROM_INDEX_FOR_BRIGHT);
-  ledMode = read_eeprom_8(EEPROM_INDEX_FOR_STARTMODE);  // Расположение в EEPROM номера режима с которого будет старт (байт)
-  NUM_LEDS = read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN); // Расположение в EEPROM длины гирлянды (2 байта)
-#if MAX_LEDS < 255
-  if (read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1)) // Если почемуто светодиодов болше чем размер переменной
-    NUM_LEDS = MAX_LEDS;          
+  // если задано сохранение настроек в EEPROM
+  eeprom_init();
 #else
-  NUM_LEDS += (uint16_t)read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1) << 8; 
-#endif
-  meshdelay = read_eeprom_8(EEPROM_INDEX_FOR_STRANDEL); // Расположение в EEPROM задержки (байт)
-
-#if SAVE_EEPROM == 1
-  ExtFlag.Byte = read_eeprom_8(EEPROM_INDEX_FOR_EXTFLAG); // Прочитаем расширенные настройки
-#else
-  ExtFlag.Glitter = GLITER_ON;    // Флаг включения блеска
-  ExtFlag.Background = BACKGR_ON; // Флаг включения заполнения фона
-  ExtFlag.Candle = CANDLE_ON;     // Флаг включения свечей
-#endif
-
-  if ((read_eeprom_8(EEPROM_INDEX_FOR_ISINIT) != INITVAL) || // проверка правильности в EEPROM байта корректности записи
-      (NUM_LEDS > MAX_LEDS) ||
-      ((ledMode > maxMode) && (ledMode != 100)))
-  {                                    // Не корректен
-    write_eeprom_8(EEPROM_INDEX_FOR_STARTMODE, INITMODE); // сохраним в EEPROM номера режима с которого будет старт (байт)
-#if MAX_LEDS < 255
-    write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, INITLEN); // сохраним в EEPROM длины гирлянды (2 байта)
-#else
-    write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(INITLEN) & 0x00ff);
-    write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(INITLEN) >> 8);
-#endif
-    write_eeprom_8(EEPROM_INDEX_FOR_STRANDEL, INITDEL); // сохраним в EPROM задержку (байт)
-
-    ExtFlag.Glitter = GLITER_ON;         // Флаг включения блеска
-    ExtFlag.Background = BACKGR_ON;      // Флаг включения заполнения фона
-    ExtFlag.Candle = CANDLE_ON;          // Флаг включения свечей
-#if SAVE_EEPROM == 1
-    write_eeprom_8(EEPROM_INDEX_FOR_EXTFLAG, ExtFlag.Byte); // сохраним в EPROM расширенные настройки
-#endif
-
-    write_eeprom_8(EEPROM_INDEX_FOR_ISINIT, INITVAL); // сохраним в EEPROM байта корректности записи
-
-    ledMode = INITMODE;
-    NUM_LEDS = INITLEN;
-    meshdelay = INITDEL;
-  }
-#else
-#ifndef EORDER
-  ExtFlag.RedGreen = digitalRead(COLOR_ORDER_PIN);
-#else
-  ExtFlag.RedGreen = 0;
-#endif
-  ExtFlag.Glitter = GLITER_ON;    // Флаг включения блеска
-  ExtFlag.Background = BACKGR_ON; // Флаг включения заполнения фона
-  ExtFlag.Candle = CANDLE_ON;     // Флаг включения свечей
+  // если настройки в EEPROM не сохраняются
 
 #ifdef MY_MODE
   switch (demorun)
@@ -184,38 +128,7 @@ void setup()
     NUM_LEDS = (TOP_LENGTH + 1); // Проверка
   }
 
-  LEDS.setBrightness(max_bright);
-
-#ifdef EORDER
-// очередность цветов задана явно макросом EORDER
-
-#if LED_CLK_PIN
-    LEDS.addLeds<CHIPSET, LED_DATA_PIN, LED_CLK_PIN, EORDER>(leds, MAX_LEDS);
-#else
-    LEDS.addLeds<CHIPSET, LED_DATA_PIN, EORDER>(leds, MAX_LEDS); // Для светодиодов WS2812B
-#endif
-
-#else
-// очередность цветов определяется положением переключателя или сохраненным в EEPROM значением (только RGB или GRB)
-  if (ExtFlag.RedGreen)
-  {
-#if LED_CLK_PIN
-    LEDS.addLeds<CHIPSET, LED_DATA_PIN, LED_CLK_PIN, RGB>(leds, MAX_LEDS);
-#else
-    LEDS.addLeds<CHIPSET, LED_DATA_PIN, RGB>(leds, MAX_LEDS); // Для светодиодов WS2812B
-#endif
-  }
-  else
-  {
-#if LED_CLK_PIN
-    LEDS.addLeds<CHIPSET, LED_DATA_PIN, LED_CLK_PIN, GRB>(leds, MAX_LEDS);
-#else
-    LEDS.addLeds<CHIPSET, LED_DATA_PIN, GRB>(leds, MAX_LEDS); // Для светодиодов WS2812B
-#endif
-  }
-#endif
-
-  LEDS.setMaxPowerInVoltsAndMilliamps(POWER_V, POWER_I); // Настройка блока питания
+  fastled_init();
 
   random16_set_seed(4832); // Рандомайзер
   random16_add_entropy(analogRead(2));
@@ -226,11 +139,8 @@ void setup()
   CTG_PRINT(F("Initial strand length: "));
   CTG_PRINT(NUM_LEDS);
   CTG_PRINTLN(F(" LEDs"));
+  print_eorder();
   CTG_PRINTLN(F("EXTEND Setup"));
-  if (ExtFlag.RedGreen)
-    CTG_PRINTLN(F("RGB LEDS"));
-  else
-    CTG_PRINTLN(F("GRB LEDS"));
   if (ExtFlag.Glitter)
     CTG_PRINTLN(F("Glitter On"));
   else
@@ -272,7 +182,7 @@ void setup()
 void loop()
 {
 
-#if KEY_ON
+#if BUTTONS_NUM
   getirl(); // Обработка кнопок
 #endif
 
@@ -313,7 +223,6 @@ void loop()
 
         CTG_PRINT(F("New Palette: "));
         CTG_PRINTLN(gCurrentPaletteNumber);
-
       }
       gTargetPalette = gGradientPalettes[gCurrentPaletteNumber]; // We're just ensuring that the gTargetPalette WILL be assigned.
     }
@@ -371,7 +280,6 @@ void loop()
         StepMode = MAX_LEDS - TOP_LENGTH;
 
         CTG_PRINTLN(F("End SetMode"));
-        
       }
       nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, PALETTE_SPEED);
     }
@@ -381,29 +289,29 @@ void loop()
 #if TOP_LENGTH > 0
   top(); // Обработка конца гирлянды
 #endif
-  if (GLITTER)
+  if (ExtFlag.Glitter)
   {
     addglitter(10); // блеск, если включен
   }
 #if CANDLE_KOL > 0
-  if (CANDLE)
+  if (ExtFlag.Candle)
   {
     addcandle();
   }
 #endif
 
-  if (BACKGROUND)
+  if (ExtFlag.Background)
   {
     addbackground(); // Включить заполнение черного цвета фоном
   }
 
   BtnHandler(); // Обработчик нажатий кнопок
 
-  FastLED.show(); 
+  LEDS.show();
 }
 
 void strobe_mode(uint8_t mode, bool mc)
-{ //mc == 0 - работа, mc == 1 - смена режима
+{ // mc == 0 - работа, mc == 1 - смена режима
 
   if (mc)
   {

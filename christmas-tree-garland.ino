@@ -119,13 +119,13 @@ void setup()
 #else
   ledMode = INITMODE;
 #endif
-  NUM_LEDS = MAX_LEDS;
+  numLeds = MAX_LEDS;
   meshdelay = INITDEL;
 #endif
 
-  if (NUM_LEDS < (TOP_LENGTH + 1))
+  if (numLeds < (TOP_LENGTH + 1))
   {
-    NUM_LEDS = (TOP_LENGTH + 1); // Проверка
+    numLeds = (TOP_LENGTH + 1); // Проверка
   }
 
   fastled_init();
@@ -137,19 +137,19 @@ void setup()
   CTG_PRINT(meshdelay * 100);
   CTG_PRINTLN(F("ms delay."));
   CTG_PRINT(F("Initial strand length: "));
-  CTG_PRINT(NUM_LEDS);
+  CTG_PRINT(numLeds);
   CTG_PRINTLN(F(" LEDs"));
   print_eorder();
   CTG_PRINTLN(F("EXTEND Setup"));
-  if (ExtFlag.Glitter)
+  if (extFlag.Glitter)
     CTG_PRINTLN(F("Glitter On"));
   else
     CTG_PRINTLN(F("Glitter Off"));
-  if (ExtFlag.Background)
+  if (extFlag.Background)
     CTG_PRINTLN(F("Background On"));
   else
     CTG_PRINTLN(F("Background Off"));
-  if (ExtFlag.Candle)
+  if (extFlag.Candle)
     CTG_PRINTLN(F("Candle On"));
   else
     CTG_PRINTLN(F("Candle Off"));
@@ -158,7 +158,7 @@ void setup()
   solid = CRGB::Black; // Запуск с пустого поля
 #if CHANGE_ON == 1
   newMode = ledMode;
-  StepMode = 1;
+  stepMode = 1;
 #endif
   ledMode = 255;
 #endif
@@ -191,19 +191,19 @@ void loop()
   EVERY_N_MILLISECONDS(50)
   { // Плавный переход от одной палитры в другую
 #if CHANGE_ON == 1
-    if (StepMode == MAX_LEDS)
+    if (stepMode == MAX_LEDS)
 #endif
       nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, PALETTE_SPEED);
 
 #if LED_ON > 0 // мигаем светодиодом 1
-    if (Led1_flesh > 0)
+    if (led1Flesh > 0)
     {
-      ledsFlash(1, Led1_flesh);
+      ledsFlash(1, led1Flesh);
     }
 #if LED_ON > 1 // мигаем светодиодом 2
-    if (Led2_flesh > 0)
+    if (led2Flesh > 0)
     {
-      ledsFlash(2, Led2_flesh);
+      ledsFlash(2, led2Flesh);
     }
 #endif
 #endif
@@ -239,16 +239,16 @@ void loop()
   EVERY_N_MILLIS_I(thistimer, thisdelay)
   {                                 // Sets the original delay time.
     thistimer.setPeriod(thisdelay); // This is how you update the delay value on the fly.
-    KolLed = NUM_LEDS - TOP_LENGTH; // Выводим Эффект на все светодиоды
+    kolLeds = numLeds - TOP_LENGTH; // Выводим Эффект на все светодиоды
     strobe_mode(ledMode, 0);        // отобразить эффект;
 #if CHANGE_ON == 1
-    if ((StepMode < (NUM_LEDS - TOP_LENGTH)) && ((ledMode < 220) || (ledMode >= 230)))
+    if ((stepMode < (numLeds - TOP_LENGTH)) && ((ledMode < 220) || (ledMode >= 230)))
     {                    // требуется наложить новый эффект
-      KolLed = StepMode; // Выводим Эффект на все светодиоды
-      if (StepMode > 10)
+      kolLeds = stepMode; // Выводим Эффект на все светодиоды
+      if (stepMode > 10)
         strobe_mode(newMode, 0); // отобразить эффект;
 #if CHANGE_SPARK == 4
-      sparkler(rand_spark);
+      sparkler(randSpark);
 #else
       sparkler(CHANGE_SPARK); // бенгальский огонь
 #endif
@@ -257,27 +257,27 @@ void loop()
   }
 
 #if CHANGE_ON == 1 // Включена плавная смена эффектов
-  if (StepMode < (NUM_LEDS - TOP_LENGTH))
+  if (stepMode < (numLeds - TOP_LENGTH))
   {                                                                         // есть шаги, исполняем
-    uint16_t change_time = (1000L * CHANGE_TIME) / (NUM_LEDS - TOP_LENGTH); // время в мСек на каждый светодиод
+    uint16_t change_time = (1000L * CHANGE_TIME) / (numLeds - TOP_LENGTH); // время в мСек на каждый светодиод
     if (change_time < 20)
     {
       change_time = 20;
     }
-    //        static uint8_t change_increment = (uint32_t)change_time * (NUM_LEDS-TOP_LENGTH) / (1000L *CHANGE_TIME)+1;
+    //        static uint8_t change_increment = (uint32_t)change_time * (numLeds-TOP_LENGTH) / (1000L *CHANGE_TIME)+1;
     EVERY_N_MILLISECONDS(change_time)
     { // Движение плавной смены эффектов
-      //            if (StepMode > 10) StepMode += change_increment;
+      //            if (stepMode > 10) stepMode += change_increment;
       //            else
-      StepMode++;
-      if (StepMode == 10)
+      stepMode++;
+      if (stepMode == 10)
       {
         strobe_mode(newMode, 1);
       }
-      if (StepMode >= (NUM_LEDS - TOP_LENGTH))
+      if (stepMode >= (numLeds - TOP_LENGTH))
       {
         ledMode = newMode;
-        StepMode = MAX_LEDS - TOP_LENGTH;
+        stepMode = MAX_LEDS - TOP_LENGTH;
 
         CTG_PRINTLN(F("End SetMode"));
       }
@@ -289,18 +289,18 @@ void loop()
 #if TOP_LENGTH > 0
   top(); // Обработка конца гирлянды
 #endif
-  if (ExtFlag.Glitter)
+  if (extFlag.Glitter)
   {
     addglitter(10); // блеск, если включен
   }
 #if CANDLE_KOL > 0
-  if (ExtFlag.Candle)
+  if (extFlag.Candle)
   {
     addcandle();
   }
 #endif
 
-  if (ExtFlag.Background)
+  if (extFlag.Background)
   {
     addbackground(); // Включить заполнение черного цвета фоном
   }
@@ -315,7 +315,7 @@ void strobe_mode(uint8_t mode, bool mc)
 
   if (mc)
   {
-    fill_solid(leds, NUM_LEDS - TOP_LENGTH, CRGB(0, 0, 0)); // очистить гирлянду при смене режима
+    fill_solid(leds, numLeds - TOP_LENGTH, CRGB(0, 0, 0)); // очистить гирлянду при смене режима
 
     CTG_PRINT(F("Mode: "));
     CTG_PRINTLN(mode);
@@ -841,28 +841,28 @@ void strobe_mode(uint8_t mode, bool mc)
     //  case 42 .. 121: if(mc) {thisdelay=10; } running_fire(9,3,1); break;
   case 200:
     fill_solid(leds, MAX_LEDS, CRGB::Black);
-    fill_solid(leds, NUM_LEDS, CRGB(255, 255, 255));
-    break; // Зажечь гирлянду длиной NUM_LEDS (регулировка длины гирлянды)
+    fill_solid(leds, numLeds, CRGB(255, 255, 255));
+    break; // Зажечь гирлянду длиной numLeds (регулировка длины гирлянды)
   case 201:
     fill_solid(leds, MAX_LEDS, CRGB::Black);
     fill_solid(leds, meshdelay, CRGB(255, 255, 255));
     break; // Зажечь гирлянду длиной meshdelay
   case 220:
     fill_solid(leds, MAX_LEDS, CRGB::Black);
-    fill_solid(leds, NUM_LEDS, CRGB(255, 255, 255));
+    fill_solid(leds, numLeds, CRGB(255, 255, 255));
     leds[0] = set_new_eorder(CRGB::Red);
-    break; // Зажечь гирлянду длиной NUM_LEDS (регулировка длины гирлянды)
+    break; // Зажечь гирлянду длиной numLeds (регулировка длины гирлянды)
   case 221:
     fill_solid(leds, MAX_LEDS, CRGB::Black);
-    fill_solid(leds, NUM_LEDS, CRGB(255, 255, 255));
+    fill_solid(leds, numLeds, CRGB(255, 255, 255));
     leds[0] = set_new_eorder(CRGB::Green);
-    break; // Зажечь гирлянду длиной NUM_LEDS (регулировка длины гирлянды)
+    break; // Зажечь гирлянду длиной numLeds (регулировка длины гирлянды)
   case 255:
     if (mc)
     {
       palchg = 0;
     }
-    fill_solid(leds, NUM_LEDS - TOP_LENGTH, solid);
+    fill_solid(leds, numLeds - TOP_LENGTH, solid);
     break; // Установить цвет
   default:
 #if RUNNING_FIRE == 1
@@ -907,7 +907,7 @@ void demo_check()
       switch (demorun)
       {
       case 2:
-        newMode = random8(0, maxMode); // демо 2
+        newMode = random8(0, MAX_MODE); // демо 2
         break;
 #ifdef MY_MODE
       case 3:
@@ -922,15 +922,15 @@ void demo_check()
         break;
 #endif
       case 1:
-        if (newMode >= maxMode)
+        if (newMode >= MAX_MODE)
           newMode = 0; // демо 1
         else
           newMode++;
         break;
       }
-      StepMode = 1;
+      stepMode = 1;
 #if CHANGE_SPARK == 4
-      rand_spark = random8(3) + 1;
+      randSpark = random8(3) + 1;
 #endif
 
       CTG_PRINTLN(F("Start SetMode"));
@@ -944,7 +944,7 @@ void demo_check()
       switch (demorun)
       {
       case 2:
-        ledMode = random8(0, maxMode); // демо 2
+        ledMode = random8(0, MAX_MODE); // демо 2
         break;
 #ifdef MY_MODE
       case 3:
@@ -959,7 +959,7 @@ void demo_check()
         break;
 #endif
       case 1:
-        if (ledMode >= maxMode)
+        if (ledMode >= MAX_MODE)
           ledMode = 0; // демо 1
         else
           ledMode++;

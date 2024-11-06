@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../setting.h"
+#include "_leds.h"
 #include <EEPROM.h>
 
 // ===================================================
@@ -64,10 +65,13 @@ void write_eeprom_8(uint16_t _index, uint8_t _data)
 // инициализация параметров, сохраненных в EEPROM
 void eeprom_init()
 {
-    // проверка правильности в EEPROM байта корректности записи
+  numLeds = read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN);
+  ledMode = read_eeprom_8(EEPROM_INDEX_FOR_STARTMODE);
+
+  // проверка правильности в EEPROM байта корректности записи
   if ((read_eeprom_8(EEPROM_INDEX_FOR_ISINIT) != INITVAL) ||
-      (NUM_LEDS > MAX_LEDS) ||
-      ((ledMode > maxMode) && (ledMode != 100)))
+      (numLeds > MAX_LEDS) ||
+      ((ledMode > MAX_MODE) && (ledMode != 100)))
   { // Не корректен
     write_eeprom_8(EEPROM_INDEX_FOR_STARTMODE, INITMODE);
 #if MAX_LEDS < 255
@@ -78,11 +82,11 @@ void eeprom_init()
 #endif
     write_eeprom_8(EEPROM_INDEX_FOR_STRANDEL, INITDEL);
 
-    ExtFlag.Glitter = GLITER_ON;
-    ExtFlag.Background = BACKGR_ON;
-    ExtFlag.Candle = CANDLE_ON;
+    extFlag.Glitter = GLITER_ON;
+    extFlag.Background = BACKGR_ON;
+    extFlag.Candle = CANDLE_ON;
 #if SAVE_EEPROM == 1
-    write_eeprom_8(EEPROM_INDEX_FOR_EXTFLAG, ExtFlag.Byte);
+    write_eeprom_8(EEPROM_INDEX_FOR_EXTFLAG, extFlag.Byte);
 #endif
 #if !defined(EORDER)
     write_eeprom_8(EEPROM_INDEX_FOR_EORDER, eorder_index);
@@ -90,20 +94,20 @@ void eeprom_init()
     write_eeprom_8(EEPROM_INDEX_FOR_ISINIT, INITVAL);
 
     ledMode = INITMODE;
-    NUM_LEDS = INITLEN;
+    numLeds = INITLEN;
     meshdelay = INITDEL;
   }
   else
   {
 #if SAVE_EEPROM == 1
-    ExtFlag.Byte = read_eeprom_8(EEPROM_INDEX_FOR_EXTFLAG); // Прочитаем расширенные настройки
+    extFlag.Byte = read_eeprom_8(EEPROM_INDEX_FOR_EXTFLAG); // Прочитаем расширенные настройки
 #else
-    ExtFlag.Glitter = GLITER_ON;    // Флаг включения блеска
-    ExtFlag.Background = BACKGR_ON; // Флаг включения заполнения фона
-    ExtFlag.Candle = CANDLE_ON;     // Флаг включения свечей
+    extFlag.Glitter = GLITER_ON;    // Флаг включения блеска
+    extFlag.Background = BACKGR_ON; // Флаг включения заполнения фона
+    extFlag.Candle = CANDLE_ON;     // Флаг включения свечей
 #endif
 
-    max_bright = read_eeprom_8(EEPROM_INDEX_FOR_BRIGHT);
+    maxBright = read_eeprom_8(EEPROM_INDEX_FOR_BRIGHT);
 #if !defined(EORDER)
     eorder_index = read_eeprom_8(EEPROM_INDEX_FOR_EORDER);
     if (eorder_index > 5)
@@ -112,13 +116,13 @@ void eeprom_init()
     }
 #endif
     ledMode = read_eeprom_8(EEPROM_INDEX_FOR_STARTMODE);
-    NUM_LEDS = read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN);
+    numLeds = read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN);
 #if MAX_LEDS < 255
     if (read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1))
       // Если почемуто светодиодов больше чем размер переменной
-      NUM_LEDS = MAX_LEDS;
+      numLeds = MAX_LEDS;
 #else
-    NUM_LEDS += (uint16_t)read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1) << 8;
+    numLeds += (uint16_t)read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1) << 8;
 #endif
     meshdelay = read_eeprom_8(EEPROM_INDEX_FOR_STRANDEL);
   }

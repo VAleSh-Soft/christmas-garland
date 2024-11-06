@@ -13,12 +13,12 @@ void getirl();
 
 void SetMode(uint8_t Mode)
 {
-  SetOff(demorun);
+  setOff(demorun);
 #if CHANGE_ON == 1
   newMode = Mode;
-  StepMode = 1;
+  stepMode = 1;
 #if CHANGE_SPARK == 4
-  rand_spark = random8(3) + 1;
+  randSpark = random8(3) + 1;
 #endif
 #else
   ledMode = Mode;
@@ -33,79 +33,77 @@ void SetMode(uint8_t Mode)
 void getirl()
 { // Обработка команд с кнопок
 
-  if (Protocol)
+  if (protocol)
   {
 
     if ((ledMode < 220) || (ledMode >= 230) || (demorun < 100))
     {
-#if LED_ON > 1
       LED2_Off; // Выключить светодиод
-#endif
 
-      CTG_PRINT(F("Command: 0x"));
-      CTG_PRINTLN_2(Command, HEX);
+      CTG_PRINT(F("command: 0x"));
+      CTG_PRINTLN_2(command, HEX);
 
-      switch (Command)
+      switch (command)
       {
 
 #if Command_Brightness_plus
       case Command_Brightness_plus: //  Увеличить максимальную яркость и остановится если достигли максимума
-        max_bright = min((max_bright < 5) ? max_bright + 1 : max_bright / 2 * 3, 255);
-        LEDS.setBrightness(max_bright);
+        maxBright = min((maxBright < 5) ? maxBright + 1 : maxBright / 2 * 3, 255);
+        LEDS.setBrightness(maxBright);
 #if SAVE_EEPROM > 0
-        write_eeprom_8(EEPROM_INDEX_FOR_BRIGHT, max_bright);
+        write_eeprom_8(EEPROM_INDEX_FOR_BRIGHT, maxBright);
 #endif
 
         CTG_PRINT(F("Brightness+ "));
-        CTG_PRINTLN(max_bright);
+        CTG_PRINTLN(maxBright);
 
         break;
 #endif
 
 #if Command_Brightness_plus_R
       case Command_Brightness_plus_R: //  Увеличить максимальную яркость, при достижения максимума начать с минимума
-        if (max_bright == 255)
-          max_bright = 1;
+        if (maxBright == 255)
+          maxBright = 1;
         else
-          max_bright = min((max_bright < 5) ? max_bright + 1 : max_bright / 2 * 3, 255);
-        LEDS.setBrightness(max_bright);
+          maxBright = min((maxBright < 5) ? maxBright + 1 : maxBright / 2 * 3, 255);
+        LEDS.setBrightness(maxBright);
 #if SAVE_EEPROM > 0
-        write_eeprom_8(EEPROM_INDEX_FOR_BRIGHT, max_bright);
+        write_eeprom_8(EEPROM_INDEX_FOR_BRIGHT, maxBright);
 #endif
 
         CTG_PRINT(F("Brightness+ "));
-        CTG_PRINTLN(max_bright);
+        CTG_PRINTLN(maxBright);
 
         break;
 #endif
 
 #if Command_Brightness_minus
       case Command_Brightness_minus: //  Уменьшить максимальную яркость и остановится если достигли минимума
-        max_bright = max((max_bright < 5) ? max_bright - 1 : max_bright / 3 * 2, 1);
-        LEDS.setBrightness(max_bright);
+        maxBright = max((maxBright < 5) ? maxBright - 1 : maxBright / 3 * 2, 1);
+        LEDS.setBrightness(maxBright);
 #if SAVE_EEPROM > 0
-        write_eeprom_8(EEPROM_INDEX_FOR_BRIGHT, max_bright);
+        write_eeprom_8(EEPROM_INDEX_FOR_BRIGHT, maxBright);
 #endif
 
         CTG_PRINT(F("Brightness- "));
-        CTG_PRINTLN(max_bright);
+        CTG_PRINTLN(maxBright);
 
         break;
 #endif
 
 #if Command_Brightness_minus_R
       case Command_Brightness_minus_R: //  Уменьшить максимальную яркость, при достижения минимума начать с максимума
-        if (max_bright == 1)
-          max_bright = 255;
+        if (maxBright == 1)
+          maxBright = 255;
         else
-          max_bright = max((max_bright < 5) ? max_bright - 1 : max_bright / 3 * 2, 1);
-        LEDS.setBrightness(max_bright);
+          maxBright = max((maxBright < 5) ? maxBright - 1 : maxBright / 3 * 2, 1);
+        LEDS.setBrightness(maxBright);
 #if SAVE_EEPROM > 0
-        write_eeprom_8(EEPROM_INDEX_FOR_BRIGHT, max_bright);
+        write_eeprom_8(EEPROM_INDEX_FOR_BRIGHT, maxBright);
 #endif
 
         CTG_PRINT(F("Brightness- "));
-        CTG_PRINTLN(max_bright);
+        CTG_PRINTLN(maxBright);
 
         break;
 #endif
@@ -124,7 +122,7 @@ void getirl()
 
 #if Command_Stop
       case Command_Stop: //  Стоп
-        SetOff(demorun);
+        setOff(demorun);
         ledMode = 255;
         palchg = 0;
         solid = CRGB::Black;
@@ -137,9 +135,9 @@ void getirl()
 
 #if Command_Start
       case Command_Start: //  Старт
-        SetOn(demorun);
+        setOn(demorun);
         ledMode = newMode;
-        LEDS.setBrightness(max_bright);
+        LEDS.setBrightness(maxBright);
 
         CTG_PRINTLN(F("Start"));
 
@@ -150,15 +148,15 @@ void getirl()
       case Command_Start_Stop: //  Старт/Стоп
         if (demorun >= 100)
         {
-          SetOn(demorun);
+          setOn(demorun);
           ledMode = newMode;
-          LEDS.setBrightness(max_bright);
+          LEDS.setBrightness(maxBright);
 
           CTG_PRINTLN(F("Start"));
         }
         else
         {
-          SetOff(demorun);
+          setOff(demorun);
           ledMode = 255;
           palchg = 0;
           solid = CRGB::Black;
@@ -171,7 +169,7 @@ void getirl()
 
 #if Command_Demo_On
       case Command_Demo_On: //  Востановим демо режим (какой был до этого)
-        SetOn(demorun);
+        setOn(demorun);
         meshwait();
 
         CTG_PRINTLN(F("Demo On"));
@@ -233,51 +231,51 @@ void getirl()
 
 #if Command_Length_Garland_plus
       case Command_Length_Garland_plus: //  Увеличить количество светодиодов в гирлянде
-        SetOff(demorun);
+        setOff(demorun);
         ledMode = 200;
-        if (NUM_LEDS < (MAX_LEDS - 1))
-          NUM_LEDS++; // Новое значение
+        if (numLeds < (MAX_LEDS - 1))
+          numLeds++; // Новое значение
 #if SAVE_EEPROM > 0
 #if MAX_LEDS < 255
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, NUM_LEDS); // Сохранить в память
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, numLeds); // Сохранить в память
         write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, 0);    // Сохранить в память
 #else
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(NUM_LEDS) & 0x00ff); // Сохранить в память
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(NUM_LEDS) >> 8); // Сохранить в память
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(numLeds) & 0x00ff); // Сохранить в память
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(numLeds) >> 8); // Сохранить в память
 #endif
 #endif
 
         CTG_PRINT(F("Length Garland "));
-        CTG_PRINTLN(NUM_LEDS);
+        CTG_PRINTLN(numLeds);
 
         break;
 #endif
 
 #if Command_Length_Garland_minus
       case Command_Length_Garland_minus: //  Уменьшить количество светодиодов в гирлянде
-        SetOff(demorun);
+        setOff(demorun);
         ledMode = 200;
-        if (NUM_LEDS > 0)
-          NUM_LEDS--; // Новое значение
+        if (numLeds > 0)
+          numLeds--; // Новое значение
 #if SAVE_EEPROM > 0
 #if MAX_LEDS < 255
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, NUM_LEDS); // Сохранить в память
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, numLeds); // Сохранить в память
         write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, 0);    // Сохранить в память
 #else
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(NUM_LEDS) & 0x00ff); // Сохранить в память
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(NUM_LEDS) >> 8); // Сохранить в память
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(numLeds) & 0x00ff); // Сохранить в память
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(numLeds) >> 8); // Сохранить в память
 #endif
 #endif
 
         CTG_PRINT(F("Length Garland "));
-        CTG_PRINTLN(NUM_LEDS);
+        CTG_PRINTLN(numLeds);
 
         break;
 #endif
 
 #if Command_Rotate
       case Command_Rotate: //  Сменить направление движения эффектов
-        if (Protocol == 1)
+        if (protocol == 1)
         { // отключить повтор
           thisdir = thisdir * -1;
 
@@ -310,24 +308,24 @@ void getirl()
 
 #if Command_Glitter
       case Command_Glitter: //  Включить/выключить сверкание
-        if (Protocol == 1)
+        if (protocol == 1)
         { // отключить повтор
-          ExtFlag.Glitter = !ExtFlag.Glitter;
+          extFlag.Glitter = !extFlag.Glitter;
 
           CTG_PRINT(F("Glitter "));
-          CTG_PRINTLN(ExtFlag.Glitter);
+          CTG_PRINTLN(extFlag.Glitter);
         }
         break;
 #endif
 
 #if Command_BackGround
       case Command_BackGround: //  Включить/выключить заполнение фона
-        if (Protocol == 1)
+        if (protocol == 1)
         { // отключить повтор
-          ExtFlag.Background = !ExtFlag.Background;
+          extFlag.Background = !extFlag.Background;
 
           CTG_PRINT(F("BackGround "));
-          CTG_PRINTLN(ExtFlag.Background);
+          CTG_PRINTLN(extFlag.Background);
         }
         break;
 #endif
@@ -335,13 +333,13 @@ void getirl()
 #if Command_Candle
       case Command_Candle: //  Включить/выключить Свечки
 #if CANDLE_KOL > 0
-        if (Protocol == 1)
+        if (protocol == 1)
         { // отключить повтор
-          ExtFlag.Candle = !ExtFlag.Candle;
+          extFlag.Candle = !extFlag.Candle;
           PolCandle = random8(CANDLE_KOL);
 
           CTG_PRINT(F("Candle "));
-          CTG_PRINTLN(ExtFlag.Candle);
+          CTG_PRINTLN(extFlag.Candle);
         }
 #endif
         break;
@@ -349,12 +347,12 @@ void getirl()
 
 #if Command_Previous_mode
       case Command_Previous_mode: //  Предыдущий эффект
-        if (Protocol == 1)
+        if (protocol == 1)
         { // отключить повтор
           if (newMode > 0)
             SetMode(newMode - 1);
           else
-            SetMode(maxMode - 1);
+            SetMode(MAX_MODE - 1);
 
           CTG_PRINTLN(F("Previous mode"));
         }
@@ -363,13 +361,13 @@ void getirl()
 
 #if Command_Previous_mode_Demo
       case Command_Previous_mode_Demo: //  Предыдущий эффект. Оставляет демонстрационный режим
-        if (Protocol == 1)
+        if (protocol == 1)
         { // отключить повтор
           if (newMode > 0)
             SetMode(newMode - 1);
           else
-            SetMode(maxMode - 1);
-          SetOn(demorun);
+            SetMode(MAX_MODE - 1);
+          setOn(demorun);
 
           CTG_PRINTLN(F("Previous mode + Demo"));
         }
@@ -378,9 +376,9 @@ void getirl()
 
 #if Command_Next_mode
       case Command_Next_mode: //  Следующий эффект
-        if (Protocol == 1)
+        if (protocol == 1)
         { // отключить повтор
-          if (newMode >= (maxMode - 1))
+          if (newMode >= (MAX_MODE - 1))
             SetMode(0);
           else
             SetMode(newMode + 1);
@@ -392,13 +390,13 @@ void getirl()
 
 #if Command_Next_mode_Demo
       case Command_Next_mode_Demo: //  Следующий эффект. Оставляет демонстрационный режим
-        if (Protocol == 1)
+        if (protocol == 1)
         { // отключить повтор
-          if (newMode >= (maxMode - 1))
+          if (newMode >= (MAX_MODE - 1))
             SetMode(0);
           else
             SetMode(newMode + 1);
-          SetOn(demorun);
+          setOn(demorun);
 
           CTG_PRINTLN(F("Next mode + Demo"));
         }
@@ -659,7 +657,7 @@ void getirl()
 
 #if Command_Save_Mode
       case Command_Save_Mode: //  Сохранить эффект как запускающийся первым
-        if (Protocol == 1)
+        if (protocol == 1)
         { // отключить повтор
 #if SAVE_EEPROM > 0
           write_eeprom_8(EEPROM_INDEX_FOR_STARTMODE, ledMode);
@@ -673,7 +671,7 @@ void getirl()
 
 #if Command_Delay_minus
       case Command_Delay_minus: //  Уменьшить задержку на 100ms
-        SetOff(demorun);
+        setOff(demorun);
         ledMode = 201;
         if (meshdelay > 0)
           meshdelay--; // Новое значение
@@ -690,7 +688,7 @@ void getirl()
 
 #if Command_Delay_plus
       case Command_Delay_plus: //  Увеличить задержку на 100ms
-        SetOff(demorun);
+        setOff(demorun);
         ledMode = 201;
         if (meshdelay < 100)
           meshdelay++; // Новое значение
@@ -717,7 +715,7 @@ void getirl()
 
 #if Command_Palette_Previous
       case Command_Palette_Previous: //  Установить предыдущую палитру
-        if (Protocol == 1)
+        if (protocol == 1)
         { // отключить повтор
           palchg = 1;
           if (gCurrentPaletteNumber > 0)
@@ -734,7 +732,7 @@ void getirl()
 
 #if Command_Palette_Next
       case Command_Palette_Next: //  Установить следующую палитру
-        if (Protocol == 1)
+        if (protocol == 1)
         { // отключить повтор
           palchg = 2;
           if (gCurrentPaletteNumber < (gGradientPaletteCount - 1))
@@ -760,7 +758,7 @@ void getirl()
 
 #if Command_Solid_Black
       case Command_Solid_Black: //  Установить цвет Черный
-        SetOff(demorun);
+        setOff(demorun);
         ledMode = 255;
         palchg = 0;
         solid = CRGB::Black;
@@ -772,7 +770,7 @@ void getirl()
 
 #if Command_Solid_Red
       case Command_Solid_Red: //  Установить цвет Красный
-        SetOff(demorun);
+        setOff(demorun);
         ledMode = 255;
         palchg = 0;
         solid = set_new_eorder(CRGB::Red);
@@ -784,7 +782,7 @@ void getirl()
 
 #if Command_Solid_Orange
       case Command_Solid_Orange: //  Установить цвет Оранжевый
-        SetOff(demorun);
+        setOff(demorun);
         ledMode = 255;
         palchg = 0;
         solid = set_new_eorder(CRGB::Orange);
@@ -796,7 +794,7 @@ void getirl()
 
 #if Command_Solid_Yellow
       case Command_Solid_Yellow: //  Установить цвет Желтый
-        SetOff(demorun);
+        setOff(demorun);
         ledMode = 255;
         palchg = 0;
         solid = set_new_eorder(CRGB::Yellow);
@@ -808,7 +806,7 @@ void getirl()
 
 #if Command_Solid_Green
       case Command_Solid_Green: //  Установить цвет Зеленый
-        SetOff(demorun);
+        setOff(demorun);
         ledMode = 255;
         palchg = 0;
         solid = set_new_eorder(CRGB::Green);
@@ -820,7 +818,7 @@ void getirl()
 
 #if Command_Solid_SkyBlue
       case Command_Solid_SkyBlue: //  Установить цвет Голубой
-        SetOff(demorun);
+        setOff(demorun);
         ledMode = 255;
         palchg = 0;
         solid = set_new_eorder(CRGB::SkyBlue);
@@ -832,7 +830,7 @@ void getirl()
 
 #if Command_Solid_Blue
       case Command_Solid_Blue: //  Установить цвет Синий
-        SetOff(demorun);
+        setOff(demorun);
         ledMode = 255;
         palchg = 0;
         solid = set_new_eorder(CRGB::Blue);
@@ -844,7 +842,7 @@ void getirl()
 
 #if Command_Solid_Violet
       case Command_Solid_Violet: //  Установить цвет Фиолетовый
-        SetOff(demorun);
+        setOff(demorun);
         ledMode = 255;
         palchg = 0;
         solid = set_new_eorder(CRGB::Violet);
@@ -856,7 +854,7 @@ void getirl()
 
 #if Command_Solid_White
       case Command_Solid_White: //  Установить цвет Белый
-        SetOff(demorun);
+        setOff(demorun);
         ledMode = 255;
         palchg = 0;
         solid = CRGB::White;
@@ -869,15 +867,15 @@ void getirl()
       default:
         break; // We could do something by default
 
-      } // switch Command
+      } // switch command
     }
     else
     { //        Режим настройки
 
-      CTG_PRINT(F("Setup Command: 0x"));
-      CTG_PRINTLN_2(Command, HEX);
+      CTG_PRINT(F("Setup command: 0x"));
+      CTG_PRINTLN_2(command, HEX);
 
-      switch (Command)
+      switch (command)
       {
 
 #if Setup_Command_Setup_Mode_Off
@@ -892,24 +890,24 @@ void getirl()
       case Setup_Command_Setup_Mode_Off3: // Выйти из режима настройки
 #endif
                                           // ledMode = newMode;
-                                          // SetOn(demorun);
+                                          // setOn(demorun);
 #if SAVE_EEPROM > 0
 #if MAX_LEDS < 255
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, NUM_LEDS); // Сохранить в память
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, numLeds); // Сохранить в память
         write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, 0);    // Сохранить в память
 #else
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(NUM_LEDS) & 0x00ff); // Сохранить в память
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(NUM_LEDS) >> 8); // Сохранить в память
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(numLeds) & 0x00ff); // Сохранить в память
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(numLeds) >> 8); // Сохранить в память
 #endif
 
 #if SAVE_EEPROM == 1
-        write_eeprom_8(EEPROM_INDEX_FOR_EXTFLAG, ExtFlag.Byte); // сохраним в EPROM расширенные настройки
+        write_eeprom_8(EEPROM_INDEX_FOR_EXTFLAG, extFlag.Byte); // сохраним в EPROM расширенные настройки
 #endif
 #endif
 
         CTG_PRINTLN(F("Setup Mode Off "));
         CTG_PRINT(F("Leds num: "));
-        CTG_PRINTLN(NUM_LEDS);
+        CTG_PRINTLN(numLeds);
         print_eorder();
         CTG_PRINTLN(F("Reset "));
 
@@ -918,48 +916,48 @@ void getirl()
 #endif
 #if Setup_Command_Length_Garland_plus
       case Setup_Command_Length_Garland_plus: //  Увеличить количество светодиодов в гирлянде
-        if (NUM_LEDS < MAX_LEDS)
-          NUM_LEDS++; // Новое значение
+        if (numLeds < MAX_LEDS)
+          numLeds++; // Новое значение
 
         CTG_PRINT(F("Length Garland Plus: "));
-        CTG_PRINTLN(NUM_LEDS);
+        CTG_PRINTLN(numLeds);
 
         break;
 #endif
 
 #if Setup_Command_Length_Garland_plus_speed
       case Setup_Command_Length_Garland_plus_speed: //  Увеличить количество светодиодов в гирлянде
-        if (NUM_LEDS < (MAX_LEDS - 10))
-          NUM_LEDS += 10;
+        if (numLeds < (MAX_LEDS - 10))
+          numLeds += 10;
         else
-          NUM_LEDS = MAX_LEDS; // Новое значение
+          numLeds = MAX_LEDS; // Новое значение
 
         CTG_PRINT(F("Length Garland Plus: "));
-        CTG_PRINTLN(NUM_LEDS);
+        CTG_PRINTLN(numLeds);
 
         break;
 #endif
 
 #if Setup_Command_Length_Garland_minus
       case Setup_Command_Length_Garland_minus: //  Уменьшить количество светодиодов в гирлянде
-        if (NUM_LEDS > 1)
-          NUM_LEDS--; // Новое значение
+        if (numLeds > 1)
+          numLeds--; // Новое значение
 
         CTG_PRINT(F("Length Garland Munus: "));
-        CTG_PRINTLN(NUM_LEDS);
+        CTG_PRINTLN(numLeds);
 
         break;
 #endif
 
 #if Setup_Command_Length_Garland_minus_speed
       case Setup_Command_Length_Garland_minus_speed: //  Уменьшить количество светодиодов в гирлянде
-        if (NUM_LEDS > 10)
-          NUM_LEDS -= 10;
+        if (numLeds > 10)
+          numLeds -= 10;
         else
-          NUM_LEDS = 1; // Новое значение
+          numLeds = 1; // Новое значение
 
         CTG_PRINT(F("Length Garland Munus: "));
-        CTG_PRINTLN(NUM_LEDS);
+        CTG_PRINTLN(numLeds);
 
         break;
 #endif
@@ -985,12 +983,12 @@ void getirl()
       default:
         break; // We could do something by default
 
-      } // switch Command
+      } // switch command
     }
 
-    Protocol = 0; // Reset Protocol variable to not read the same value twice.
+    protocol = 0; // Reset protocol variable to not read the same value twice.
 
-  } // if Protocol
+  } // if protocol
 
 } // getirl()
 

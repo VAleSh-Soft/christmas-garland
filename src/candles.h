@@ -5,7 +5,7 @@
 
 void candles()
 {
-  if (KolLed >= 10)
+  if (kolLeds >= 10)
   {
 
 #if MAX_LEDS < 255
@@ -14,7 +14,7 @@ void candles()
     uint16_t x;
 #endif
 
-    for (x = 0; x < KolLed; x++)
+    for (x = 0; x < kolLeds; x++)
     {
 #if CANDLE_40 == 1
       // Вариант  efimova1969

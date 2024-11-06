@@ -10,14 +10,14 @@
 #include <FastLED.h>
 
 #if MAX_LEDS < 255
-uint8_t NUM_LEDS; // Количество светодиодов, которые мы на самом деле используем, и мы можем изменить его только на длину нити - не более MAX_LEDS
-uint8_t KolLed;
+uint8_t numLeds; // Количество светодиодов, которые мы на самом деле используем, и мы можем изменить его только на длину нити - не более MAX_LEDS
+uint8_t kolLeds;
 #else
-uint16_t NUM_LEDS; // Количество светодиодов, которые мы на самом деле используем, и мы можем изменить его только на длину нити - не более MAX_LEDS
-uint16_t KolLed;
+uint16_t numLeds; // Количество светодиодов, которые мы на самом деле используем, и мы можем изменить его только на длину нити - не более MAX_LEDS
+uint16_t kolLeds;
 #endif
 
-uint8_t max_bright = 255; // Определение общей яркости; возможно изменение на лету
+uint8_t maxBright = 255; // Определение общей яркости; возможно изменение на лету
 
 struct CRGB leds[MAX_LEDS]; // инициализация массива светодиодов
 
@@ -45,17 +45,17 @@ uint8_t ledMode = 0; // номер текущего режима
 #if CHANGE_ON == 1
 uint8_t newMode = 0; // номер нового режима
 #if MAX_LEDS < 255
-uint8_t StepMode = MAX_LEDS; // Текущий шаг перехода от нового режима к старому
+uint8_t stepMode = MAX_LEDS; // Текущий шаг перехода от нового режима к старому
 #else
-uint16_t StepMode = MAX_LEDS; // Текущий шаг перехода от нового режима к старому
+uint16_t stepMode = MAX_LEDS; // Текущий шаг перехода от нового режима к старому
 #endif
 #endif
 
 uint8_t demorun = DEMO_MODE;
 #if RUNNING_FIRE > 0
-#define maxMode 122 // Maximum number of modes.
+#define MAX_MODE 122 // Maximum number of modes.
 #else
-#define maxMode 42 // Maximum number of modes.
+#define MAX_MODE 42 // Maximum number of modes.
 #endif
 
 #ifndef EORDER
@@ -109,7 +109,7 @@ void fastled_init()
 #endif
 
 #endif
-  LEDS.setBrightness(max_bright);
+  LEDS.setBrightness(maxBright);
   LEDS.setMaxPowerInVoltsAndMilliamps(5, 500);
 }
 

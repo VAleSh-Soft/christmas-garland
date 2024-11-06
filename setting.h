@@ -238,16 +238,27 @@ shButton btn4(BTN4_PIN);
 
 #if LED_ON
 // ==== Команды связанные со светодиодами ============
-#define LED1_On digitalWrite(LED1_PIN, HIGH);       // Включить светодиод 1
-#define LED1_Off digitalWrite(LED1_PIN, LOW);       // Выключить светодиод 1
-#define LED1_FleshH(x) Led1_flesh = 4 * x;          // Мигнуть быстро x раз 1 светодиодом    (1-15)
-#define LED1_Flesh(x) Led1_flesh = 64 + (8 * x);    // Мигнуть x раз 1 светодиодом           (1-7)
-#define LED1_FleshL(x) Led1_flesh = 128 + (16 * x); // Мигнуть медленно x раз 1 светодиодом  (1-7)
-#define LED2_On digitalWrite(LED2_PIN, HIGH);       // Включить светодиод 2
-#define LED2_Off digitalWrite(LED2_PIN, LOW);       // Выключить светодиод 2
-#define LED2_FleshH(x) Led2_flesh = 4 * x;          // Мигнуть быстро x раз 2 светодиодом    (1-15)
-#define LED2_Flesh(x) Led2_flesh = 64 + 8 * x;      // Мигнуть x раз 2 светодиодом           (1-7)
-#define LED2_FleshL(x) Led2_flesh = 128 + 16 * x;   // Мигнуть медленно x раз 2 светодиодом  (1-7)
+#define LED1_On digitalWrite(LED1_PIN, HIGH)       // Включить светодиод 1
+#define LED1_Off digitalWrite(LED1_PIN, LOW)       // Выключить светодиод 1
+#define LED1_FleshH(x) led1Flesh = 4 * x          // Мигнуть быстро x раз 1 светодиодом    (1-15)
+#define LED1_Flesh(x) led1Flesh = 64 + (8 * x)    // Мигнуть x раз 1 светодиодом           (1-7)
+#define LED1_FleshL(x) led1Flesh = 128 + (16 * x) // Мигнуть медленно x раз 1 светодиодом  (1-7)
+#define LED2_On digitalWrite(LED2_PIN, HIGH)       // Включить светодиод 2
+#define LED2_Off digitalWrite(LED2_PIN, LOW)       // Выключить светодиод 2
+#define LED2_FleshH(x) led2Flesh = 4 * x          // Мигнуть быстро x раз 2 светодиодом    (1-15)
+#define LED2_Flesh(x) led2Flesh = 64 + 8 * x      // Мигнуть x раз 2 светодиодом           (1-7)
+#define LED2_FleshL(x) led2Flesh = 128 + 16 * x   // Мигнуть медленно x раз 2 светодиодом  (1-7)
+#else
+#define LED1_On
+#define LED1_Off
+#define LED1_FleshH(x)
+#define LED1_Flesh(x)
+#define LED1_FleshL(x)
+#define LED2_On
+#define LED2_Off
+#define LED2_FleshH(x)
+#define LED2_Flesh(x)
+#define LED2_FleshL(x)
 #endif
 
 #if LOG_ON
@@ -264,22 +275,22 @@ shButton btn4(BTN4_PIN);
 // ==== Переменные ===================================
 
 // Установить флаг OFF
-void SetOff(uint8_t &x);
+void setOff(uint8_t &x);
 // Установить флаг ON
-void SetOn(uint8_t &x);
+void setOn(uint8_t &x);
 
 int qsubd(size_t x, size_t b);
 int qsuba(size_t x, size_t b);
 
 #if LED_ON > 0
-uint8_t Led1_flesh = 0; // Управление мигания светодиодом 1
+uint8_t led1Flesh = 0; // Управление мигания светодиодом 1
 #if LED_ON > 1
-uint8_t Led2_flesh = 0; // Управление мигания светодиодом 2
+uint8_t led2Flesh = 0; // Управление мигания светодиодом 2
 #endif
 #endif
 
-uint8_t Protocol = 0; // Temporary variables to save latest IR input
-uint32_t Command = 0;
+uint8_t protocol = 0; 
+uint32_t command = 0;
 
 // ==== Общие переменные =============================
 
@@ -306,7 +317,7 @@ typedef union
 } ExtendedFlags;
 #pragma pack(pop)
 
-ExtendedFlags ExtFlag; // Флаги расширенных настроек
+ExtendedFlags extFlag; // Флаги расширенных настроек
 
 uint8_t palchg = 3;       // Управление палитрой  3 - менять палитру автоматически иначе нет
 uint8_t startindex = 0;   // С какого цвета начинать. Переменная для эффектов one_sin_pal.
@@ -331,20 +342,20 @@ uint8_t cur_my_mode = 0;                       // Указатель на тек
 #endif
 
 #if CHANGE_SPARK == 4
-uint8_t rand_spark = 0;
+uint8_t randSpark = 0;
 #endif
 
 long summ = 0;
 
 // ===================================================
 
-void SetOff(uint8_t &x)
+void setOff(uint8_t &x)
 {
   if (x < 100)
     x += 100;
 }
 
-void SetOn(uint8_t &x)
+void setOn(uint8_t &x)
 {
   if (x >= 100)
     x -= 100;

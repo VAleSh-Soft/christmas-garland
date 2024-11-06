@@ -35,11 +35,11 @@ void serendipitous_pal()
 
   X = Xn;
   Y = Yn;
-  if (KolLed >= 10)
+  if (kolLeds >= 10)
   {
     thisindex = (sin8(X) + cos8(Y)) / 2;
-    leds[X % (KolLed)] = set_new_eorder(ColorFromPalette(gCurrentPalette, thisindex, 255, currentBlending));
-    fadeToBlackBy(leds, KolLed, 16); // 8 bit, 1 = slow, 255 = fast
+    leds[X % (kolLeds)] = set_new_eorder(ColorFromPalette(gCurrentPalette, thisindex, 255, currentBlending));
+    fadeToBlackBy(leds, kolLeds, 16); // 8 bit, 1 = slow, 255 = fast
   }
 } // serendipitous_pal()
 

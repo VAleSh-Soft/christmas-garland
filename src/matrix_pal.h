@@ -23,7 +23,7 @@ void matrix_pal()
   if (thisrot)
     thisindex++; // Increase palette index to change colours on the fly
 
-  if (KolLed >= 10)
+  if (kolLeds >= 10)
   {
 
     if (random8(90) > 80)
@@ -31,14 +31,14 @@ void matrix_pal()
       if (thisdir == -1)
         leds[0] = set_new_eorder(ColorFromPalette(gCurrentPalette, thisindex, 255, currentBlending)); // Foreground matrix colour
       else
-        leds[KolLed - 1] = set_new_eorder(ColorFromPalette(gCurrentPalette, thisindex, 255, currentBlending));
+        leds[kolLeds - 1] = set_new_eorder(ColorFromPalette(gCurrentPalette, thisindex, 255, currentBlending));
     }
     else
     {
       if (thisdir == -1)
         leds[0] = set_new_eorder(CHSV(bgclr, 255, bgbri)); // Background colour
       else
-        leds[KolLed - 1] = set_new_eorder(CHSV(bgclr, 255, bgbri));
+        leds[kolLeds - 1] = set_new_eorder(CHSV(bgclr, 255, bgbri));
     }
 
 #if MAX_LEDS < 255
@@ -49,12 +49,12 @@ void matrix_pal()
 
     if (thisdir == -1)
     { // Move the foreground colour down the line.
-      for (i = KolLed - 1; i > 0; i--)
+      for (i = kolLeds - 1; i > 0; i--)
         leds[i] = leds[i - 1];
     }
     else
     {
-      for (i = 0; i < KolLed - 1; i++)
+      for (i = 0; i < kolLeds - 1; i++)
         leds[i] = leds[i + 1];
     }
   }

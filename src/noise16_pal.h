@@ -17,17 +17,17 @@ int8_t hxyinc = 3;       // 3
 
 void noise16_pal()
 {
-  if (KolLed >= 10)
+  if (kolLeds >= 10)
   {
-    if (KolLed <= DEV_NOISE16)
-      fill_noise16(leds, KolLed, octaves, x, xscale, hue_octaves, hxy, hue_scale, hue_time);
+    if (kolLeds <= DEV_NOISE16)
+      fill_noise16(leds, kolLeds, octaves, x, xscale, hue_octaves, hxy, hue_scale, hue_time);
     else
     {
       int8_t a;
-      for (a = 0; a < (KolLed / DEV_NOISE16); a++)
+      for (a = 0; a < (kolLeds / DEV_NOISE16); a++)
         fill_noise16(&leds[DEV_NOISE16 * a], DEV_NOISE16, octaves, x, xscale, hue_octaves, hxy, hue_scale, hue_time);
-      if (KolLed > (DEV_NOISE16 * a))
-        fill_noise16(&leds[DEV_NOISE16 * a], KolLed - DEV_NOISE16 * a, octaves, x, xscale, hue_octaves, hxy, hue_scale, hue_time);
+      if (kolLeds > (DEV_NOISE16 * a))
+        fill_noise16(&leds[DEV_NOISE16 * a], kolLeds - DEV_NOISE16 * a, octaves, x, xscale, hue_octaves, hxy, hue_scale, hue_time);
     }
     hxy += hxyinc * thisdir;
     x += x_speed * thisdir;

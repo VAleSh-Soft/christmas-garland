@@ -14,7 +14,7 @@ void blendwave()
   uint16_t loc1;
 #endif
 
-  if (KolLed >= 10)
+  if (kolLeds >= 10)
   {
 
     speed = beatsin8(6, 0, 255);
@@ -23,13 +23,13 @@ void blendwave()
     clr2 = blend(CHSV(beatsin8(4, 0, 255), 255, 255), CHSV(beatsin8(3, 0, 255), 255, 255), speed);
 
 #if MAX_LEDS < 255
-    loc1 = beatsin8(10, 0, KolLed - 1);
+    loc1 = beatsin8(10, 0, kolLeds - 1);
 #else
-    loc1 = beatsin16(10, 0, KolLed - 1);
+    loc1 = beatsin16(10, 0, kolLeds - 1);
 #endif
 
     fill_gradient_RGB(leds, 0, set_new_eorder(clr2), loc1, set_new_eorder(clr1));
-    fill_gradient_RGB(leds, loc1, set_new_eorder(clr2), KolLed - 1, set_new_eorder(clr1));
+    fill_gradient_RGB(leds, loc1, set_new_eorder(clr2), kolLeds - 1, set_new_eorder(clr1));
   }
 } // blendwave()
 

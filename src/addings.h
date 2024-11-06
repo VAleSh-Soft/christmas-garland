@@ -18,13 +18,13 @@ void addcandle()
   uint16_t poz = PolCandle;
   CRGBPalette16 myPal = candle_Pal;
 
-  if (NUM_LEDS > CANDLE_KOL)
+  if (numLeds > CANDLE_KOL)
   {
-    uint16_t kol = NUM_LEDS / CANDLE_KOL; // Количество свечей
+    uint16_t kol = numLeds / CANDLE_KOL; // Количество свечей
 
     for (uint16_t x = 0; x < kol; x++)
     {
-      if (poz < NUM_LEDS)
+      if (poz < numLeds)
         leds[poz] = set_new_eorder(ColorFromPalette(myPal, random8(255)));
       poz += CANDLE_KOL;
     }
@@ -41,7 +41,7 @@ void addbackground()
   uint16_t i;
 #endif
 
-  for (i = 0; i < NUM_LEDS; i++)
+  for (i = 0; i < numLeds; i++)
     if ((leds[i].r < 5) &&
         (leds[i].g < 5) &&
         (leds[i].b < 5))
@@ -54,9 +54,9 @@ void addglitter(fract8 chanceOfGlitter)
   if (random8() < chanceOfGlitter)
   {
 #if MAX_LEDS < 255
-    leds[random8(NUM_LEDS)] += CRGB::White;
+    leds[random8(numLeds)] += CRGB::White;
 #else
-    leds[random16(NUM_LEDS)] += CRGB::White;
+    leds[random16(numLeds)] += CRGB::White;
 #endif
   }
 }
@@ -71,8 +71,8 @@ void sparkler(uint8_t n) // Бенгальский огонь
 {
   uint8_t kol = 3;
 
-  if (KolLed < 10)
-    kol = KolLed / 3;
+  if (kolLeds < 10)
+    kol = kolLeds / 3;
   if (kol >= 2)
   {
     uint8_t nn = n;
@@ -80,15 +80,15 @@ void sparkler(uint8_t n) // Бенгальский огонь
     {
     case 1:
       for (uint8_t x = 0; x < kol; x++)
-        leds[KolLed - random8(kol * 2)] = CRGB::White;
+        leds[kolLeds - random8(kol * 2)] = CRGB::White;
       break; // Бенгальский
     case 2:
-      leds[KolLed - 1] = CRGB::White;
+      leds[kolLeds - 1] = CRGB::White;
       break; // 1 яркий
     case 3:
-      leds[KolLed] = CRGB::White;
-      leds[KolLed - 1] = set_new_eorder(CRGB::Red);
-      leds[KolLed - 2] = set_new_eorder(CRGB::Violet);
+      leds[kolLeds] = CRGB::White;
+      leds[kolLeds - 1] = set_new_eorder(CRGB::Red);
+      leds[kolLeds - 2] = set_new_eorder(CRGB::Violet);
       break; // Метеорит
     }
   }
@@ -99,7 +99,7 @@ void sparkler(uint8_t n) // Бенгальский огонь
 void top()
 {
 #if TOP_EFFECT == 0
-  fill_solid(&leds[NUM_LEDS - TOP_LENGTH], TOP_LENGTH, set_new_eorder(TOP_COLOR));
+  fill_solid(&leds[numLeds - TOP_LENGTH], TOP_LENGTH, set_new_eorder(TOP_COLOR));
 #else
 #if MAX_LEDS < 255
   static uint8_t x;
@@ -107,24 +107,24 @@ void top()
   static uint16_t x;
 #endif
 
-  fadeToBlackBy(&leds[NUM_LEDS - TOP_LENGTH], TOP_LENGTH, TOP_FADING); // Затухание к черному
+  fadeToBlackBy(&leds[numLeds - TOP_LENGTH], TOP_LENGTH, TOP_FADING); // Затухание к черному
   EVERY_N_MILLIS_I(toptimer, TOP_DELAY)
   { // Sets the original delay time.
 #if TOP_EFFECT == 1
 #if TOP_LENGTH < 255
-    leds[NUM_LEDS - TOP_LENGTH + random8(0, TOP_LENGTH)] = set_new_eorder(TOP_COLOR);
+    leds[numLeds - TOP_LENGTH + random8(0, TOP_LENGTH)] = set_new_eorder(TOP_COLOR);
 #else
-    leds[NUM_LEDS - TOP_LENGTH + random16(0, TOP_LENGTH)] = set_new_eorder(TOP_COLOR);
+    leds[numLeds - TOP_LENGTH + random16(0, TOP_LENGTH)] = set_new_eorder(TOP_COLOR);
 #endif
 #elif TOP_EFFECT == 2
-    if ((x <= NUM_LEDS - TOP_LENGTH) || (x >= NUM_LEDS))
-      x = NUM_LEDS - 1;
+    if ((x <= numLeds - TOP_LENGTH) || (x >= numLeds))
+      x = numLeds - 1;
     else
       x--;
     leds[x] = set_new_eorder(TOP_COLOR);
 #else
-    if ((x < NUM_LEDS - TOP_LENGTH) || (x >= NUM_LEDS - 1))
-      x = NUM_LEDS - TOP_LENGTH;
+    if ((x < numLeds - TOP_LENGTH) || (x >= numLeds - 1))
+      x = numLeds - TOP_LENGTH;
     else
       x++;
     leds[x] = set_new_eorder(TOP_COLOR);
@@ -143,34 +143,31 @@ void BtnHandler()
     switch (btn1.getButtonState())
     {
     case BTN_ONECLICK:
-      Protocol = 1;
-      Command = BTN1_1;
+      protocol = 1;
+      command = BTN1_1;
 
       CTG_PRINTLN(F("BTN1 Click"));
 
-#if LED_ON > 0
       LED1_FleshH(1); // мигнуть светодиодом 1
-#endif
+
       break;
     case BTN_DBLCLICK:
-      Protocol = 1;
-      Command = BTN1_2;
+      protocol = 1;
+      command = BTN1_2;
 
       CTG_PRINTLN(F("BTN1 DblClick"));
 
-#if LED_ON > 0
       LED1_FleshH(2); // мигнуть 2 раза светодиодом 1
-#endif
+
       break;
     case BTN_LONGCLICK:
-      Protocol = 1;
-      Command = BTN1_PRESS;
+      protocol = 1;
+      command = BTN1_PRESS;
 
       CTG_PRINTLN(F("BTN1 Step"));
 
-#if LED_ON > 0
       LED1_FleshL(1); // мигнуть  светодиодом 1
-#endif
+
       break;
     }
   }
@@ -179,34 +176,31 @@ void BtnHandler()
     switch (btn2.getButtonState())
     {
     case BTN_ONECLICK:
-      Protocol = 1;
-      Command = BTN2_1;
+      protocol = 1;
+      command = BTN2_1;
 
       CTG_PRINTLN(F("BTN2 Click"));
 
-#if LED_ON > 0
       LED1_FleshH(1); // мигнуть светодиодом 1
-#endif
+
       break;
     case BTN_DBLCLICK:
-      Protocol = 1;
-      Command = BTN2_2;
+      protocol = 1;
+      command = BTN2_2;
 
       CTG_PRINTLN(F("BTN2 DblClick"));
 
-#if LED_ON > 0
-      LED1_FleshH(2); // мигнуть 2 раза светодиодом 1
-#endif
+     LED1_FleshH(2); // мигнуть 2 раза светодиодом 1
+
       break;
     case BTN_LONGCLICK:
-      Protocol = 1;
-      Command = BTN2_PRESS;
+      protocol = 1;
+      command = BTN2_PRESS;
 
       CTG_PRINTLN(F("BTN2 Step"));
 
-#if LED_ON > 0
       LED1_FleshL(1); // мигнуть  светодиодом 1
-#endif
+
       break;
     }
   }
@@ -215,34 +209,31 @@ void BtnHandler()
     switch (btn3.getButtonState())
     {
     case BTN_ONECLICK:
-      Protocol = 1;
-      Command = BTN3_1;
+      protocol = 1;
+      command = BTN3_1;
 
       CTG_PRINTLN(F("BTN3 Click"));
 
-#if LED_ON > 0
       LED1_FleshH(1); // мигнуть светодиодом 1
-#endif
+
       break;
     case BTN_DBLCLICK:
-      Protocol = 1;
-      Command = BTN3_2;
+      protocol = 1;
+      command = BTN3_2;
 
       CTG_PRINTLN(F("BTN3 DblClick"));
 
-#if LED_ON > 0
       LED1_FleshH(2); // мигнуть 2 раза светодиодом 1
-#endif
+
       break;
     case BTN_LONGCLICK:
-      Protocol = 1;
-      Command = BTN3_PRESS;
+      protocol = 1;
+      command = BTN3_PRESS;
 
       CTG_PRINTLN(F("BTN3 Step"));
 
-#if LED_ON > 0
       LED1_FleshL(1); // мигнуть  светодиодом 1
-#endif
+
       break;
     }
   }
@@ -251,34 +242,31 @@ void BtnHandler()
     switch (btn4.getButtonState())
     {
     case BTN_ONECLICK:
-      Protocol = 1;
-      Command = BTN4_1;
+      protocol = 1;
+      command = BTN4_1;
 
       CTG_PRINTLN(F("BTN4 Click"));
 
-#if LED_ON > 0
       LED1_FleshH(1); // мигнуть светодиодом 1
-#endif
+
       break;
     case BTN_DBLCLICK:
-      Protocol = 1;
-      Command = BTN4_2;
+      protocol = 1;
+      command = BTN4_2;
 
       CTG_PRINTLN(F("BTN4 DblClick"));
 
-#if LED_ON > 0
       LED1_FleshH(2); // мигнуть 2 раза светодиодом 1
-#endif
+
       break;
     case BTN_LONGCLICK:
-      Protocol = 1;
-      Command = BTN4_PRESS;
+      protocol = 1;
+      command = BTN4_PRESS;
 
       CTG_PRINTLN(F("BTN4 Step"));
 
-#if LED_ON > 0
       LED1_FleshL(1); // мигнуть  светодиодом 1
-#endif
+
       break;
     }
   }

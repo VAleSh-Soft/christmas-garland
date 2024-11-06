@@ -14,7 +14,7 @@ uint8_t mul3;
 
 void three_sin_pal()
 {
-  if (KolLed >= 10)
+  if (kolLeds >= 10)
   {
 
     wave1 += beatsin8(10, -4, 4) * thisdir;
@@ -27,7 +27,7 @@ void three_sin_pal()
     uint16_t k;
 #endif
 
-    for (k = 0; k < KolLed; k++)
+    for (k = 0; k < kolLeds; k++)
     {
       uint8_t tmp = sin8(mul1 * k + wave1) + sin8(mul1 * k + wave2) + sin8(mul1 * k + wave3);
       leds[k] = set_new_eorder(ColorFromPalette(gCurrentPalette, tmp, 255, currentBlending));

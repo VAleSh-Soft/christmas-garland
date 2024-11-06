@@ -60,8 +60,8 @@ void running_fire(uint8_t prog, uint8_t effect, uint8_t clear)
 #endif
 
     if (tek_clear)
-      fadeToBlackBy(leds, KolLed, tek_clear * 5 + 1);
-    for (i = 0; i < KolLed; i++)
+      fadeToBlackBy(leds, kolLeds, tek_clear * 5 + 1);
+    for (i = 0; i < kolLeds; i++)
     {
       uint8_t x;
       if (tek_effect < 2)

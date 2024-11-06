@@ -18,7 +18,7 @@ uint8_t thatcutoff = 192; // You can change the cutoff value to display that wav
 
 void two_sin()
 { // This is the heart of this program. Sure is short.
-  if (KolLed >= 10)
+  if (kolLeds >= 10)
   {
     thisphase += thisspeed * thisdir;
     thatphase += thatspeed * thisdir;
@@ -32,7 +32,7 @@ void two_sin()
     uint16_t k;
 #endif
 
-    for (k = 0; k < KolLed; k++)
+    for (k = 0; k < kolLeds; k++)
     {
       int thisbright = qsuba(cubicwave8((k * allfreq) + thisphase), thiscutoff);       // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
       int thatbright = qsuba(cubicwave8((k * allfreq) + 128 + thatphase), thatcutoff); // This wave is 180 degrees out of phase (with the value of 128).

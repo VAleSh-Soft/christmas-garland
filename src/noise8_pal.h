@@ -20,9 +20,9 @@ void noise8_pal()
 #else
   uint16_t i;
 #endif
-  if (KolLed >= 10)
+  if (kolLeds >= 10)
   {
-    for (i = 0; i < KolLed; i++)
+    for (i = 0; i < kolLeds; i++)
     {                                                                           // Just ONE loop to fill up the LED array as all of the pixels change.
       uint8_t index = inoise8(i * scale, dist + i * scale) % 255;               // Get a value from the noise function. I'm using both x and y axis.
       leds[i] = set_new_eorder(ColorFromPalette(gCurrentPalette, index, 255, currentBlending)); // With that value, look up the 8 bit colour palette value and assign it to the current LED.

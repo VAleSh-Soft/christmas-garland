@@ -19,13 +19,13 @@ uint8_t numdots;
 
 void juggle_pal()
 { // Several colored dots, weaving in and out of sync with each other
-  if (KolLed >= 10)
+  if (kolLeds >= 10)
   {
     thisindex = 0;                         // Reset the hue values.
-    fadeToBlackBy(leds, KolLed, thisfade); // Затухание к черному
+    fadeToBlackBy(leds, kolLeds, thisfade); // Затухание к черному
     for (uint8_t i = 0; i < numdots; i++)
     {
-      leds[beatsin16(thisbeat + i + numdots, 0, KolLed - 1)] +=
+      leds[beatsin16(thisbeat + i + numdots, 0, kolLeds - 1)] +=
           set_new_eorder(ColorFromPalette(gCurrentPalette,
                                           thisindex,
                                           255,

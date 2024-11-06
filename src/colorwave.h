@@ -28,7 +28,7 @@ void colorwaves()
   uint16_t i;
 #endif
 
-  if (KolLed >= 10)
+  if (kolLeds >= 10)
   {
     uint8_t brightdepth = beatsin88(341, 96, 224);
     uint16_t brightnessthetainc16 = beatsin88(203, (25 * 256), (40 * 256));
@@ -44,7 +44,7 @@ void colorwaves()
     sHue16 += deltams * beatsin88(400, 5, 9);
     uint16_t brightnesstheta16 = sPseudotime;
 
-    for (i = 0; i < KolLed; i++)
+    for (i = 0; i < kolLeds; i++)
     {
       hue16 += hueinc16;
       uint8_t hue8 = hue16 / 256;
@@ -71,7 +71,7 @@ void colorwaves()
 
       CRGB newcolor = set_new_eorder(ColorFromPalette(gCurrentPalette, index, bri8));
       if (thisdir == 1) // направление
-        nblend(leds[(KolLed - 1) - i], newcolor, 128);
+        nblend(leds[(kolLeds - 1) - i], newcolor, 128);
       else
         nblend(leds[i], newcolor, 128);
     }

@@ -36,9 +36,9 @@ void one_sin_pal()
 #else
   uint16_t k;
 #endif
-  if (KolLed >= 10)
+  if (kolLeds >= 10)
   {
-    for (k = 0; k < KolLed; k++)
+    for (k = 0; k < kolLeds; k++)
     {                                                                            // For each of the LED's in the strand, set a brightness based on a wave as follows:
       int thisbright = qsubd(cubicwave8((k * allfreq) + thisphase), thiscutoff); // qsub sets a minimum value called thiscutoff. If < thiscutoff, then bright = 0. Otherwise, bright = 128 (as defined in qsub)..
       leds[k] = set_new_eorder(CHSV(bgclr, 255, bgbri));                                         // First set a background colour, but fully saturated.

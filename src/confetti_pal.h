@@ -18,13 +18,13 @@
 
 void confetti_pal()
 { // random colored speckles that blink in and fade smoothly
-  if (KolLed >= 10)
+  if (kolLeds >= 10)
   {
-    fadeToBlackBy(leds, KolLed, thisfade); // Задухание светодиодов на значение thisfade
+    fadeToBlackBy(leds, kolLeds, thisfade); // Задухание светодиодов на значение thisfade
 #if MAX_LEDS < 255
-    uint8_t pos = random8(KolLed);
+    uint8_t pos = random8(kolLeds);
 #else
-    uint16_t pos = random16(KolLed);
+    uint16_t pos = random16(kolLeds);
 #endif
     leds[pos] = set_new_eorder(ColorFromPalette(gCurrentPalette,
                                                 thisindex + random8(thisdiff) / 4,

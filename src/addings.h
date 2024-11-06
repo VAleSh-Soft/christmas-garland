@@ -11,11 +11,9 @@ DEFINE_GRADIENT_PALETTE(candle_Pal){
     180, 255, 255, 0,    // bright yellow
     255, 255, 255, 255}; // full white
 
-uint8_t PolCandle = 1; // Положение свечи
-
 void addcandle()
 {
-  uint16_t poz = PolCandle;
+  uint16_t poz = polCandle;
   CRGBPalette16 myPal = candle_Pal;
 
   if (numLeds > CANDLE_KOL)

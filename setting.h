@@ -7,7 +7,7 @@
 
 // ==== Подключенная периферия =======================
 
-#define LED_ON 0 // Количество индикаторных светодиодов (0- светодиоды не используются, максимум 2 светодиода
+#define LED_ON 0      // Количество индикаторных светодиодов (0- светодиоды не используются, максимум 2 светодиода
 #define BUTTONS_NUM 3 // Количество кнопок подключенных к библиотеке shButton (0- библиотека отключена, максимум 4 кнопки)
 
 // ==== Вывод отладочной информации ==================
@@ -238,13 +238,13 @@ shButton btn4(BTN4_PIN);
 
 #if LED_ON
 // ==== Команды связанные со светодиодами ============
-#define LED1_On digitalWrite(LED1_PIN, HIGH)       // Включить светодиод 1
-#define LED1_Off digitalWrite(LED1_PIN, LOW)       // Выключить светодиод 1
+#define LED1_On digitalWrite(LED1_PIN, HIGH)      // Включить светодиод 1
+#define LED1_Off digitalWrite(LED1_PIN, LOW)      // Выключить светодиод 1
 #define LED1_FleshH(x) led1Flesh = 4 * x          // Мигнуть быстро x раз 1 светодиодом    (1-15)
 #define LED1_Flesh(x) led1Flesh = 64 + (8 * x)    // Мигнуть x раз 1 светодиодом           (1-7)
 #define LED1_FleshL(x) led1Flesh = 128 + (16 * x) // Мигнуть медленно x раз 1 светодиодом  (1-7)
-#define LED2_On digitalWrite(LED2_PIN, HIGH)       // Включить светодиод 2
-#define LED2_Off digitalWrite(LED2_PIN, LOW)       // Выключить светодиод 2
+#define LED2_On digitalWrite(LED2_PIN, HIGH)      // Включить светодиод 2
+#define LED2_Off digitalWrite(LED2_PIN, LOW)      // Выключить светодиод 2
 #define LED2_FleshH(x) led2Flesh = 4 * x          // Мигнуть быстро x раз 2 светодиодом    (1-15)
 #define LED2_Flesh(x) led2Flesh = 64 + 8 * x      // Мигнуть x раз 2 светодиодом           (1-7)
 #define LED2_FleshL(x) led2Flesh = 128 + 16 * x   // Мигнуть медленно x раз 2 светодиодом  (1-7)
@@ -289,7 +289,7 @@ uint8_t led2Flesh = 0; // Управление мигания светодиод
 #endif
 #endif
 
-uint8_t protocol = 0; 
+uint8_t protocol = 0;
 uint32_t command = 0;
 
 // ==== Общие переменные =============================

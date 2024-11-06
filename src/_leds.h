@@ -17,6 +17,8 @@ uint16_t numLeds; // Количество светодиодов, которые
 uint16_t kolLeds;
 #endif
 
+uint8_t polCandle = 1; // Положение свечи
+
 uint8_t maxBright = 255; // Определение общей яркости; возможно изменение на лету
 
 struct CRGB leds[MAX_LEDS]; // инициализация массива светодиодов

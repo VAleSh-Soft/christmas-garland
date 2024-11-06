@@ -3,6 +3,8 @@
 #if SAVE_EEPROM > 0
 #include "_eeprom.h"
 #endif
+#include "../setting.h"
+#include "_leds.h"
 
 // ==== Работа с кнопками ============================
 #if BUTTONS_NUM
@@ -26,7 +28,7 @@ void SetMode(uint8_t Mode)
   strobe_mode(Mode, 1); // Does NOT reset to 0.
 #endif
 #if CANDLE_KOL > 0
-  PolCandle = random8(CANDLE_KOL);
+  polCandle = random8(CANDLE_KOL);
 #endif
 }
 
@@ -336,7 +338,7 @@ void getirl()
         if (protocol == 1)
         { // отключить повтор
           extFlag.Candle = !extFlag.Candle;
-          PolCandle = random8(CANDLE_KOL);
+          polCandle = random8(CANDLE_KOL);
 
           CTG_PRINT(F("Candle "));
           CTG_PRINTLN(extFlag.Candle);

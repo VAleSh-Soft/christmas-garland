@@ -967,7 +967,7 @@ void demo_check()
       }
       strobe_mode(ledMode, 1); // Does NOT reset to 0.
 #if CANDLE_KOL > 0
-      PolCandle = random8(CANDLE_KOL);
+      polCandle = random8(CANDLE_KOL);
 #endif
 #endif
     }

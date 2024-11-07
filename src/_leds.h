@@ -22,6 +22,10 @@ void print_eorder();
 // установка количества светодиодов в гирлянде
 void setLengthOfGarland();
 #endif
+#if !defined(EORDER) && BUTTONS_NUM > 0
+// настройка порядка следования цветов в чипе
+void set_eorder();
+#endif
 
 // ===================================================
 
@@ -70,12 +74,21 @@ void fastled_init()
   LEDS.addLeds<CHIPSET, LED_DATA_PIN, RGB>(leds, MAX_LEDS);
 #endif
 
-#if BUTTONS_NUM
+#if BUTTONS_NUM > 0
   // настройка следования цветов при зажатой кнопке 1
   if (!digitalRead(BTN1_PIN))
   {
-    /* code */
+    // отработка первого клика, чтобы не мешался в настройках
+    btn1.getButtonState();
+    delay(100);
+    btn1.getButtonState();
+
+    set_eorder();
   }
+
+#endif
+
+#endif
 
 #if BUTTONS_NUM > 1
   // если кнопок больше одной, доступна настройка длины гирлянды
@@ -83,10 +96,6 @@ void fastled_init()
   {
     setLengthOfGarland();
   }
-#endif
-
-#endif
-
 #endif
 }
 
@@ -208,6 +217,40 @@ void setLengthOfGarland()
       write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(numLeds) & 0x00ff);
       write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(numLeds) >> 8);
 #endif
+    }
+  }
+}
+#endif
+
+#if !defined(EORDER) && BUTTONS_NUM > 0
+static void show_rgb()
+{
+  CRGB exmpl[] = {CRGB::Red, CRGB::Green, CRGB::Blue};
+  for (uint8_t i = 0; i < 3; i++)
+  {
+    leds[i] = set_new_eorder(exmpl[i]);
+  }
+  LEDS.show();
+}
+
+void set_eorder()
+{
+  eorder_index = 0;
+  write_eeprom_8(EEPROM_INDEX_FOR_EORDER, eorder_index);
+  fill_solid(leds, MAX_LEDS, CRGB::Black);
+  show_rgb();
+
+  // запускаем бесконечный цикл для опроса кнопки
+  while (true)
+  {
+    if (btn1.getButtonState() == BTN_DOWN)
+    {
+      if (++eorder_index > 5)
+      {
+        eorder_index = 0;
+      }
+      write_eeprom_8(EEPROM_INDEX_FOR_EORDER, eorder_index);
+      show_rgb();
     }
   }
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#if SAVE_EEPROM > 0
+#if SAVE_EEPROM
 #include "_eeprom.h"
 #endif
 #include "../setting.h"
@@ -13,7 +13,7 @@ void bootme();
 void meshwait();
 void getirl();
 
-void SetMode(uint8_t Mode)
+void setMode(uint8_t Mode)
 {
   setOff(demorun);
 #if CHANGE_ON == 1
@@ -52,7 +52,7 @@ void getirl()
       case Command_Brightness_plus: //  Увеличить максимальную яркость и остановится если достигли максимума
         maxBright = min((maxBright < 5) ? maxBright + 1 : maxBright / 2 * 3, 255);
         LEDS.setBrightness(maxBright);
-#if SAVE_EEPROM > 0
+#if SAVE_EEPROM
         write_eeprom_8(EEPROM_INDEX_FOR_BRIGHT, maxBright);
 #endif
 
@@ -69,7 +69,7 @@ void getirl()
         else
           maxBright = min((maxBright < 5) ? maxBright + 1 : maxBright / 2 * 3, 255);
         LEDS.setBrightness(maxBright);
-#if SAVE_EEPROM > 0
+#if SAVE_EEPROM
         write_eeprom_8(EEPROM_INDEX_FOR_BRIGHT, maxBright);
 #endif
 
@@ -83,7 +83,7 @@ void getirl()
       case Command_Brightness_minus: //  Уменьшить максимальную яркость и остановится если достигли минимума
         maxBright = max((maxBright < 5) ? maxBright - 1 : maxBright / 3 * 2, 1);
         LEDS.setBrightness(maxBright);
-#if SAVE_EEPROM > 0
+#if SAVE_EEPROM
         write_eeprom_8(EEPROM_INDEX_FOR_BRIGHT, maxBright);
 #endif
 
@@ -100,7 +100,7 @@ void getirl()
         else
           maxBright = max((maxBright < 5) ? maxBright - 1 : maxBright / 3 * 2, 1);
         LEDS.setBrightness(maxBright);
-#if SAVE_EEPROM > 0
+#if SAVE_EEPROM
         write_eeprom_8(EEPROM_INDEX_FOR_BRIGHT, maxBright);
 #endif
 
@@ -219,62 +219,6 @@ void getirl()
         break;
 #endif
 
-#if Command_Setup_Mode_On
-      case Command_Setup_Mode_On: //  Перейти в режим настройки
-        if (demorun < 100)
-          demorun += 100;
-        ledMode = 200;
-        LED2_On; // Включить светодиод
-
-        CTG_PRINTLN(F("Setup Mode On "));
-
-        break;
-#endif
-
-#if Command_Length_Garland_plus
-      case Command_Length_Garland_plus: //  Увеличить количество светодиодов в гирлянде
-        setOff(demorun);
-        ledMode = 200;
-        if (numLeds < (MAX_LEDS - 1))
-          numLeds++; // Новое значение
-#if SAVE_EEPROM > 0
-#if MAX_LEDS < 255
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, numLeds); // Сохранить в память
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, 0);    // Сохранить в память
-#else
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(numLeds) & 0x00ff); // Сохранить в память
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(numLeds) >> 8); // Сохранить в память
-#endif
-#endif
-
-        CTG_PRINT(F("Length Garland "));
-        CTG_PRINTLN(numLeds);
-
-        break;
-#endif
-
-#if Command_Length_Garland_minus
-      case Command_Length_Garland_minus: //  Уменьшить количество светодиодов в гирлянде
-        setOff(demorun);
-        ledMode = 200;
-        if (numLeds > 0)
-          numLeds--; // Новое значение
-#if SAVE_EEPROM > 0
-#if MAX_LEDS < 255
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, numLeds); // Сохранить в память
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, 0);    // Сохранить в память
-#else
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(numLeds) & 0x00ff); // Сохранить в память
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(numLeds) >> 8); // Сохранить в память
-#endif
-#endif
-
-        CTG_PRINT(F("Length Garland "));
-        CTG_PRINTLN(numLeds);
-
-        break;
-#endif
-
 #if Command_Rotate
       case Command_Rotate: //  Сменить направление движения эффектов
         if (protocol == 1)
@@ -352,9 +296,9 @@ void getirl()
         if (protocol == 1)
         { // отключить повтор
           if (newMode > 0)
-            SetMode(newMode - 1);
+            setMode(newMode - 1);
           else
-            SetMode(MAX_MODE - 1);
+            setMode(MAX_MODE - 1);
 
           CTG_PRINTLN(F("Previous mode"));
         }
@@ -366,9 +310,9 @@ void getirl()
         if (protocol == 1)
         { // отключить повтор
           if (newMode > 0)
-            SetMode(newMode - 1);
+            setMode(newMode - 1);
           else
-            SetMode(MAX_MODE - 1);
+            setMode(MAX_MODE - 1);
           setOn(demorun);
 
           CTG_PRINTLN(F("Previous mode + Demo"));
@@ -381,9 +325,9 @@ void getirl()
         if (protocol == 1)
         { // отключить повтор
           if (newMode >= (MAX_MODE - 1))
-            SetMode(0);
+            setMode(0);
           else
-            SetMode(newMode + 1);
+            setMode(newMode + 1);
 
           CTG_PRINTLN(F("Next mode"));
         }
@@ -395,9 +339,9 @@ void getirl()
         if (protocol == 1)
         { // отключить повтор
           if (newMode >= (MAX_MODE - 1))
-            SetMode(0);
+            setMode(0);
           else
-            SetMode(newMode + 1);
+            setMode(newMode + 1);
           setOn(demorun);
 
           CTG_PRINTLN(F("Next mode + Demo"));
@@ -407,253 +351,253 @@ void getirl()
 
 #if Command_Mode_0
       case Command_Mode_0: //  Эффект 0
-        SetMode(0);
+        setMode(0);
         break;
 #endif
 
 #if Command_Mode_1
       case Command_Mode_1: //  Эффект 1
-        SetMode(1);
+        setMode(1);
         break;
 #endif
 
 #if Command_Mode_2
       case Command_Mode_2: //  Эффект 2
-        SetMode(2);
+        setMode(2);
         break;
 #endif
 
 #if Command_Mode_3
       case Command_Mode_3: //  Эффект 3
-        SetMode(3);
+        setMode(3);
         break;
 #endif
 
 #if Command_Mode_4
       case Command_Mode_4: //  Эффект 4
-        SetMode(4);
+        setMode(4);
         break;
 #endif
 
 #if Command_Mode_5
       case Command_Mode_5: //  Эффект 5
-        SetMode(5);
+        setMode(5);
         break;
 #endif
 
 #if Command_Mode_6
       case Command_Mode_6: //  Эффект 6
-        SetMode(6);
+        setMode(6);
         break;
 #endif
 
 #if Command_Mode_7
       case Command_Mode_7: //  Эффект 7
-        SetMode(7);
+        setMode(7);
         break;
 #endif
 
 #if Command_Mode_8
       case Command_Mode_8: //  Эффект 8
-        SetMode(8);
+        setMode(8);
         break;
 #endif
 
 #if Command_Mode_9
       case Command_Mode_9: //  Эффект 9
-        SetMode(9);
+        setMode(9);
         break;
 #endif
 
 #if Command_Mode_10
       case Command_Mode_10: //  Эффект 10
-        SetMode(10);
+        setMode(10);
         break;
 #endif
 
 #if Command_Mode_11
       case Command_Mode_11: //  Эффект 11
-        SetMode(11);
+        setMode(11);
         break;
 #endif
 
 #if Command_Mode_12
       case Command_Mode_12: //  Эффект 12
-        SetMode(12);
+        setMode(12);
         break;
 #endif
 
 #if Command_Mode_13
       case Command_Mode_13: //  Эффект 13
-        SetMode(13);
+        setMode(13);
         break;
 #endif
 
 #if Command_Mode_14
       case Command_Mode_14: //  Эффект 14
-        SetMode(14);
+        setMode(14);
         break;
 #endif
 
 #if Command_Mode_15
       case Command_Mode_15: //  Эффект 15
-        SetMode(15);
+        setMode(15);
         break;
 #endif
 
 #if Command_Mode_16
       case Command_Mode_16: //  Эффект 16
-        SetMode(16);
+        setMode(16);
         break;
 #endif
 
 #if Command_Mode_17
       case Command_Mode_17: //  Эффект 17
-        SetMode(17);
+        setMode(17);
         break;
 #endif
 
 #if Command_Mode_18
       case Command_Mode_18: //  Эффект 18
-        SetMode(18);
+        setMode(18);
         break;
 #endif
 
 #if Command_Mode_19
       case Command_Mode_19: //  Эффект 19
-        SetMode(19);
+        setMode(19);
         break;
 #endif
 
 #if Command_Mode_20
       case Command_Mode_20: //  Эффект 20
-        SetMode(20);
+        setMode(20);
         break;
 #endif
 
 #if Command_Mode_21
       case Command_Mode_21: //  Эффект 21
-        SetMode(21);
+        setMode(21);
         break;
 #endif
 
 #if Command_Mode_22
       case Command_Mode_22: //  Эффект 22
-        SetMode(22);
+        setMode(22);
         break;
 #endif
 
 #if Command_Mode_23
       case Command_Mode_23: //  Эффект 23
-        SetMode(23);
+        setMode(23);
         break;
 #endif
 
 #if Command_Mode_24
       case Command_Mode_24: //  Эффект 24
-        SetMode(24);
+        setMode(24);
         break;
 #endif
 
 #if Command_Mode_25
       case Command_Mode_25: //  Эффект 25
-        SetMode(25);
+        setMode(25);
         break;
 #endif
 
 #if Command_Mode_26
       case Command_Mode_26: //  Эффект 26
-        SetMode(26);
+        setMode(26);
         break;
 #endif
 
 #if Command_Mode_27
       case Command_Mode_27: //  Эффект 27
-        SetMode(27);
+        setMode(27);
         break;
 #endif
 
 #if Command_Mode_28
       case Command_Mode_28: //  Эффект 28
-        SetMode(28);
+        setMode(28);
         break;
 #endif
 
 #if Command_Mode_29
       case Command_Mode_29: //  Эффект 29
-        SetMode(29);
+        setMode(29);
         break;
 #endif
 
 #if Command_Mode_30
       case Command_Mode_0: //  Эффект 30
-        SetMode(30);
+        setMode(30);
         break;
 #endif
 
 #if Command_Mode_31
       case Command_Mode_31: //  Эффект 31
-        SetMode(31);
+        setMode(31);
         break;
 #endif
 
 #if Command_Mode_32
       case Command_Mode_32: //  Эффект 32
-        SetMode(32);
+        setMode(32);
         break;
 #endif
 
 #if Command_Mode_33
       case Command_Mode_33: //  Эффект 33
-        SetMode(33);
+        setMode(33);
         break;
 #endif
 
 #if Command_Mode_34
       case Command_Mode_34: //  Эффект 34
-        SetMode(34);
+        setMode(34);
         break;
 #endif
 
 #if Command_Mode_35
       case Command_Mode_35: //  Эффект 35
-        SetMode(35);
+        setMode(35);
         break;
 #endif
 
 #if Command_Mode_36
       case Command_Mode_36: //  Эффект 36
-        SetMode(36);
+        setMode(36);
         break;
 #endif
 
 #if Command_Mode_37
       case Command_Mode_37: //  Эффект 37
-        SetMode(37);
+        setMode(37);
         break;
 #endif
 
 #if Command_Mode_38
       case Command_Mode_38: //  Эффект 38
-        SetMode(38);
+        setMode(38);
         break;
 #endif
 
 #if Command_Mode_39
       case Command_Mode_39: //  Эффект 39
-        SetMode(39);
+        setMode(39);
         break;
 #endif
 
 #if Command_Mode_40
       case Command_Mode_40: //  Эффект 40
-        SetMode(40);
+        setMode(40);
         break;
 #endif
 
 #if Command_Mode_41
       case Command_Mode_41: //  Эффект 41
-        SetMode(41);
+        setMode(41);
         break;
 #endif
 
@@ -661,7 +605,7 @@ void getirl()
       case Command_Save_Mode: //  Сохранить эффект как запускающийся первым
         if (protocol == 1)
         { // отключить повтор
-#if SAVE_EEPROM > 0
+#if SAVE_EEPROM
           write_eeprom_8(EEPROM_INDEX_FOR_STARTMODE, ledMode);
 
           CTG_PRINTLN(F("Save Mode"));
@@ -677,7 +621,7 @@ void getirl()
         ledMode = 201;
         if (meshdelay > 0)
           meshdelay--; // Новое значение
-#if SAVE_EEPROM > 0
+#if SAVE_EEPROM
         write_eeprom_8(EEPROM_INDEX_FOR_STRANDEL, meshdelay);
 #endif
 
@@ -694,7 +638,7 @@ void getirl()
         ledMode = 201;
         if (meshdelay < 100)
           meshdelay++; // Новое значение
-#if SAVE_EEPROM > 0
+#if SAVE_EEPROM
         write_eeprom_8(EEPROM_INDEX_FOR_STRANDEL, meshdelay);
 #endif
 
@@ -893,7 +837,7 @@ void getirl()
 #endif
                                           // ledMode = newMode;
                                           // setOn(demorun);
-#if SAVE_EEPROM > 0
+#if SAVE_EEPROM
 #if MAX_LEDS < 255
         write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, numLeds); // Сохранить в память
         write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, 0);    // Сохранить в память
@@ -902,9 +846,7 @@ void getirl()
         write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(numLeds) >> 8); // Сохранить в память
 #endif
 
-#if SAVE_EEPROM == 1
         write_eeprom_8(EEPROM_INDEX_FOR_EXTFLAG, extFlag.Byte); // сохраним в EPROM расширенные настройки
-#endif
 #endif
 
         CTG_PRINTLN(F("Setup Mode Off "));
@@ -960,24 +902,6 @@ void getirl()
 
         CTG_PRINT(F("Length Garland Munus: "));
         CTG_PRINTLN(numLeds);
-
-        break;
-#endif
-
-#if Setup_Command_Solid_Green
-      case Setup_Command_Solid_Green: //  Установить цвет Зеленый
-        ledMode = 221;                // Новое значение
-
-        CTG_PRINTLN(F("Green Red Blue"));
-
-        break;
-#endif
-
-#if Setup_Command_Solid_Red
-      case Setup_Command_Solid_Red: //  Установить цвет Красный
-        ledMode = 220;              // Новое значение
-
-        CTG_PRINTLN(F("Red Green Blue"));
 
         break;
 #endif

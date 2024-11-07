@@ -7,66 +7,24 @@
 #pragma once
 
 #include "../setting.h"
+#include "_eeprom.h"
 #include <FastLED.h>
-
-#if MAX_LEDS < 255
-uint8_t numLeds; // Количество светодиодов, которые мы на самом деле используем, и мы можем изменить его только на длину нити - не более MAX_LEDS
-uint8_t kolLeds;
-#else
-uint16_t numLeds; // Количество светодиодов, которые мы на самом деле используем, и мы можем изменить его только на длину нити - не более MAX_LEDS
-uint16_t kolLeds;
-#endif
-
-uint8_t polCandle = 1; // Положение свечи
-
-uint8_t maxBright = 255; // Определение общей яркости; возможно изменение на лету
-
-struct CRGB leds[MAX_LEDS]; // инициализация массива светодиодов
-
-CRGBPalette16 gCurrentPalette; // Использование палитры вместо прямых назначений CHSV или CRGB.
-CRGBPalette16 gTargetPalette;  // Поддержка плавной смены палитры
-CRGB solid = CRGB::Black;      // Цвет заливки
-
-extern const TProgmemRGBGradientPalettePtr gGradientPalettes[]; // для фиксированных палитр в gradient_palettes.h.
-
-extern const uint8_t gGradientPaletteCount; // Общее количество фиксированных палитр
-uint8_t gCurrentPaletteNumber = 0;          // Текущий номер палитры из списка палитр.
-uint8_t currentPatternIndex = 0;            // Порядковый номер текущего шаблона
-uint32_t demo_time = 0;                     // время демо режима
-
-TBlendType currentBlending = LINEARBLEND; // NOBLEND или LINEARBLEND
-
-#define INITVAL 0x55     // Это значение проверяем в бите корректности EEPROM
-#define INITMODE 0       // с этого режима будет старт, по умолчанию 0 (старт с - с черного цвета)
-#define INITLEN MAX_LEDS // Размер гирлянды при старте
-#define INITDEL 0        // размер задержки при старте в миллисекундах
-
-uint16_t meshdelay; // Timer for the notamesh. Works with INITDEL.
-
-uint8_t ledMode = 0; // номер текущего режима
-#if CHANGE_ON == 1
-uint8_t newMode = 0; // номер нового режима
-#if MAX_LEDS < 255
-uint8_t stepMode = MAX_LEDS; // Текущий шаг перехода от нового режима к старому
-#else
-uint16_t stepMode = MAX_LEDS; // Текущий шаг перехода от нового режима к старому
-#endif
-#endif
-
-uint8_t demorun = DEMO_MODE;
-#if RUNNING_FIRE > 0
-#define MAX_MODE 122 // Maximum number of modes.
-#else
-#define MAX_MODE 42 // Maximum number of modes.
-#endif
-
-#ifndef EORDER
-uint8_t eorder_index = 2; // сохраненная очередность цветов, если она не задана жестко макросом EORDER
-#endif
 
 // ===================================================
 
 // подмена цветов согласно сохраненного порядка следования перед выводом их на гирлянду
+CRGB set_new_eorder(CRGB _col);
+// инициализация FastLED
+void fastled_init();
+// вывод цветности гирлянды в Сериал
+void print_eorder();
+#if BUTTONS_NUM > 1
+// установка количества светодиодов в гирлянде
+void setLengthOfGarland();
+#endif
+
+// ===================================================
+
 CRGB set_new_eorder(CRGB _col)
 {
 #if !defined(EORDER)
@@ -91,9 +49,11 @@ CRGB set_new_eorder(CRGB _col)
 #endif
 }
 
-// инициализация FastLED
 void fastled_init()
 {
+  LEDS.setBrightness(maxBright);
+  LEDS.setMaxPowerInVoltsAndMilliamps(5, 500);
+
 #if defined(EORDER)
 
 #if defined(LED_CLK_PIN)
@@ -110,12 +70,26 @@ void fastled_init()
   LEDS.addLeds<CHIPSET, LED_DATA_PIN, RGB>(leds, MAX_LEDS);
 #endif
 
+#if BUTTONS_NUM
+  // настройка следования цветов при зажатой кнопке 1
+  if (!digitalRead(BTN1_PIN))
+  {
+    /* code */
+  }
+
+#if BUTTONS_NUM > 1
+  // если кнопок больше одной, доступна настройка длины гирлянды
+  if (!digitalRead(BTN2_PIN))
+  {
+    setLengthOfGarland();
+  }
 #endif
-  LEDS.setBrightness(maxBright);
-  LEDS.setMaxPowerInVoltsAndMilliamps(5, 500);
+
+#endif
+
+#endif
 }
 
-// вывод цветности гирлянды в Сериал
 void print_eorder()
 {
   CTG_PRINT(F("LEDS EORDER: "));
@@ -165,3 +139,76 @@ void print_eorder()
   }
 #endif
 }
+
+#if BUTTONS_NUM > 1
+static void fill_solid_garland()
+{
+  fill_solid(leds, MAX_LEDS, CRGB::Black);
+  fill_solid(leds, numLeds, set_new_eorder(CRGB::Red));
+  LEDS.show();
+}
+void setLengthOfGarland()
+{
+  fill_solid_garland();
+
+  // запускаем бесконечный цикл для опроса кнопок
+  while (true)
+  {
+    switch (btn1.getButtonState())
+    {
+    case BTN_DOWN:
+      if (numLeds < MAX_LEDS)
+      {
+        numLeds++;
+        fill_solid_garland();
+      }
+      break;
+    case BTN_LONGCLICK:
+      if (numLeds < MAX_LEDS - 10)
+      {
+        numLeds += 10;
+        fill_solid_garland();
+      }
+      break;
+    }
+
+#if BUTTONS_NUM == 2
+    shButton *btn_down = &btn2;
+#elif BUTTONS_NUM == 3
+    shButton *btn_down = &btn3;
+#elif BUTTONS_NUM == 4
+    shButton *btn_down = &btn4;
+#endif
+    switch (btn_down->getButtonState())
+    {
+    case BTN_DOWN:
+      if (numLeds > 1)
+      {
+        numLeds--;
+        fill_solid_garland();
+      }
+      break;
+    case BTN_LONGCLICK:
+      if (numLeds > 10)
+      {
+        numLeds -= 10;
+        fill_solid_garland();
+      }
+      break;
+    }
+
+    // при отпускании кнопки сохранить длину в EEPROM
+    if (btn1.getLastState() == BTN_UP ||
+        btn_down->getLastState() == BTN_UP)
+    {
+#if MAX_LEDS < 255
+      write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, numLeds);
+      write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, 0);
+#else
+      write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(numLeds) & 0x00ff);
+      write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(numLeds) >> 8);
+#endif
+    }
+  }
+}
+#endif

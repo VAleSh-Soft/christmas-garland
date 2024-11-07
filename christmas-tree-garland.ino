@@ -12,7 +12,7 @@
 // Функции поддержки
 #include "src/addings.h"
 
-#if SAVE_EEPROM > 0
+#if SAVE_EEPROM
 #include "src/_eeprom.h"
 #endif
 
@@ -96,11 +96,15 @@ void setup()
   CTG_PRINTLN(F(" "));
   CTG_PRINTLN(F("---SETTING UP---"));
 
-#if SAVE_EEPROM > 0
+#if SAVE_EEPROM
   // если задано сохранение настроек в EEPROM
   eeprom_init();
 #else
   // если настройки в EEPROM не сохраняются
+
+  extFlag.Glitter = GLITER_ON;    // Флаг включения блеска
+  extFlag.Background = BACKGR_ON; // Флаг включения заполнения фона
+  extFlag.Candle = CANDLE_ON;     // Флаг включения свечей
 
 #ifdef MY_MODE
   switch (demorun)
@@ -243,7 +247,7 @@ void loop()
     strobe_mode(ledMode, 0);        // отобразить эффект;
 #if CHANGE_ON == 1
     if ((stepMode < (numLeds - TOP_LENGTH)) && ((ledMode < 220) || (ledMode >= 230)))
-    {                    // требуется наложить новый эффект
+    {                     // требуется наложить новый эффект
       kolLeds = stepMode; // Выводим Эффект на все светодиоды
       if (stepMode > 10)
         strobe_mode(newMode, 0); // отобразить эффект;
@@ -258,7 +262,7 @@ void loop()
 
 #if CHANGE_ON == 1 // Включена плавная смена эффектов
   if (stepMode < (numLeds - TOP_LENGTH))
-  {                                                                         // есть шаги, исполняем
+  {                                                                        // есть шаги, исполняем
     uint16_t change_time = (1000L * CHANGE_TIME) / (numLeds - TOP_LENGTH); // время в мСек на каждый светодиод
     if (change_time < 20)
     {
@@ -279,7 +283,7 @@ void loop()
         ledMode = newMode;
         stepMode = MAX_LEDS - TOP_LENGTH;
 
-        CTG_PRINTLN(F("End SetMode"));
+        CTG_PRINTLN(F("End setMode"));
       }
       nblendPaletteTowardPalette(gCurrentPalette, gTargetPalette, PALETTE_SPEED);
     }
@@ -839,31 +843,10 @@ void strobe_mode(uint8_t mode, bool mc)
     colorwaves();
     break;
     //  case 42 .. 121: if(mc) {thisdelay=10; } running_fire(9,3,1); break;
-  case 200:
-    fill_solid(leds, MAX_LEDS, CRGB::Black);
-    fill_solid(leds, numLeds, CRGB(255, 255, 255));
-    break; // Зажечь гирлянду длиной numLeds (регулировка длины гирлянды)
   case 201:
     fill_solid(leds, MAX_LEDS, CRGB::Black);
     fill_solid(leds, meshdelay, CRGB(255, 255, 255));
     break; // Зажечь гирлянду длиной meshdelay
-  case 220:
-    fill_solid(leds, MAX_LEDS, CRGB::Black);
-    fill_solid(leds, numLeds, CRGB(255, 255, 255));
-    leds[0] = set_new_eorder(CRGB::Red);
-    break; // Зажечь гирлянду длиной numLeds (регулировка длины гирлянды)
-  case 221:
-    fill_solid(leds, MAX_LEDS, CRGB::Black);
-    fill_solid(leds, numLeds, CRGB(255, 255, 255));
-    leds[0] = set_new_eorder(CRGB::Green);
-    break; // Зажечь гирлянду длиной numLeds (регулировка длины гирлянды)
-  case 255:
-    if (mc)
-    {
-      palchg = 0;
-    }
-    fill_solid(leds, numLeds - TOP_LENGTH, solid);
-    break; // Установить цвет
   default:
 #if RUNNING_FIRE == 1
     if (mode >= 42 && mode < 122)
@@ -933,7 +916,7 @@ void demo_check()
       randSpark = random8(3) + 1;
 #endif
 
-      CTG_PRINTLN(F("Start SetMode"));
+      CTG_PRINTLN(F("Start setMode"));
 
 #else
       gTargetPalette = gGradientPalettes[gCurrentPaletteNumber]; // Применим палитру

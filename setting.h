@@ -5,6 +5,9 @@
  *
  */
 
+#include <FastLED.h>
+#include "src/_eeprom.h"
+
 // ==== Подключенная периферия =======================
 
 #define LED_ON 0      // Количество индикаторных светодиодов (0- светодиоды не используются, максимум 2 светодиода
@@ -20,7 +23,20 @@
 #define MAX_LEDS 100 // Максимальное количество светодиодов,  очень влияет на память
 
 #define CHIPSET WS2812B // Тип микросхемы светодиодов в гирлянде
-#define EORDER GRB      // очередность цветов в чипе; закомментируйте, если хотите иметь возможность настройки модуля под конкретную гирлянду
+// #define EORDER GRB      // очередность цветов в чипе; закомментируйте, если хотите иметь возможность настройки модуля под конкретную гирлянду (см. комментарий ниже)
+
+/*
+ * Настройка очередности цветов в чипе:
+ *   - закомментировать строку #define EORDER ;
+ *   - прошить модуль;
+ *   - при включении питания модуля удерживать нажатой кнопку №1 (использование
+ *     кнопок должно быть включено - см. строку #define BUTTONS_NUM);
+ *   - гирлянда включится в режиме настроки очередности цветов - включатся
+ *     первые три светодиода разными цветами;
+ *   - нажимая кнопку №1, добиться правильной очередности цветов - Red (красный) -
+ *     Green (зеленый) - Blue (синий); очередность будет сохранена в EEPROM;
+ *   - выключить и снова включить модуль;
+ */
 
 #define POWER_V 5   // напряжение блока питания в Вольтах
 #define POWER_I 500 // Ток блока питания в миллиамперах
@@ -29,8 +45,7 @@
 
 #define SAVE_EEPROM 1 // Сохранять настройки запуска в EEPROM
                       // 0 - ничего не  хранить
-                      // 1 - хранить стартовый режим, длина гирлянды, скорости, яркость и расширенные настройки (состояние блеска, фон свечей)
-                      // 2 - хранить стартовый режим, длина гирлянды, скорости, яркость
+                      // 1 - хранить стартовый режим, длина гирлянды, скорости, яркость и расширенные настройки (состояние блеска, фона, свечей)
 
 #define EEPROM_INDEX_FOR_ISINIT 9     // Расположение в EEPROM байта корректности записи (1 байт)
 #define EEPROM_INDEX_FOR_STARTMODE 10 // Расположение в EEPROM номера режима с которого будет старт (1 байт)
@@ -230,7 +245,8 @@ shButton btn4(BTN4_PIN);
 #define Command_Glitter BTN2_1        // Включить/выключить сверкание
 #define Command_Start_Stop BTN2_PRESS // Включить/выключить гирлянду
 
-#define Command_Candle BTN3_1 // Включить/выключить свечки
+#define Command_Candle BTN3_1         // Включить/выключить свечки
+#define Command_BackGround BTN3_PRESS // Включить/выключить заполнение фона
 
 #define Command_Previous_mode_Demo BTN4_1   // Следующий эффект. Оставляет демонстрационный режим
 #define Command_Brightness_minus BTN4_PRESS // Увеличить максимальную яркость и остановится если достигли максимума
@@ -294,6 +310,61 @@ uint32_t command = 0;
 
 // ==== Общие переменные =============================
 
+#if MAX_LEDS < 255
+uint8_t numLeds; // Количество светодиодов, которые мы на самом деле используем, и мы можем изменить его только на длину нити - не более MAX_LEDS
+uint8_t kolLeds;
+#else
+uint16_t numLeds; // Количество светодиодов, которые мы на самом деле используем, и мы можем изменить его только на длину нити - не более MAX_LEDS
+uint16_t kolLeds;
+#endif
+
+uint8_t polCandle = 1; // Положение свечи
+
+uint8_t maxBright = 255; // Определение общей яркости; возможно изменение на лету
+
+struct CRGB leds[MAX_LEDS]; // инициализация массива светодиодов
+
+CRGBPalette16 gCurrentPalette; // Использование палитры вместо прямых назначений CHSV или CRGB.
+CRGBPalette16 gTargetPalette;  // Поддержка плавной смены палитры
+CRGB solid = CRGB::Black;      // Цвет заливки
+
+extern const TProgmemRGBGradientPalettePtr gGradientPalettes[]; // для фиксированных палитр в gradient_palettes.h.
+
+extern const uint8_t gGradientPaletteCount; // Общее количество фиксированных палитр
+uint8_t gCurrentPaletteNumber = 0;          // Текущий номер палитры из списка палитр.
+uint8_t currentPatternIndex = 0;            // Порядковый номер текущего шаблона
+uint32_t demo_time = 0;                     // время демо режима
+
+TBlendType currentBlending = LINEARBLEND; // NOBLEND или LINEARBLEND
+
+#define INITVAL 0x55     // Это значение проверяем в бите корректности EEPROM
+#define INITMODE 0       // с этого режима будет старт, по умолчанию 0 (старт с - с черного цвета)
+#define INITLEN MAX_LEDS // Размер гирлянды при старте
+#define INITDEL 0        // размер задержки при старте в миллисекундах
+
+uint16_t meshdelay; // Timer for the notamesh. Works with INITDEL.
+
+uint8_t ledMode = 0; // номер текущего режима
+#if CHANGE_ON == 1
+uint8_t newMode = 0; // номер нового режима
+#if MAX_LEDS < 255
+uint8_t stepMode = MAX_LEDS; // Текущий шаг перехода от нового режима к старому
+#else
+uint16_t stepMode = MAX_LEDS; // Текущий шаг перехода от нового режима к старому
+#endif
+#endif
+
+uint8_t demorun = DEMO_MODE;
+#if RUNNING_FIRE > 0
+#define MAX_MODE 122 // Maximum number of modes.
+#else
+#define MAX_MODE 42 // Maximum number of modes.
+#endif
+
+#ifndef EORDER
+uint8_t eorder_index = 2; // сохраненная очередность цветов, если она не задана жестко макросом EORDER
+#endif
+
 uint8_t allfreq = 32; // Меняет частоту. Переменная для эффектов one_sin_pal и two_sin.
 uint8_t bgclr = 0;    // Общий цвет фона. Переменная для эффектов matrix_pal и one_sin_pal.
 uint8_t bgbri = 0;    // Общая фоновая яркость. Переменная для эффектов matrix_pal и one_sin_pal.
@@ -304,7 +375,6 @@ typedef union
 {
   struct
   {
-    bool RedGreen : 1;   // Очередность  Цветов  RGB
     bool Glitter : 1;    // Флаг включения блеска
     bool Background : 1; // Флаг включения заполнения фона
     bool Candle : 1;     // Флаг включения свечей
@@ -312,6 +382,7 @@ typedef union
     bool rezerv1 : 1;    // Зарезервировано
     bool rezerv2 : 1;    // Зарезервировано
     bool rezerv3 : 1;    // Зарезервировано
+    bool rezerv4 : 1;    // Зарезервировано
   };
   unsigned char Byte;
 } ExtendedFlags;
@@ -370,3 +441,65 @@ int qsuba(size_t x, size_t b)
 {
   return ((x > b) ? x - b : 0);
 }
+
+// ===================================================
+
+#if SAVE_EEPROM
+// инициализация параметров, сохраненных в EEPROM
+void eeprom_init()
+{
+  numLeds = read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN);
+  ledMode = read_eeprom_8(EEPROM_INDEX_FOR_STARTMODE);
+
+  // проверка правильности в EEPROM байта корректности записи
+  if ((read_eeprom_8(EEPROM_INDEX_FOR_ISINIT) != INITVAL) ||
+      (numLeds > MAX_LEDS) ||
+      ((ledMode > MAX_MODE) && (ledMode != 100)))
+  { // Не корректен
+    write_eeprom_8(EEPROM_INDEX_FOR_STARTMODE, INITMODE);
+#if MAX_LEDS < 255
+    write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, INITLEN);
+#else
+    write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(INITLEN) & 0x00ff);
+    write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(INITLEN) >> 8);
+#endif
+    write_eeprom_8(EEPROM_INDEX_FOR_STRANDEL, INITDEL);
+
+    extFlag.Glitter = GLITER_ON;
+    extFlag.Background = BACKGR_ON;
+    extFlag.Candle = CANDLE_ON;
+    write_eeprom_8(EEPROM_INDEX_FOR_EXTFLAG, extFlag.Byte);
+#if !defined(EORDER)
+    write_eeprom_8(EEPROM_INDEX_FOR_EORDER, eorder_index);
+#endif
+    write_eeprom_8(EEPROM_INDEX_FOR_ISINIT, INITVAL);
+
+    ledMode = INITMODE;
+    numLeds = INITLEN;
+    meshdelay = INITDEL;
+  }
+  else
+  {
+    extFlag.Byte = read_eeprom_8(EEPROM_INDEX_FOR_EXTFLAG); // Прочитаем расширенные настройки
+
+    maxBright = read_eeprom_8(EEPROM_INDEX_FOR_BRIGHT);
+#if !defined(EORDER)
+    eorder_index = read_eeprom_8(EEPROM_INDEX_FOR_EORDER);
+    if (eorder_index > 5)
+    {
+      eorder_index = 0;
+    }
+#endif
+    ledMode = read_eeprom_8(EEPROM_INDEX_FOR_STARTMODE);
+    numLeds = read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN);
+#if MAX_LEDS < 255
+    if (read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1))
+      // Если почему-то светодиодов больше чем размер переменной
+      numLeds = MAX_LEDS;
+#else
+    numLeds += (uint16_t)read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1) << 8;
+#endif
+    meshdelay = read_eeprom_8(EEPROM_INDEX_FOR_STRANDEL);
+  }
+}
+#endif

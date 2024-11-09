@@ -85,3 +85,5 @@ void running_fire(uint8_t prog, uint8_t effect, uint8_t clear)
 } // running_fire()
 
 #endif
+
+// ***

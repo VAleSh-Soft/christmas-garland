@@ -3,7 +3,6 @@
 #if SAVE_EEPROM
 #include "_eeprom.h"
 #endif
-#include "../setting.h"
 #include "_leds.h"
 
 // ==== Работа с кнопками ============================

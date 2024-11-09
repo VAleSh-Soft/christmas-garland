@@ -319,7 +319,7 @@ void strobe_mode(uint8_t mode, bool mc)
 
   if (mc)
   {
-    fill_solid(leds, numLeds - TOP_LENGTH, CRGB(0, 0, 0)); // очистить гирлянду при смене режима
+    fill_solid(leds, numLeds - TOP_LENGTH, CRGB::Black); // очистить гирлянду при смене режима
 
     CTG_PRINT(F("Mode: "));
     CTG_PRINTLN(mode);
@@ -845,7 +845,7 @@ void strobe_mode(uint8_t mode, bool mc)
     //  case 42 .. 121: if(mc) {thisdelay=10; } running_fire(9,3,1); break;
   case 201:
     fill_solid(leds, MAX_LEDS, CRGB::Black);
-    fill_solid(leds, meshdelay, CRGB(255, 255, 255));
+    fill_solid(leds, meshdelay, CRGB::White);
     break; // Зажечь гирлянду длиной meshdelay
   default:
 #if RUNNING_FIRE == 1

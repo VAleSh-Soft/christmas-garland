@@ -44,7 +44,7 @@ CRGB set_new_eorder(CRGB _col)
     return CRGB(_col.b, _col.r, _col.g);
   case 5: // BGR
     return CRGB(_col.b, _col.g, _col.r);
-  default:
+  default: // по умолчанию выводить RGB
     return (_col);
   }
 #else

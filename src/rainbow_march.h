@@ -1,6 +1,8 @@
 #ifndef RAINBOW_MARCH_H
 #define RAINBOW_MARCH_H
 
+#include "_leds.h"
+
 /* Usage - rainbow_march();
  *
  * thisindex
@@ -19,3 +21,5 @@ void rainbow_march()
 } // rainbow_march()
 
 #endif
+
+// ***

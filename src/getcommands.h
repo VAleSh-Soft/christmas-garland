@@ -11,7 +11,7 @@
 
 void bootme();
 void meshwait();
-void getirl();
+void getcommand();
 
 void setMode(uint8_t Mode)
 {
@@ -32,7 +32,7 @@ void setMode(uint8_t Mode)
 #endif
 }
 
-void getirl()
+void getcommand()
 { // Обработка команд с кнопок
 
   if (protocol)
@@ -858,53 +858,6 @@ void getirl()
         bootme();
         break;
 #endif
-#if Setup_Command_Length_Garland_plus
-      case Setup_Command_Length_Garland_plus: //  Увеличить количество светодиодов в гирлянде
-        if (numLeds < MAX_LEDS)
-          numLeds++; // Новое значение
-
-        CTG_PRINT(F("Length Garland Plus: "));
-        CTG_PRINTLN(numLeds);
-
-        break;
-#endif
-
-#if Setup_Command_Length_Garland_plus_speed
-      case Setup_Command_Length_Garland_plus_speed: //  Увеличить количество светодиодов в гирлянде
-        if (numLeds < (MAX_LEDS - 10))
-          numLeds += 10;
-        else
-          numLeds = MAX_LEDS; // Новое значение
-
-        CTG_PRINT(F("Length Garland Plus: "));
-        CTG_PRINTLN(numLeds);
-
-        break;
-#endif
-
-#if Setup_Command_Length_Garland_minus
-      case Setup_Command_Length_Garland_minus: //  Уменьшить количество светодиодов в гирлянде
-        if (numLeds > 1)
-          numLeds--; // Новое значение
-
-        CTG_PRINT(F("Length Garland Munus: "));
-        CTG_PRINTLN(numLeds);
-
-        break;
-#endif
-
-#if Setup_Command_Length_Garland_minus_speed
-      case Setup_Command_Length_Garland_minus_speed: //  Уменьшить количество светодиодов в гирлянде
-        if (numLeds > 10)
-          numLeds -= 10;
-        else
-          numLeds = 1; // Новое значение
-
-        CTG_PRINT(F("Length Garland Munus: "));
-        CTG_PRINTLN(numLeds);
-
-        break;
-#endif
 
       default:
         break; // We could do something by default
@@ -916,7 +869,7 @@ void getirl()
 
   } // if protocol
 
-} // getirl()
+} // getcommand()
 
 void bootme()
 { // This is used to reset all the Arduinos so that their millis() counters are all in sync.

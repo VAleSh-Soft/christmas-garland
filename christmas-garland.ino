@@ -37,7 +37,7 @@
 
 #if BUTTONS_NUM
 // Работа с кнопками
-#include "src/getirl.h"
+#include "src/getcommands.h"
 #endif
 
 #if RUNNING_FIRE
@@ -187,7 +187,7 @@ void loop()
 {
 
 #if BUTTONS_NUM
-  getirl(); // Обработка кнопок
+  getcommand(); // Обработка кнопок
 #endif
 
   demo_check(); // Работа если включен демонстрационный режим

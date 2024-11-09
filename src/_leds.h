@@ -18,7 +18,7 @@ CRGB set_new_eorder(CRGB _col);
 void fastled_init();
 // вывод цветности гирлянды в Сериал
 void print_eorder();
-#if BUTTONS_NUM > 1
+#if BUTTONS_NUM > 1 && CAN_CHANGE_NUMLEDS
 // установка количества светодиодов в гирлянде
 void setLengthOfGarland();
 #endif
@@ -78,11 +78,6 @@ void fastled_init()
   // настройка следования цветов при зажатой кнопке 1
   if (!digitalRead(BTN1_PIN))
   {
-    // отработка первого клика, чтобы не мешался в настройках
-    btn1.getButtonState();
-    delay(100);
-    btn1.getButtonState();
-
     set_eorder();
   }
 
@@ -90,7 +85,7 @@ void fastled_init()
 
 #endif
 
-#if BUTTONS_NUM > 1
+#if BUTTONS_NUM > 1 && CAN_CHANGE_NUMLEDS
   // если кнопок больше одной, доступна настройка длины гирлянды
   if (!digitalRead(BTN2_PIN))
   {
@@ -149,7 +144,7 @@ void print_eorder()
 #endif
 }
 
-#if BUTTONS_NUM > 1
+#if BUTTONS_NUM > 1 && CAN_CHANGE_NUMLEDS
 static void fill_solid_garland()
 {
   fill_solid(leds, MAX_LEDS, CRGB::Black);
@@ -158,6 +153,8 @@ static void fill_solid_garland()
 }
 void setLengthOfGarland()
 {
+  CTG_PRINT(F("Mode for changing the length of the garland"));
+
   fill_solid_garland();
 
   // запускаем бесконечный цикл для опроса кнопок
@@ -218,6 +215,9 @@ void setLengthOfGarland()
       write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(numLeds) >> 8);
 #endif
     }
+
+    CTG_PRINT(F("Length garland: "));
+    CTG_PRINTLN(numLeds);
   }
 }
 #endif
@@ -235,6 +235,13 @@ static void show_rgb()
 
 void set_eorder()
 {
+  CTG_PRINTLN(F("EORDER change mode for LEDs"));
+
+  // отработка первого клика, чтобы не мешался в настройках
+  btn1.getButtonState();
+  delay(100);
+  btn1.getButtonState();
+
   eorder_index = 0;
   write_eeprom_8(EEPROM_INDEX_FOR_EORDER, eorder_index);
   fill_solid(leds, MAX_LEDS, CRGB::Black);
@@ -250,6 +257,7 @@ void set_eorder()
         eorder_index = 0;
       }
       write_eeprom_8(EEPROM_INDEX_FOR_EORDER, eorder_index);
+      print_eorder();
       show_rgb();
     }
   }

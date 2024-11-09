@@ -127,9 +127,9 @@ void setup()
   meshdelay = INITDEL;
 #endif
 
-  if (numLeds < (TOP_LENGTH + 1))
+  if (numLeds < (topLength + 1))
   {
-    numLeds = (TOP_LENGTH + 1); // Проверка
+    numLeds = (topLength + 1); // Проверка
   }
 
   fastled_init();
@@ -243,10 +243,10 @@ void loop()
   EVERY_N_MILLIS_I(thistimer, thisdelay)
   {                                 // Sets the original delay time.
     thistimer.setPeriod(thisdelay); // This is how you update the delay value on the fly.
-    kolLeds = numLeds - TOP_LENGTH; // Выводим Эффект на все светодиоды
+    kolLeds = numLeds - topLength; // Выводим Эффект на все светодиоды
     strobe_mode(ledMode, 0);        // отобразить эффект;
 #if CHANGE_ON == 1
-    if ((stepMode < (numLeds - TOP_LENGTH)) && ((ledMode < 220) || (ledMode >= 230)))
+    if ((stepMode < (numLeds - topLength)) && ((ledMode < 220) || (ledMode >= 230)))
     {                     // требуется наложить новый эффект
       kolLeds = stepMode; // Выводим Эффект на все светодиоды
       if (stepMode > 10)
@@ -261,14 +261,14 @@ void loop()
   }
 
 #if CHANGE_ON == 1 // Включена плавная смена эффектов
-  if (stepMode < (numLeds - TOP_LENGTH))
+  if (stepMode < (numLeds - topLength))
   {                                                                        // есть шаги, исполняем
-    uint16_t change_time = (1000L * CHANGE_TIME) / (numLeds - TOP_LENGTH); // время в мСек на каждый светодиод
+    uint16_t change_time = (1000L * CHANGE_TIME) / (numLeds - topLength); // время в мСек на каждый светодиод
     if (change_time < 20)
     {
       change_time = 20;
     }
-    //        static uint8_t change_increment = (uint32_t)change_time * (numLeds-TOP_LENGTH) / (1000L *CHANGE_TIME)+1;
+    //        static uint8_t change_increment = (uint32_t)change_time * (numLeds-topLength) / (1000L *CHANGE_TIME)+1;
     EVERY_N_MILLISECONDS(change_time)
     { // Движение плавной смены эффектов
       //            if (stepMode > 10) stepMode += change_increment;
@@ -278,10 +278,10 @@ void loop()
       {
         strobe_mode(newMode, 1);
       }
-      if (stepMode >= (numLeds - TOP_LENGTH))
+      if (stepMode >= (numLeds - topLength))
       {
         ledMode = newMode;
-        stepMode = MAX_LEDS - TOP_LENGTH;
+        stepMode = MAX_LEDS - topLength;
 
         CTG_PRINTLN(F("End setMode"));
       }
@@ -319,7 +319,7 @@ void strobe_mode(uint8_t mode, bool mc)
 
   if (mc)
   {
-    fill_solid(leds, numLeds - TOP_LENGTH, CRGB::Black); // очистить гирлянду при смене режима
+    fill_solid(leds, numLeds - topLength, CRGB::Black); // очистить гирлянду при смене режима
 
     CTG_PRINT(F("Mode: "));
     CTG_PRINTLN(mode);

@@ -26,6 +26,9 @@ void setLengthOfGarland();
 // настройка порядка следования цветов в чипе
 void set_eorder();
 #endif
+#if BUTTONS_NUM > 2 && TOP_LENGTH
+void set_top_setting();
+#endif
 
 // ===================================================
 
@@ -92,6 +95,13 @@ void fastled_init()
     setLengthOfGarland();
   }
 #endif
+
+#if BUTTONS_NUM > 2 && TOP_LENGTH
+  if (!digitalRead(BTN3_PIN))
+  {
+    set_top_setting();
+  }
+#endif
 }
 
 void print_eorder()
@@ -144,18 +154,33 @@ void print_eorder()
 #endif
 }
 
+#if BUTTONS_NUM && (TOP_LENGTH || CAN_CHANGE_NUMLEDS || !defined(EORDER))
+void _start_mode()
+{
+  // отработка первого клика, чтобы не мешался в настройках
+  btn1.getButtonState();
+  delay(100);
+  btn1.getButtonState();
+}
+#endif
+
 #if BUTTONS_NUM > 1 && CAN_CHANGE_NUMLEDS
 static void fill_solid_garland()
 {
   fill_solid(leds, MAX_LEDS, CRGB::Black);
   fill_solid(leds, numLeds, set_new_eorder(CRGB::Red));
   LEDS.show();
+
+  CTG_PRINT(F("Length garland: "));
+  CTG_PRINTLN(numLeds);
 }
 void setLengthOfGarland()
 {
-  CTG_PRINT(F("Mode for changing the length of the garland"));
+  CTG_PRINTLN(F("Mode for changing the length of the garland"));
 
   fill_solid_garland();
+
+  _start_mode();
 
   // запускаем бесконечный цикл для опроса кнопок
   while (true)
@@ -215,9 +240,6 @@ void setLengthOfGarland()
       write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(numLeds) >> 8);
 #endif
     }
-
-    CTG_PRINT(F("Length garland: "));
-    CTG_PRINTLN(numLeds);
   }
 }
 #endif
@@ -237,10 +259,7 @@ void set_eorder()
 {
   CTG_PRINTLN(F("EORDER change mode for LEDs"));
 
-  // отработка первого клика, чтобы не мешался в настройках
-  btn1.getButtonState();
-  delay(100);
-  btn1.getButtonState();
+  _start_mode();
 
   eorder_index = 0;
   write_eeprom_8(EEPROM_INDEX_FOR_EORDER, eorder_index);
@@ -260,6 +279,81 @@ void set_eorder()
       print_eorder();
       show_rgb();
     }
+  }
+}
+#endif
+
+#if BUTTONS_NUM > 2 && TOP_LENGTH
+void set_top_setting()
+{
+  CTG_PRINTLN(F("Mode for changing the setting for top of the garland"));
+
+  fill_solid(leds, MAX_LEDS, CRGB::Black);
+  top();
+  LEDS.show();
+
+  _start_mode();
+
+  while (true)
+  {
+    if (btn1.getButtonState() == BTN_DOWN)
+    {
+      if (topLength < TOP_LENGTH)
+      {
+        topLength++;
+#if TOP_LENGTH < 255
+        write_eeprom_8(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
+#else
+        write_eeprom_16(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
+#endif
+        fill_solid(leds, MAX_LEDS, CRGB::Black);
+
+        CTG_PRINT(F("Top length: "));
+        CTG_PRINTLN(topLength);
+      }
+    }
+
+#if BUTTONS_NUM == 3
+    shButton *btn_down = &btn3;
+#elif BUTTONS_NUM == 4
+    shButton *btn_down = &btn4;
+#endif
+    if (btn_down->getButtonState() == BTN_DOWN)
+    {
+      if (topLength > 0)
+      {
+        topLength--;
+#if TOP_LENGTH < 255
+        write_eeprom_8(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
+#else
+        write_eeprom_16(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
+#endif
+        fill_solid(leds, MAX_LEDS, CRGB::Black);
+
+        CTG_PRINT(F("Top length: "));
+        CTG_PRINTLN(topLength);
+      }
+    }
+
+    if (btn2.getButtonState() == BTN_DOWN)
+    {
+      if (++topEffect > 3)
+      {
+        topEffect = 0;
+      }
+      write_eeprom_8(EEPROM_INDEX_FOR_TOPEFFECT, topEffect);
+      fill_solid(leds, MAX_LEDS, CRGB::Black);
+
+      CTG_PRINT(F("Top effect: "));
+      CTG_PRINTLN(topEffect);
+    }
+
+#if BUTTON_NUM > 3
+TODO: сделать выбор цвета вершины третьей кнопкой, если модуль использует все 4 кнопки
+#endif
+
+    top();
+    LEDS.show();
   }
 }
 #endif

@@ -43,7 +43,26 @@ void addbackground()
     if ((leds[i].r < 5) &&
         (leds[i].g < 5) &&
         (leds[i].b < 5))
-      leds[i].b += 5; // CRGB(5, 5, 5);
+    {
+#if !defined(EORDER)
+      switch (eorder_index)
+      {
+      case 1:
+      case 3:
+        leds[i].g += 5;
+        break;
+      case 4:
+      case 5:
+        leds[i].r += 5;
+        break;
+      default:
+        leds[i].b += 5;
+        break;
+      }
+#else
+      leds[i].b += 5;
+#endif
+    }
 }
 
 // ==== Блеск ========================================
@@ -96,39 +115,56 @@ void sparkler(uint8_t n) // Бенгальский огонь
 // ==== Обработка конца гирлянды =====================
 void top()
 {
-#if TOP_EFFECT == 0
-  fill_solid(&leds[numLeds - TOP_LENGTH], TOP_LENGTH, set_new_eorder(TOP_COLOR));
-#else
+  if (topEffect == 0)
+  {
+    fill_solid(&leds[numLeds - topLength], topLength, set_new_eorder(TOP_COLOR));
+  }
+  else
+  {
 #if MAX_LEDS < 255
-  static uint8_t x;
+    static uint8_t x;
 #else
-  static uint16_t x;
+    static uint16_t x;
 #endif
 
-  fadeToBlackBy(&leds[numLeds - TOP_LENGTH], TOP_LENGTH, TOP_FADING); // Затухание к черному
-  EVERY_N_MILLIS_I(toptimer, TOP_DELAY)
-  { // Sets the original delay time.
-#if TOP_EFFECT == 1
+    fadeToBlackBy(&leds[numLeds - topLength], topLength, TOP_FADING); // Затухание к черному
+    EVERY_N_MILLIS_I(toptimer, TOP_DELAY)
+    { // Sets the original delay time.
+
+      switch (topEffect)
+      {
+      case 1:
 #if TOP_LENGTH < 255
-    leds[numLeds - TOP_LENGTH + random8(0, TOP_LENGTH)] = set_new_eorder(TOP_COLOR);
+        leds[numLeds - topLength + random8(0, topLength)] = set_new_eorder(TOP_COLOR);
 #else
-    leds[numLeds - TOP_LENGTH + random16(0, TOP_LENGTH)] = set_new_eorder(TOP_COLOR);
+        leds[numLeds - topLength + random16(0, topLength)] = set_new_eorder(TOP_COLOR);
 #endif
-#elif TOP_EFFECT == 2
-    if ((x <= numLeds - TOP_LENGTH) || (x >= numLeds))
-      x = numLeds - 1;
-    else
-      x--;
-    leds[x] = set_new_eorder(TOP_COLOR);
-#else
-    if ((x < numLeds - TOP_LENGTH) || (x >= numLeds - 1))
-      x = numLeds - TOP_LENGTH;
-    else
-      x++;
-    leds[x] = set_new_eorder(TOP_COLOR);
-#endif
+        break;
+      case 2:
+        if ((x <= numLeds - topLength) || (x >= numLeds))
+        {
+          x = numLeds - 1;
+        }
+        else
+        {
+          x--;
+        }
+        leds[x] = set_new_eorder(TOP_COLOR);
+        break;
+      default:
+        if ((x < numLeds - topLength) || (x >= numLeds - 1))
+        {
+          x = numLeds - topLength;
+        }
+        else
+        {
+          x++;
+        }
+        leds[x] = set_new_eorder(TOP_COLOR);
+        break;
+      }
+    }
   }
-#endif
 } // top()
 #endif
 
@@ -188,7 +224,7 @@ void BtnHandler()
 
       CTG_PRINTLN(F("BTN2 DblClick"));
 
-     LED1_FleshH(2); // мигнуть 2 раза светодиодом 1
+      LED1_FleshH(2); // мигнуть 2 раза светодиодом 1
 
       break;
     case BTN_LONGCLICK:

@@ -155,12 +155,18 @@ void print_eorder()
 }
 
 #if BUTTONS_NUM && (TOP_LENGTH || CAN_CHANGE_NUMLEDS || !defined(EORDER))
-void _start_mode()
+void _start_mode(shButton &btn)
 {
-  // отработка первого клика, чтобы не мешался в настройках
-  btn1.getButtonState();
-  delay(100);
-  btn1.getButtonState();
+  /* отработка первого клика, чтобы не мешался в настройках; если этого не
+   * сделать, то в момент входа в режим настройки (напомню - кнопка в этот
+   * момент удерживается нажатой, но ее отслеживание пока не началось, т.к.
+   * мы по сути еще не вышли из функции setup()) будет зафиксировано состяние
+   * BTN_DOWN, что может привести к несанкционированному изменению параметра;
+   * вот это событие мы здесь и ждем перед тем, как запустить код, собственно,
+   * настройки параметра
+   */
+  while (btn.getButtonState() != BTN_DOWN)
+    ;
 }
 #endif
 
@@ -178,9 +184,10 @@ void setLengthOfGarland()
 {
   CTG_PRINTLN(F("Mode for changing the length of the garland"));
 
+  LEDS.setBrightness(10);
   fill_solid_garland();
 
-  _start_mode();
+  _start_mode(btn2);
 
   // запускаем бесконечный цикл для опроса кнопок
   while (true)
@@ -259,7 +266,7 @@ void set_eorder()
 {
   CTG_PRINTLN(F("EORDER change mode for LEDs"));
 
-  _start_mode();
+  _start_mode(btn1);
 
   eorder_index = 0;
   write_eeprom_8(EEPROM_INDEX_FOR_EORDER, eorder_index);
@@ -288,11 +295,11 @@ void set_top_setting()
 {
   CTG_PRINTLN(F("Mode for changing the setting for top of the garland"));
 
-  fill_solid(leds, MAX_LEDS, CRGB::Black);
+  fill_solid(leds, MAX_LEDS, set_new_eorder(CRGB(0, 0,  5)));
   top();
   LEDS.show();
 
-  _start_mode();
+  _start_mode(btn3);
 
   while (true)
   {
@@ -306,7 +313,7 @@ void set_top_setting()
 #else
         write_eeprom_16(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
 #endif
-        fill_solid(leds, MAX_LEDS, CRGB::Black);
+        fill_solid(leds, MAX_LEDS, set_new_eorder(CRGB(0, 0,  5)));
 
         CTG_PRINT(F("Top length: "));
         CTG_PRINTLN(topLength);
@@ -328,13 +335,14 @@ void set_top_setting()
 #else
         write_eeprom_16(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
 #endif
-        fill_solid(leds, MAX_LEDS, CRGB::Black);
+        fill_solid(leds, MAX_LEDS, set_new_eorder(CRGB(0, 0,  5)));
 
         CTG_PRINT(F("Top length: "));
         CTG_PRINTLN(topLength);
       }
     }
 
+    // тип заливки вершины
     if (btn2.getButtonState() == BTN_DOWN)
     {
       if (++topEffect > 3)
@@ -342,14 +350,17 @@ void set_top_setting()
         topEffect = 0;
       }
       write_eeprom_8(EEPROM_INDEX_FOR_TOPEFFECT, topEffect);
-      fill_solid(leds, MAX_LEDS, CRGB::Black);
+      fill_solid(leds, MAX_LEDS, set_new_eorder(CRGB(0, 0,  5)));
 
       CTG_PRINT(F("Top effect: "));
       CTG_PRINTLN(topEffect);
     }
 
 #if BUTTON_NUM > 3
-TODO: сделать выбор цвета вершины третьей кнопкой, если модуль использует все 4 кнопки
+    //  TODO:сделать выбор цвета вершины третьей кнопкой, если модуль использует все 4 кнопки
+    if (btn3.getButtonState() == BTN_DOWN)
+    {
+    }
 #endif
 
     top();

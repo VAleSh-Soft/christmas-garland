@@ -21,14 +21,16 @@ void addcandle()
   uint16_t poz = polCandle;
   CRGBPalette16 myPal = candle_Pal;
 
-  if (numLeds > CANDLE_KOL)
+  if ((numLeds - topLength) > CANDLE_KOL)
   {
-    uint16_t kol = numLeds / CANDLE_KOL; // Количество свечей
+    uint16_t kol = (numLeds - topLength) / CANDLE_KOL; // Количество свечей
 
     for (uint16_t x = 0; x < kol; x++)
     {
-      if (poz < numLeds)
+      if (poz < (numLeds - topLength))
+      {
         leds[poz] = set_new_eorder(ColorFromPalette(myPal, random8(255)));
+      }
       poz += CANDLE_KOL;
     }
   }
@@ -192,11 +194,10 @@ void top()
 } // top()
 #endif
 
-// ==== Обработчик нажатий кнопок ====================
-void BtnHandler()
-{
-
 #if BUTTONS_NUM
+// ==== Обработчик нажатий кнопок ====================
+void btnHandler()
+{
   {
     switch (btn1.getButtonState())
     {
@@ -331,7 +332,7 @@ void BtnHandler()
 #endif
 #endif
 #endif
-#endif
 }
+#endif
 
 #endif

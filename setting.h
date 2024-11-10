@@ -101,7 +101,7 @@
  *     светодиодом может быть в диапазоне от 0 до TOP_LENGTH;
  *   - клик второй кнопки определяет тип заполнения вершины - заливка,
  *     переливание или случайное мерцание;
- *   - если используются четыре кнопки, то клик третьей кнопкой меняет цвет 
+ *   - если используются четыре кнопки, то клик третьей кнопкой меняет цвет
  *     заливки вершины; возможные значения - цвета радуги и белый цвет;
  *   - настройки будут сохранены в EEPROM;
  *   - выключить и снова включить модуль для применения настроек;
@@ -299,11 +299,11 @@ shButton btn4(BTN4_PIN);
 #define LED1_FleshH(x) led1Flesh = 4 * x          // Мигнуть быстро x раз 1 светодиодом    (1-15)
 #define LED1_Flesh(x) led1Flesh = 64 + (8 * x)    // Мигнуть x раз 1 светодиодом           (1-7)
 #define LED1_FleshL(x) led1Flesh = 128 + (16 * x) // Мигнуть медленно x раз 1 светодиодом  (1-7)
-#define LED2_On digitalWrite(LED2_PIN, HIGH)    // Включить светодиод 2
-#define LED2_Off digitalWrite(LED2_PIN, LOW)    // Выключить светодиод 2
-#define LED2_FleshH(x) led2Flesh = 4 * x        // Мигнуть быстро x раз 2 светодиодом    (1-15)
-#define LED2_Flesh(x) led2Flesh = 64 + 8 * x    // Мигнуть x раз 2 светодиодом           (1-7)
-#define LED2_FleshL(x) led2Flesh = 128 + 16 * x // Мигнуть медленно x раз 2 светодиодом  (1-7)
+#define LED2_On digitalWrite(LED2_PIN, HIGH)      // Включить светодиод 2
+#define LED2_Off digitalWrite(LED2_PIN, LOW)      // Выключить светодиод 2
+#define LED2_FleshH(x) led2Flesh = 4 * x          // Мигнуть быстро x раз 2 светодиодом    (1-15)
+#define LED2_Flesh(x) led2Flesh = 64 + 8 * x      // Мигнуть x раз 2 светодиодом           (1-7)
+#define LED2_FleshL(x) led2Flesh = 128 + 16 * x   // Мигнуть медленно x раз 2 светодиодом  (1-7)
 #else
 #define LED1_On
 #define LED1_Off
@@ -563,6 +563,11 @@ void eeprom_init()
 #else
     numLeds += (uint16_t)read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1) << 8;
 #endif
+    if (numLeds > MAX_LEDS)
+    {
+      numLeds = MAX_LEDS;
+    }
+
     meshdelay = read_eeprom_8(EEPROM_INDEX_FOR_STRANDEL);
 #if TOP_LENGTH
     topEffect = read_eeprom_8(EEPROM_INDEX_FOR_TOPEFFECT);

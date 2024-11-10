@@ -46,8 +46,8 @@
 
 // ===================================================
 
-void strobe_mode(uint8_t newMode, bool mc);
-void demo_check();
+void strobeMode(uint8_t newMode, bool mc);
+void demoCheck();
 
 #if LED_ON > 0
 void ledsFlash(uint8_t led_idx, uint8_t &count);
@@ -169,7 +169,7 @@ void setup()
 
   gCurrentPalette = gGradientPalettes[0];
   gTargetPalette = gGradientPalettes[0];
-  strobe_mode(ledMode, 1); // инициализация первой последовательности
+  strobeMode(ledMode, 1); // инициализация первой последовательности
 
   if (DEMO_MODE)
   {
@@ -187,10 +187,11 @@ void loop()
 {
 
 #if BUTTONS_NUM
-  getcommand(); // Обработка кнопок
+  btnHandler(); // Обработчик нажатий кнопок
+  getCommand(); // Обработка кнопок
 #endif
 
-  demo_check(); // Работа если включен демонстрационный режим
+  demoCheck(); // Работа если включен демонстрационный режим
 
   EVERY_N_MILLISECONDS(50)
   { // Плавный переход от одной палитры в другую
@@ -244,13 +245,13 @@ void loop()
   {                                 // Sets the original delay time.
     thistimer.setPeriod(thisdelay); // This is how you update the delay value on the fly.
     kolLeds = numLeds - topLength; // Выводим Эффект на все светодиоды
-    strobe_mode(ledMode, 0);        // отобразить эффект;
+    strobeMode(ledMode, 0);        // отобразить эффект;
 #if CHANGE_ON == 1
     if ((stepMode < (numLeds - topLength)) && ((ledMode < 220) || (ledMode >= 230)))
     {                     // требуется наложить новый эффект
       kolLeds = stepMode; // Выводим Эффект на все светодиоды
       if (stepMode > 10)
-        strobe_mode(newMode, 0); // отобразить эффект;
+        strobeMode(newMode, 0); // отобразить эффект;
 #if CHANGE_SPARK == 4
       sparkler(randSpark);
 #else
@@ -276,7 +277,7 @@ void loop()
       stepMode++;
       if (stepMode == 10)
       {
-        strobe_mode(newMode, 1);
+        strobeMode(newMode, 1);
       }
       if (stepMode >= (numLeds - topLength))
       {
@@ -293,10 +294,12 @@ void loop()
 #if TOP_LENGTH > 0
   top(); // Обработка конца гирлянды
 #endif
+
   if (extFlag.Glitter)
   {
     addglitter(10); // блеск, если включен
   }
+
 #if CANDLE_KOL > 0
   if (extFlag.Candle)
   {
@@ -309,12 +312,10 @@ void loop()
     addbackground(); // Включить заполнение черного цвета фоном
   }
 
-  BtnHandler(); // Обработчик нажатий кнопок
-
   LEDS.show();
 }
 
-void strobe_mode(uint8_t mode, bool mc)
+void strobeMode(uint8_t mode, bool mc)
 { // mc == 0 - работа, mc == 1 - смена режима
 
   if (mc)
@@ -877,7 +878,7 @@ void strobe_mode(uint8_t mode, bool mc)
 #endif
 }
 
-void demo_check()
+void demoCheck()
 {
 
   if ((demorun > 0) && (demorun <= 100))
@@ -948,7 +949,7 @@ void demo_check()
           ledMode++;
         break;
       }
-      strobe_mode(ledMode, 1); // Does NOT reset to 0.
+      strobeMode(ledMode, 1); // Does NOT reset to 0.
 #if CANDLE_KOL > 0
       polCandle = random8(CANDLE_KOL);
 #endif

@@ -10,7 +10,7 @@
 
 void bootme();
 void meshwait();
-void getcommand();
+void getCommand();
 
 void setMode(uint8_t Mode)
 {
@@ -24,14 +24,14 @@ void setMode(uint8_t Mode)
 #else
   ledMode = Mode;
   meshwait();
-  strobe_mode(Mode, 1); // Does NOT reset to 0.
+  strobeMode(Mode, 1); // Does NOT reset to 0.
 #endif
 #if CANDLE_KOL > 0
   polCandle = random8(CANDLE_KOL);
 #endif
 }
 
-void getcommand()
+void getCommand()
 { // Обработка команд с кнопок
 
   if (protocol)
@@ -112,7 +112,7 @@ void getcommand()
 #if Command_Reset
       case Command_Reset: //  Сброс всех настроек
         ledMode = 0;
-        strobe_mode(ledMode, 1);
+        strobeMode(ledMode, 1);
         LEDS.show();
         bootme();
 
@@ -257,6 +257,8 @@ void getcommand()
         { // отключить повтор
           extFlag.Glitter = !extFlag.Glitter;
 
+          write_eeprom_8(EEPROM_INDEX_FOR_EXTFLAG, extFlag.Byte);
+
           CTG_PRINT(F("Glitter "));
           CTG_PRINTLN(extFlag.Glitter);
         }
@@ -268,6 +270,8 @@ void getcommand()
         if (protocol == 1)
         { // отключить повтор
           extFlag.Background = !extFlag.Background;
+
+          write_eeprom_8(EEPROM_INDEX_FOR_EXTFLAG, extFlag.Byte);
 
           CTG_PRINT(F("BackGround "));
           CTG_PRINTLN(extFlag.Background);
@@ -282,6 +286,8 @@ void getcommand()
         { // отключить повтор
           extFlag.Candle = !extFlag.Candle;
           polCandle = random8(CANDLE_KOL);
+
+          write_eeprom_8(EEPROM_INDEX_FOR_EXTFLAG, extFlag.Byte);
 
           CTG_PRINT(F("Candle "));
           CTG_PRINTLN(extFlag.Candle);
@@ -839,7 +845,7 @@ void getcommand()
 #if SAVE_EEPROM
 #if MAX_LEDS < 255
         write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, numLeds); // Сохранить в память
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, 0);    // Сохранить в память
+        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, 0);   // Сохранить в память
 #else
         write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(numLeds) & 0x00ff); // Сохранить в память
         write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(numLeds) >> 8); // Сохранить в память
@@ -868,7 +874,7 @@ void getcommand()
 
   } // if protocol
 
-} // getcommand()
+} // getCommand()
 
 void bootme()
 { // This is used to reset all the Arduinos so that their millis() counters are all in sync.

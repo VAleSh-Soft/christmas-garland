@@ -13,7 +13,7 @@
 // ---- Подключенная периферия ------------------
 
 #define LED_ON 0      // Количество индикаторных светодиодов (0 - светодиоды не используются, максимум 2 светодиода)
-#define BUTTONS_NUM 3 // Количество кнопок подключенных к модулю (0 - кнопок нет, максимум 4 кнопки)
+#define BUTTONS_NUM 4 // Количество кнопок подключенных к модулю (0 - кнопок нет, максимум 4 кнопки)
 
 // ---- Вывод отладочной информации -------------
 
@@ -75,6 +75,7 @@
 #define EEPROM_INDEX_FOR_EORDER 16    // Расположение в EEPROM очередности цветов в чипе (1 байт)
 #define EEPROM_INDEX_FOR_TOPLENGTH 17 // Расположение в EEPROM размера вершины (2 байта)
 #define EEPROM_INDEX_FOR_TOPEFFECT 19 // Расположение в EEPROM типа заливки вершины (1 байт)
+#define EEPROM_INDEX_FOR_TOPCOLOR 20  // Расположение в EEPROM индекса цвета заливки вершины (1 байт)
 
 // ---- Настройки вершины -----------------------
 
@@ -91,8 +92,8 @@
  * значении макроса #define TOP_LENGTH` больше нуля):
  *   - при включении питания модуля удерживать нажатой кнопку №3;
  *   - гирлянда включится в режиме настройки вершины - будет светиться только
- *     заданное количество светодиодов (по умолчанию `TOP_LENGTH`) в конце 
- *     гирлянды; цвет свечения вершины определяется макросом 
+ *     заданное количество светодиодов (по умолчанию `TOP_LENGTH`) в конце
+ *     гирлянды; цвет свечения вершины определяется макросом
  *     `#define TOP_COLOR`; остальные светодиоды будут светиться слабым
  *     голубым цветом;
  *   - для настройки количества светодиодов вершины используются первая кнопка
@@ -100,6 +101,8 @@
  *     светодиодом может быть в диапазоне от 0 до TOP_LENGTH;
  *   - клик второй кнопки определяет тип заполнения вершины - заливка,
  *     переливание или случайное мерцание;
+ *   - если используются четыре кнопки, то клик третьей кнопкой меняет цвет 
+ *     заливки вершины; возможные значения - цвета радуги и белый цвет;
  *   - настройки будут сохранены в EEPROM;
  *   - выключить и снова включить модуль для применения настроек;
  */
@@ -156,7 +159,7 @@
 
 #define DIRECT_TIME 20   // Через сколько секунд менять направление если 0 - не меняем
 #define PALETTE_TIME 40  // Через сколько секунд менять палитру если 0 - не меняем
-#define PALETTE_SPEED 20 // скорость перехода с одной палитры в другую (1- 48)
+#define PALETTE_SPEED 20 // скорость перехода с одной палитры в другую (1-48)
 
 #define DEV_NOISE16 100 // если Зависает на 22 и 37 режимах, то уменьшаем число
 
@@ -296,13 +299,11 @@ shButton btn4(BTN4_PIN);
 #define LED1_FleshH(x) led1Flesh = 4 * x          // Мигнуть быстро x раз 1 светодиодом    (1-15)
 #define LED1_Flesh(x) led1Flesh = 64 + (8 * x)    // Мигнуть x раз 1 светодиодом           (1-7)
 #define LED1_FleshL(x) led1Flesh = 128 + (16 * x) // Мигнуть медленно x раз 1 светодиодом  (1-7)
-#if LED_ON > 1
 #define LED2_On digitalWrite(LED2_PIN, HIGH)    // Включить светодиод 2
 #define LED2_Off digitalWrite(LED2_PIN, LOW)    // Выключить светодиод 2
 #define LED2_FleshH(x) led2Flesh = 4 * x        // Мигнуть быстро x раз 2 светодиодом    (1-15)
 #define LED2_Flesh(x) led2Flesh = 64 + 8 * x    // Мигнуть x раз 2 светодиодом           (1-7)
 #define LED2_FleshL(x) led2Flesh = 128 + 16 * x // Мигнуть медленно x раз 2 светодиодом  (1-7)
-#endif
 #else
 #define LED1_On
 #define LED1_Off
@@ -364,6 +365,10 @@ uint8_t topLength = TOP_LENGTH;
 uint16_t topLength = TOP_LENGTH;
 #endif
 uint8_t topEffect = TOP_EFFECT;
+#endif
+
+#if BUTTONS_NUM > 3
+uint8_t topColor = 0;
 #endif
 
 uint8_t polCandle = 1; // Положение свечи
@@ -532,6 +537,9 @@ void eeprom_init()
 #else
     write_eeprom_16(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
 #endif
+#if BUTTONS_NUM > 3
+    write_eeprom_8(EEPROM_INDEX_FOR_TOPCOLOR, topColor);
+#endif
 #endif
   }
   else
@@ -571,6 +579,13 @@ void eeprom_init()
     {
       topLength = TOP_LENGTH;
     }
+#if BUTTONS_NUM > 3
+    topColor = read_eeprom_8(EEPROM_INDEX_FOR_TOPCOLOR);
+    if (topColor > 7)
+    {
+      topColor = 0;
+    }
+#endif
 #endif
   }
 }

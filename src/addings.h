@@ -2,6 +2,11 @@
 #define ADDINGS_H
 
 #include "_leds.h"
+#if defined(ARDUINO_ARCH_ESP32)
+#include <pgmspace.h>
+#else
+#include <avr/pgmspace.h>
+#endif
 
 #if CANDLE_KOL > 0
 // ==== Свечи ========================================
@@ -115,9 +120,28 @@ void sparkler(uint8_t n) // Бенгальский огонь
 // ==== Обработка конца гирлянды =====================
 void top()
 {
+  CRGB top_color;
+
+#if BUTTONS_NUM > 3
+  static const uint32_t PROGMEM color_of_number[] = {
+      0xFF0000, // красный (Red)
+      0xFF4500, // оранжевый (Orange)
+      0xFFCC00, // желтый (Yellow)
+      0x00FF00, // зеленый (Green)
+      0x00FFFF, // голубой (Blue)
+      0x0000FF, // синий (Indigo)
+      0x9600D7, // фиолетовый (Violet)
+      0xFFFFFF, // белый (White)
+  };
+
+  top_color = pgm_read_dword(&color_of_number[topColor]);
+#else
+  top_color = TOP_COLOR;
+#endif
+
   if (topEffect == 0)
   {
-    fill_solid(&leds[numLeds - topLength], topLength, set_new_eorder(TOP_COLOR));
+    fill_solid(&leds[numLeds - topLength], topLength, set_new_eorder(top_color));
   }
   else
   {
@@ -135,9 +159,9 @@ void top()
       {
       case 1:
 #if TOP_LENGTH < 255
-        leds[numLeds - topLength + random8(0, topLength)] = set_new_eorder(TOP_COLOR);
+        leds[numLeds - topLength + random8(0, topLength)] = set_new_eorder(top_color);
 #else
-        leds[numLeds - topLength + random16(0, topLength)] = set_new_eorder(TOP_COLOR);
+        leds[numLeds - topLength + random16(0, topLength)] = set_new_eorder(top_color);
 #endif
         break;
       case 2:
@@ -149,7 +173,7 @@ void top()
         {
           x--;
         }
-        leds[x] = set_new_eorder(TOP_COLOR);
+        leds[x] = set_new_eorder(top_color);
         break;
       default:
         if ((x < numLeds - topLength) || (x >= numLeds - 1))
@@ -160,7 +184,7 @@ void top()
         {
           x++;
         }
-        leds[x] = set_new_eorder(TOP_COLOR);
+        leds[x] = set_new_eorder(top_color);
         break;
       }
     }

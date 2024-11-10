@@ -295,7 +295,7 @@ void set_top_setting()
 {
   CTG_PRINTLN(F("Mode for changing the setting for top of the garland"));
 
-  fill_solid(leds, MAX_LEDS, set_new_eorder(CRGB(0, 0,  5)));
+  fill_solid(leds, MAX_LEDS, set_new_eorder(CRGB(0, 0, 5)));
   top();
   LEDS.show();
 
@@ -313,7 +313,7 @@ void set_top_setting()
 #else
         write_eeprom_16(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
 #endif
-        fill_solid(leds, MAX_LEDS, set_new_eorder(CRGB(0, 0,  5)));
+        fill_solid(leds, MAX_LEDS, set_new_eorder(CRGB(0, 0, 5)));
 
         CTG_PRINT(F("Top length: "));
         CTG_PRINTLN(topLength);
@@ -335,7 +335,7 @@ void set_top_setting()
 #else
         write_eeprom_16(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
 #endif
-        fill_solid(leds, MAX_LEDS, set_new_eorder(CRGB(0, 0,  5)));
+        fill_solid(leds, MAX_LEDS, set_new_eorder(CRGB(0, 0, 5)));
 
         CTG_PRINT(F("Top length: "));
         CTG_PRINTLN(topLength);
@@ -350,16 +350,50 @@ void set_top_setting()
         topEffect = 0;
       }
       write_eeprom_8(EEPROM_INDEX_FOR_TOPEFFECT, topEffect);
-      fill_solid(leds, MAX_LEDS, set_new_eorder(CRGB(0, 0,  5)));
+      fill_solid(leds, MAX_LEDS, set_new_eorder(CRGB(0, 0, 5)));
 
       CTG_PRINT(F("Top effect: "));
       CTG_PRINTLN(topEffect);
     }
 
-#if BUTTON_NUM > 3
-    //  TODO:сделать выбор цвета вершины третьей кнопкой, если модуль использует все 4 кнопки
+#if BUTTONS_NUM > 3
+    // цвет заливки вершины
     if (btn3.getButtonState() == BTN_DOWN)
     {
+      if (++topColor > 7)
+      {
+        topColor = 0;
+      }
+      write_eeprom_8(EEPROM_INDEX_FOR_TOPCOLOR, topColor);
+
+      CTG_PRINT(F("Top color: "));
+      switch (topColor)
+      {
+      case 0:
+        CTG_PRINTLN(F("Red"));
+        break;
+      case 1:
+        CTG_PRINTLN(F("Orange"));
+        break;
+      case 2:
+        CTG_PRINTLN(F("Yellow"));
+        break;
+      case 3:
+        CTG_PRINTLN(F("Green"));
+        break;
+      case 4:
+        CTG_PRINTLN(F("Blue"));
+        break;
+      case 5:
+        CTG_PRINTLN(F("Indigo"));
+        break;
+      case 6:
+        CTG_PRINTLN(F("Violet"));
+        break;
+      case 7:
+        CTG_PRINTLN(F("White"));
+        break;
+      }
     }
 #endif
 

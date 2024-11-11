@@ -16,7 +16,7 @@ DEFINE_GRADIENT_PALETTE(candle_Pal){
     180, 255, 255, 0,    // bright yellow
     255, 255, 255, 255}; // full white
 
-void addcandle()
+void addCandle()
 {
   uint16_t poz = polCandle;
   CRGBPalette16 myPal = candle_Pal;
@@ -38,7 +38,7 @@ void addcandle()
 #endif
 
 // ==== Черный фон ===================================
-void addbackground()
+void addBackground()
 {
 #if MAX_LEDS < 255
   uint8_t i;
@@ -73,7 +73,7 @@ void addbackground()
 }
 
 // ==== Блеск ========================================
-void addglitter(fract8 chanceOfGlitter)
+void addGlitter(fract8 chanceOfGlitter)
 {
   if (random8() < chanceOfGlitter)
   {

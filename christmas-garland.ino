@@ -297,19 +297,19 @@ void loop()
 
   if (extFlag.Glitter)
   {
-    addglitter(10); // блеск, если включен
+    addGlitter(10); // блеск, если включен
   }
 
 #if CANDLE_KOL > 0
   if (extFlag.Candle)
   {
-    addcandle();
+    addCandle();
   }
 #endif
 
   if (extFlag.Background)
   {
-    addbackground(); // Включить заполнение черного цвета фоном
+    addBackground(); // Включить заполнение черного цвета фоном
   }
 
   LEDS.show();

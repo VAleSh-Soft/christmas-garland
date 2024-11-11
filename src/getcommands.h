@@ -878,9 +878,9 @@ void getCommand()
 
 void bootme()
 { // This is used to reset all the Arduinos so that their millis() counters are all in sync.
-#if defined(__AVR__)
+#if defined(ARDUINO_ARCH_AVR)
   asm volatile("jmp 0");
-#elif defined(ESP32)
+#elif defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_ESP32)
   ESP.restart();
 #elif defined(STM32L1XX_MD)
   NVIC_SystemReset();

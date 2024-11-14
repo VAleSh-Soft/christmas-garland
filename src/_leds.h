@@ -291,6 +291,18 @@ void set_eorder()
 #endif
 
 #if BUTTONS_NUM > 2 && TOP_LENGTH
+void save_length()
+{
+#if TOP_LENGTH < 255
+  write_eeprom_8(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
+#else
+  write_eeprom_16(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
+#endif
+
+  CTG_PRINT(F("Top length: "));
+  CTG_PRINTLN(topLength);
+}
+
 void set_top_setting()
 {
   CTG_PRINTLN(F("Mode for changing the setting for top of the garland"));
@@ -303,48 +315,35 @@ void set_top_setting()
 
   while (true)
   {
-    if (btn1.getButtonState() == BTN_DOWN)
-    {
-      if (topLength < TOP_LENGTH)
-      {
-        topLength++;
-#if TOP_LENGTH < 255
-        write_eeprom_8(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
-#else
-        write_eeprom_16(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
-#endif
-        fill_solid(leds, MAX_LEDS, set_new_eorder(CRGB(0, 0, 5)));
-
-        CTG_PRINT(F("Top length: "));
-        CTG_PRINTLN(topLength);
-      }
-    }
-
 #if BUTTONS_NUM == 3
     shButton *btn_down = &btn3;
 #elif BUTTONS_NUM == 4
     shButton *btn_down = &btn4;
 #endif
-    if (btn_down->getButtonState() == BTN_DOWN)
+
+    // размер вершины
+    if (btn1.getButtonState() == BTN_DOWN || btn_down->getButtonState() == BTN_DOWN)
     {
-      if (topLength > 0)
+      if (btn1.getLastState() == BTN_DOWN)
+      {
+        if (topLength < TOP_LENGTH)
+        {
+          topLength++;
+          save_length();
+        }
+      }
+      else if (topLength > 0)
       {
         topLength--;
-#if TOP_LENGTH < 255
-        write_eeprom_8(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
-#else
-        write_eeprom_16(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
-#endif
-        fill_solid(leds, MAX_LEDS, set_new_eorder(CRGB(0, 0, 5)));
-
-        CTG_PRINT(F("Top length: "));
-        CTG_PRINTLN(topLength);
+        save_length();
       }
+      fill_solid(leds, MAX_LEDS, set_new_eorder(CRGB(0, 0, 5)));
     }
 
-    // тип заливки вершины
-    if (btn2.getButtonState() == BTN_DOWN)
+    // тип заливки вершины - сплошной, сверху вниз, снизу вверх или случайное мерцание
+    switch (btn2.getButtonState())
     {
+    case BTN_DOWN:
       if (++topEffect > 3)
       {
         topEffect = 0;
@@ -354,6 +353,7 @@ void set_top_setting()
 
       CTG_PRINT(F("Top effect: "));
       CTG_PRINTLN(topEffect);
+      break;
     }
 
 #if BUTTONS_NUM > 3

@@ -47,9 +47,7 @@ void addBackground()
 #endif
 
   for (i = 0; i < numLeds; i++)
-    if ((leds[i].r < 5) &&
-        (leds[i].g < 5) &&
-        (leds[i].b < 5))
+    if ((leds[i].r < 5) && (leds[i].g < 5) && (leds[i].b < 5))
     {
 #if !defined(EORDER)
       switch (eorder_index)

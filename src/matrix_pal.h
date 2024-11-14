@@ -1,7 +1,7 @@
 #ifndef MATRIX_PAL_H
 #define MATRIX_PAL_H
 
-#include "_leds.h"
+#include "function.h"
 
 /* Usage - matrix_pal();
  *
@@ -62,4 +62,3 @@ void matrix_pal()
 
 #endif
 
-// ***

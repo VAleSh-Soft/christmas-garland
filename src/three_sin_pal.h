@@ -1,7 +1,7 @@
 #ifndef THREE_SIN_PAL_H
 #define THREE_SIN_PAL_H
 
-#include "_leds.h"
+#include "function.h"
 
 // three_sin_pal variables ---------------------------------------------------------------------
 
@@ -37,4 +37,3 @@ void three_sin_pal()
 
 #endif
 
-// ***

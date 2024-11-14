@@ -1,7 +1,7 @@
 #ifndef ONE_SIN_PAL_H
 #define ONE_SIN_PAL_H
 
-#include "_leds.h"
+#include "function.h"
 
 /* There's lots of values to play with here, as well as selecting your own palettes
  *
@@ -50,4 +50,3 @@ void one_sin_pal()
 
 #endif
 
-// ***

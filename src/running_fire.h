@@ -1,7 +1,7 @@
 #ifndef RUNNING_FIRE_H
 #define RUNNING_FIRE_H
 
-#include "_leds.h"
+#include "function.h"
 
 const PROGMEM uint8_t prog_run_fire[] = {PROG_RUN_FIRE};    // массив программ
 const uint16_t prog_run_fire_count = sizeof(prog_run_fire); // размер программы
@@ -86,4 +86,3 @@ void running_fire(uint8_t prog, uint8_t effect, uint8_t clear)
 
 #endif
 
-// ***

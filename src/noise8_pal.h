@@ -1,7 +1,7 @@
 #ifndef NOISE8_PAL_H
 #define NOISE8_PAL_H
 
-#include "_leds.h"
+#include "function.h"
 
 /* This is adapted from a routine created by Mark Kriegsman */
 
@@ -33,4 +33,3 @@ void noise8_pal()
 
 #endif
 
-// ***

@@ -1,7 +1,7 @@
 #ifndef TWO_SIN_H
 #define TWO_SIN_H
 
-#include "_leds.h"
+#include "function.h"
 /* Usage - two_sin();
  *
  * Loads of variables to play with
@@ -45,4 +45,3 @@ void two_sin()
 
 #endif
 
-// ***

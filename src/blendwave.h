@@ -1,7 +1,7 @@
 #ifndef BLENDWARE_H
 #define BLENDWARE_H
 
-#include "_leds.h"
+#include "function.h"
 
 void blendwave()
 {
@@ -35,4 +35,4 @@ void blendwave()
 
 #endif
 
-// ***
+

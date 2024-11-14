@@ -1,7 +1,7 @@
 #ifndef RAINBOW_MARCH_H
 #define RAINBOW_MARCH_H
 
-#include "_leds.h"
+#include "function.h"
 
 /* Usage - rainbow_march();
  *
@@ -22,4 +22,3 @@ void rainbow_march()
 
 #endif
 
-// ***

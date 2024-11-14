@@ -1,7 +1,7 @@
 #ifndef JUGGLE_PAL_H
 #define JUGGLE_PAL_H
 
-#include "_leds.h"
+#include "function.h"
 
 /* This is adapted from a routine created by Mark Kriegsman */
 
@@ -37,4 +37,3 @@ void juggle_pal()
 
 #endif
 
-// ***

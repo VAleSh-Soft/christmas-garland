@@ -1,7 +1,7 @@
 #ifndef NOISE16_PAL_H
 #define NOISE16_PAL_H
 
-#include "_leds.h"
+#include "function.h"
 
 // noise16 variables -----------------------------------------------------------------------
 
@@ -37,4 +37,3 @@ void noise16_pal()
 
 #endif
 
-// ***

@@ -1,7 +1,7 @@
 #ifndef RAINBOW_BEAT_H
 #define RAINBOW_BEAT_H
 
-#include "_leds.h"
+#include "function.h"
 
 // Usage - rainbow_beat();
 
@@ -17,4 +17,3 @@ void rainbow_beat()
 
 #endif
 
-// ***

@@ -1,7 +1,7 @@
 #ifndef CONFETTI_PAL_H
 #define CONFETTI_PAL_H
 
-#include "_leds.h"
+#include "function.h"
 
 /* This is adapted from the confetti routine created by Mark Kriegsman */
 
@@ -36,4 +36,3 @@ void confetti_pal()
 
 #endif
 
-// ***

@@ -1,7 +1,7 @@
 #ifndef SERENDIPITOUS_PAL_H
 #define SERENDIPITOUS_PAL_H
 
-#include "_leds.h"
+#include "function.h"
 
 /*  This is from Serendipitous Circles from the August 1977 and April 1978 issues of Byte Magazine. I didn't do a very good job of it, but am at least getting some animation and the routine is very short.
  */
@@ -45,4 +45,3 @@ void serendipitous_pal()
 
 #endif
 
-// ***

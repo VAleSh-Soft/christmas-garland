@@ -1,7 +1,7 @@
 #ifndef COLORWAVE_H
 #define COLORWAVE_H
 
-#include "_leds.h"
+#include "function.h"
 
 // ColorWavesWithPalettes
 // Animated shifting color waves, with several cross-fading color palettes.
@@ -80,4 +80,3 @@ void colorwaves()
 
 #endif
 
-// ***

@@ -1,7 +1,7 @@
 #ifndef PLASMA_H
 #define PLASMA_H
 
-#include "_leds.h"
+#include "function.h"
 
 /* Usage - plasma(freq1, freq2, phase1, phase2);
  *
@@ -34,4 +34,3 @@ void plasma(uint8_t freq1, uint8_t freq2, int8_t phase1, int8_t phase2)
   }
 } // plasma()
 
-// ***

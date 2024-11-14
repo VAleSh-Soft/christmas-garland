@@ -10,7 +10,6 @@
 // ===================================================
 
 // Функции поддержки
-#include "src/addings.h"
 
 #if SAVE_EEPROM
 #include "src/_eeprom.h"

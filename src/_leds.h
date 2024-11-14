@@ -7,13 +7,12 @@
 #pragma once
 
 #include "../setting.h"
+#include "function.h"
 #include "_eeprom.h"
 #include <FastLED.h>
 
 // ===================================================
 
-// подмена цветов согласно сохраненного порядка следования перед выводом их на гирлянду
-CRGB set_new_eorder(CRGB _col);
 // инициализация FastLED
 void fastled_init();
 // вывод цветности гирлянды в Сериал
@@ -31,30 +30,6 @@ void set_top_setting();
 #endif
 
 // ===================================================
-
-CRGB set_new_eorder(CRGB _col)
-{
-#if !defined(EORDER)
-  switch (eorder_index)
-  {
-  case 1: // RBG
-    return CRGB(_col.r, _col.b, _col.g);
-  case 2: // GRB
-    return CRGB(_col.g, _col.r, _col.b);
-  case 3: // GBR
-    return CRGB(_col.g, _col.b, _col.r);
-  case 4: // BRG
-    return CRGB(_col.b, _col.r, _col.g);
-  case 5: // BGR
-    return CRGB(_col.b, _col.g, _col.r);
-  default: // по умолчанию выводить RGB
-    return (_col);
-  }
-#else
-  // если порядок задан жестко, вывести, не меняя
-  return (_col);
-#endif
-}
 
 void fastled_init()
 {
@@ -291,7 +266,7 @@ void set_eorder()
 #endif
 
 #if BUTTONS_NUM > 2 && TOP_LENGTH
-void save_length()
+static void save_length()
 {
 #if TOP_LENGTH < 255
   write_eeprom_8(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
@@ -303,11 +278,43 @@ void save_length()
   CTG_PRINTLN(topLength);
 }
 
+static void print_top_color()
+{
+  CTG_PRINT(F("Top color: "));
+  switch (topColor)
+  {
+  case 0:
+    CTG_PRINTLN(F("Red"));
+    break;
+  case 1:
+    CTG_PRINTLN(F("Orange"));
+    break;
+  case 2:
+    CTG_PRINTLN(F("Yellow"));
+    break;
+  case 3:
+    CTG_PRINTLN(F("Green"));
+    break;
+  case 4:
+    CTG_PRINTLN(F("Blue"));
+    break;
+  case 5:
+    CTG_PRINTLN(F("Indigo"));
+    break;
+  case 6:
+    CTG_PRINTLN(F("Violet"));
+    break;
+  case 7:
+    CTG_PRINTLN(F("White"));
+    break;
+  }
+}
+
 void set_top_setting()
 {
   CTG_PRINTLN(F("Mode for changing the setting for top of the garland"));
 
-  fill_solid(leds, MAX_LEDS, set_new_eorder(CRGB(0, 0, 5)));
+  addBackground();
   top();
   LEDS.show();
 
@@ -337,7 +344,7 @@ void set_top_setting()
         topLength--;
         save_length();
       }
-      fill_solid(leds, MAX_LEDS, set_new_eorder(CRGB(0, 0, 5)));
+      addBackground();
     }
 
     // тип заливки вершины - сплошной, сверху вниз, снизу вверх или случайное мерцание
@@ -349,7 +356,7 @@ void set_top_setting()
         topEffect = 0;
       }
       write_eeprom_8(EEPROM_INDEX_FOR_TOPEFFECT, topEffect);
-      fill_solid(leds, MAX_LEDS, set_new_eorder(CRGB(0, 0, 5)));
+      addBackground();
 
       CTG_PRINT(F("Top effect: "));
       CTG_PRINTLN(topEffect);
@@ -366,34 +373,7 @@ void set_top_setting()
       }
       write_eeprom_8(EEPROM_INDEX_FOR_TOPCOLOR, topColor);
 
-      CTG_PRINT(F("Top color: "));
-      switch (topColor)
-      {
-      case 0:
-        CTG_PRINTLN(F("Red"));
-        break;
-      case 1:
-        CTG_PRINTLN(F("Orange"));
-        break;
-      case 2:
-        CTG_PRINTLN(F("Yellow"));
-        break;
-      case 3:
-        CTG_PRINTLN(F("Green"));
-        break;
-      case 4:
-        CTG_PRINTLN(F("Blue"));
-        break;
-      case 5:
-        CTG_PRINTLN(F("Indigo"));
-        break;
-      case 6:
-        CTG_PRINTLN(F("Violet"));
-        break;
-      case 7:
-        CTG_PRINTLN(F("White"));
-        break;
-      }
+      print_top_color();
     }
 #endif
 

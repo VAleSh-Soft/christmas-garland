@@ -1,7 +1,7 @@
 #ifndef CANDLES_H
 #define CANDLES_H
 
-#include "_leds.h"
+#include "function.h"
 
 void candles()
 {
@@ -30,4 +30,3 @@ void candles()
 
 #endif
 
-// ***

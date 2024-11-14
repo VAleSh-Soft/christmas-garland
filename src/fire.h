@@ -1,7 +1,7 @@
 #ifndef FIRE_H
 #define FIRE_H
 
-#include "_leds.h"
+#include "function.h"
 
 void fire()
 { // The fill_rainbow call doesn't support brightness levels
@@ -82,4 +82,3 @@ void fire()
 
 #endif
 
-// ***

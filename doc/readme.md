@@ -5,8 +5,14 @@
 
 ![alt text](case.jpg)
 
-- **christmas-garland_easyeda.json** - файл проекта EasyEDA, если вам вдруг понадобится внести изменения в схему или плату; загрузка проекта в EasyEDA (если вдруг кто не знает )):
+- **christmas-garland_gerber_ver3.0.zip** - Gerber-файл для заказа у китайцев
+- **EasyEDA_project.zip** - файл проекта EasyEDA, если вам вдруг понадобится внести изменения в схему или плату; загрузка проекта в EasyEDA (если вдруг кто не знает )):
 
 ![alt text](0001.jpg)
 
-- **christmas-garland_gerber_ver3.0.zip** - Gerber-файл для заказа у китайцев
+  - выбрать файл **EasyEDA_project.zip** и нажать кнопку **Импорт**
+
+![alt text](0002.jpg)
+
+  - После чего сохранить проект в редакторе;
+

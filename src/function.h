@@ -463,7 +463,7 @@ void addBackground()
   uint16_t i;
 #endif
 
-  for (i = 0; i < numLeds; i++)
+  for (i = 0; i < numLeds - topLength; i++)
     if ((leds[i].r < 5) && (leds[i].g < 5) && (leds[i].b < 5))
     {
 #if !defined(EORDER)

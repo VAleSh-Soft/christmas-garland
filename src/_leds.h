@@ -344,7 +344,7 @@ void set_top_setting()
         topLength--;
         save_length();
       }
-      addBackground();
+      fill_solid(leds, numLeds, CRGB::Black);
     }
 
     // тип заливки вершины - сплошной, сверху вниз, снизу вверх или случайное мерцание
@@ -356,7 +356,6 @@ void set_top_setting()
         topEffect = 0;
       }
       write_eeprom_8(EEPROM_INDEX_FOR_TOPEFFECT, topEffect);
-      addBackground();
 
       CTG_PRINT(F("Top effect: "));
       CTG_PRINTLN(topEffect);
@@ -377,6 +376,7 @@ void set_top_setting()
     }
 #endif
 
+    addBackground();
     top();
     LEDS.show();
   }

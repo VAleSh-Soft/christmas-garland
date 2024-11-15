@@ -164,7 +164,7 @@ void setLengthOfGarland()
 
   _start_mode(btn2);
 
-  // запускаем бесконечный цикл для опроса кнопок
+  // опрос кнопок
   while (true)
   {
     switch (btn1.getButtonState())
@@ -248,7 +248,7 @@ void set_eorder()
   fill_solid(leds, MAX_LEDS, CRGB::Black);
   show_rgb();
 
-  // запускаем бесконечный цикл для опроса кнопки
+  // опрос кнопок
   while (true)
   {
     if (btn1.getButtonState() == BTN_DOWN)
@@ -320,6 +320,7 @@ void set_top_setting()
 
   _start_mode(btn3);
 
+  // опрос кнопок
   while (true)
   {
 #if BUTTONS_NUM == 3
@@ -347,10 +348,10 @@ void set_top_setting()
       fill_solid(leds, numLeds, CRGB::Black);
     }
 
-    // тип заливки вершины - сплошной, сверху вниз, снизу вверх или случайное мерцание
     switch (btn2.getButtonState())
     {
-    case BTN_DOWN:
+    // тип заливки вершины - сплошной, сверху вниз, снизу вверх или случайное мерцание
+    case BTN_ONECLICK:
       if (++topEffect > 3)
       {
         topEffect = 0;
@@ -360,12 +361,8 @@ void set_top_setting()
       CTG_PRINT(F("Top effect: "));
       CTG_PRINTLN(topEffect);
       break;
-    }
-
-#if BUTTONS_NUM > 3
     // цвет заливки вершины
-    if (btn3.getButtonState() == BTN_DOWN)
-    {
+    case BTN_LONGCLICK:
       if (++topColor > 7)
       {
         topColor = 0;
@@ -373,8 +370,8 @@ void set_top_setting()
       write_eeprom_8(EEPROM_INDEX_FOR_TOPCOLOR, topColor);
 
       print_top_color();
+      break;
     }
-#endif
 
     addBackground();
     top();

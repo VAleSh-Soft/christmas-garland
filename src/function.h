@@ -53,20 +53,20 @@ int qsuba(size_t x, size_t b);
 void eeprom_init();
 #endif
 #if TOP_LENGTH > 0
-// обработка конца гирлянды 
+// обработка конца гирлянды
 void top();
 #endif
 // подмена цветов согласно сохраненного порядка следования перед выводом их на гирлянду
 CRGB set_new_eorder(CRGB _col);
-//  добавление свечей 
+//  добавление свечей
 void addCandle();
-// заливка фона 
+// заливка фона
 void addBackground();
 // блестки
 void addGlitter(fract8 chanceOfGlitter);
-// бенгальский огонь 
+// бенгальский огонь
 void sparkler(uint8_t n);
-// обработчик нажатий кнопок 
+// обработчик нажатий кнопок
 void btnHandler();
 
 // ===================================================
@@ -97,11 +97,12 @@ uint8_t topLength = TOP_LENGTH;
 #else
 uint16_t topLength = TOP_LENGTH;
 #endif
-uint8_t topEffect = TOP_EFFECT;
+uint8_t topEffectIndex = TOP_EFFECT;
 #endif
 
 #if BUTTONS_NUM > 3
-uint8_t topColor = 0;
+uint8_t topColorIndex = 0;
+uint8_t bgrColorIndex = 0;
 #endif
 
 uint8_t polCandle = 1; // Положение свечи
@@ -148,7 +149,7 @@ uint8_t demorun = DEMO_MODE;
 #endif
 
 #ifndef EORDER
-uint8_t eorder_index = 2; // сохраненная очередность цветов, если она не задана жестко макросом EORDER
+uint8_t eorderIndex = 2; // сохраненная очередность цветов, если она не задана жестко макросом EORDER
 #endif
 
 uint8_t allfreq = 32; // Меняет частоту. Переменная для эффектов one_sin_pal и two_sin.
@@ -255,7 +256,7 @@ void eeprom_init()
     extFlag.Candle = CANDLE_ON;
     write_eeprom_8(EEPROM_INDEX_FOR_EXTFLAG, extFlag.Byte);
 #if !defined(EORDER)
-    write_eeprom_8(EEPROM_INDEX_FOR_EORDER, eorder_index);
+    write_eeprom_8(EEPROM_INDEX_FOR_EORDER, eorderIndex);
 #endif
     write_eeprom_8(EEPROM_INDEX_FOR_ISINIT, INITVAL);
 
@@ -263,14 +264,15 @@ void eeprom_init()
     numLeds = INITLEN;
     meshdelay = INITDEL;
 #if TOP_LENGTH
-    write_eeprom_8(EEPROM_INDEX_FOR_TOPEFFECT, topEffect);
+    write_eeprom_8(EEPROM_INDEX_FOR_TOPEFFECT, topEffectIndex);
 #if TOP_LENGTH < 255
     write_eeprom_8(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
 #else
     write_eeprom_16(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
 #endif
 #if BUTTONS_NUM > 3
-    write_eeprom_8(EEPROM_INDEX_FOR_TOPCOLOR, topColor);
+    write_eeprom_8(EEPROM_INDEX_FOR_TOPCOLOR, topColorIndex);
+    write_eeprom_8(EEPROM_INDEX_FOR_BGRCOLOR, bgrColorIndex);
 #endif
 #endif
   }
@@ -280,10 +282,10 @@ void eeprom_init()
 
     maxBright = read_eeprom_8(EEPROM_INDEX_FOR_BRIGHT);
 #if !defined(EORDER)
-    eorder_index = read_eeprom_8(EEPROM_INDEX_FOR_EORDER);
-    if (eorder_index > 5)
+    eorderIndex = read_eeprom_8(EEPROM_INDEX_FOR_EORDER);
+    if (eorderIndex > 5)
     {
-      eorder_index = 0;
+      eorderIndex = 0;
     }
 #endif
     ledMode = read_eeprom_8(EEPROM_INDEX_FOR_STARTMODE);
@@ -302,10 +304,10 @@ void eeprom_init()
 
     meshdelay = read_eeprom_8(EEPROM_INDEX_FOR_STRANDEL);
 #if TOP_LENGTH
-    topEffect = read_eeprom_8(EEPROM_INDEX_FOR_TOPEFFECT);
-    if (topEffect > 3)
+    topEffectIndex = read_eeprom_8(EEPROM_INDEX_FOR_TOPEFFECT);
+    if (topEffectIndex > 3)
     {
-      topEffect = 0;
+      topEffectIndex = 0;
     }
 #if TOP_LENGTH < 255
     topLength = read_eeprom_8(EEPROM_INDEX_FOR_TOPLENGTH);
@@ -317,10 +319,15 @@ void eeprom_init()
       topLength = TOP_LENGTH;
     }
 #if BUTTONS_NUM > 3
-    topColor = read_eeprom_8(EEPROM_INDEX_FOR_TOPCOLOR);
-    if (topColor > 7)
+    topColorIndex = read_eeprom_8(EEPROM_INDEX_FOR_TOPCOLOR);
+    if (topColorIndex > 7)
     {
-      topColor = 0;
+      topColorIndex = 0;
+    }
+    bgrColorIndex = read_eeprom_8(EEPROM_INDEX_FOR_BGRCOLOR);
+    if (bgrColorIndex > 2)
+    {
+      bgrColorIndex = 0;
     }
 #endif
 #endif
@@ -345,12 +352,12 @@ void top()
       0xFFFFFF, // белый (White)
   };
 
-  top_color = pgm_read_dword(&color_of_number[topColor]);
+  top_color = pgm_read_dword(&color_of_number[topColorIndex]);
 #else
   top_color = TOP_COLOR;
 #endif
 
-  if (topEffect == 0)
+  if (topEffectIndex == 0)
   {
     fill_solid(&leds[numLeds - topLength], topLength, set_new_eorder(top_color));
   }
@@ -366,7 +373,7 @@ void top()
     EVERY_N_MILLIS_I(toptimer, TOP_DELAY)
     { // Sets the original delay time.
 
-      switch (topEffect)
+      switch (topEffectIndex)
       {
       case 1:
 #if TOP_LENGTH < 255
@@ -406,7 +413,7 @@ void top()
 CRGB set_new_eorder(CRGB _col)
 {
 #if !defined(EORDER)
-  switch (eorder_index)
+  switch (eorderIndex)
   {
   case 1: // RBG
     return CRGB(_col.r, _col.b, _col.g);
@@ -457,34 +464,96 @@ void addCandle()
 
 void addBackground()
 {
+  const uint8_t thrsh = 5; // пороговое значение для заливки
+
 #if MAX_LEDS < 255
   uint8_t i;
 #else
   uint16_t i;
 #endif
 
+#if BUTTONS_NUM > 2
+  uint8_t bgr_color = bgrColorIndex;
+#else
+  uint8_t bgr_color = 0;
+#endif
+
   for (i = 0; i < numLeds - topLength; i++)
-    if ((leds[i].r < 5) && (leds[i].g < 5) && (leds[i].b < 5))
+  {
+    if ((leds[i].r < thrsh) && (leds[i].g < thrsh) && (leds[i].b < thrsh))
     {
 #if !defined(EORDER)
-      switch (eorder_index)
+      switch (bgr_color)
       {
-      case 1:
-      case 3:
-        leds[i].g += 5;
+      case 0: // заливка фона голубым
+        switch (eorderIndex)
+        {
+        case 0:
+        case 2:
+          leds[i].b += thrsh;
+          break;
+        case 1:
+        case 3:
+          leds[i].g += thrsh;
+          break;
+        case 4:
+        case 5:
+          leds[i].r += thrsh;
+          break;
+        }
         break;
-      case 4:
-      case 5:
-        leds[i].r += 5;
+      case 1: // заливка фона зеленым
+        switch (eorderIndex)
+        {
+        case 0:
+        case 5:
+          leds[i].g += thrsh;
+          break;
+        case 1:
+        case 4:
+          leds[i].b += thrsh;
+          break;
+        case 2:
+        case 3:
+          leds[i].r += thrsh;
+          break;
+        }
         break;
-      default:
-        leds[i].b += 5;
+      case 2: // заливка фона красным
+        switch (eorderIndex)
+        {
+        case 0:
+        case 1:
+          leds[i].r += thrsh;
+          break;
+        case 2:
+        case 4:
+          leds[i].g += thrsh;
+          break;
+        case 3:
+        case 5:
+          leds[i].b += thrsh;
+          break;
+        }
+        break;
         break;
       }
 #else
-      leds[i].b += 5;
+      switch (bgr_color)
+      {
+      case 0: // заливка фона голубым
+        leds[i].b += thrsh;
+        break;
+      case 1: // заливка фона зеленым
+        leds[i].g += thrsh;
+        break;
+      case 2: // заливка фона красным
+        leds[i].r += thrsh;
+        break;
+      }
 #endif
     }
+  }
 }
 
 void addGlitter(fract8 chanceOfGlitter)

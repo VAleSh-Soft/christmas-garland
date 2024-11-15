@@ -83,7 +83,7 @@ void print_eorder()
 {
   CTG_PRINT(F("LEDS EORDER: "));
 #if !defined(EORDER)
-  switch (eorder_index)
+  switch (eorderIndex)
   {
   case 0:
     CTG_PRINTLN(F("RGB"));
@@ -102,6 +102,9 @@ void print_eorder()
     break;
   case 5:
     CTG_PRINTLN(F("BGR"));
+    break;
+  default:
+    CTG_PRINTLN(F("Unknown"));
     break;
   }
 #else
@@ -145,21 +148,65 @@ void _start_mode(shButton &btn)
 }
 #endif
 
-#if BUTTONS_NUM > 1 && CAN_CHANGE_NUMLEDS
-static void fill_solid_garland()
+#if BUTTONS_NUM > 2
+void print_bgr_color()
 {
-  fill_solid(leds, MAX_LEDS, CRGB::Black);
-  fill_solid(leds, numLeds, set_new_eorder(CRGB::Red));
-  LEDS.show();
-
-  CTG_PRINT(F("Length garland: "));
-  CTG_PRINTLN(numLeds);
+  CTG_PRINT(F("Background Fill Color: "));
+  switch (bgrColorIndex)
+  {
+  case 0:
+    CTG_PRINTLN(F("Blue"));
+    break;
+  case 1:
+    CTG_PRINTLN(F("Green"));
+    break;
+  case 2:
+    CTG_PRINTLN(F("Red"));
+    break;
+  default:
+    CTG_PRINTLN(F("Unknown"));
+    break;
+  }
 }
+#endif
+
+#if BUTTONS_NUM > 1
+static void fill_solid_garland(bool can_print = true)
+{
+  LEDS.setBrightness(10);
+  fill_solid(leds, MAX_LEDS, CRGB::Black);
+
+#if BUTTONS_NUM > 2
+  switch (bgrColorIndex)
+  {
+  case 0:
+    fill_solid(leds, numLeds, set_new_eorder(CRGB::Blue));
+    break;
+  case 1:
+    fill_solid(leds, numLeds, set_new_eorder(CRGB::Green));
+    break;
+  case 2:
+    fill_solid(leds, numLeds, set_new_eorder(CRGB::Red));
+    break;
+  }
+#else
+  fill_solid(leds, numLeds, set_new_eorder(CRGB::Blue));
+#endif
+
+  if (can_print)
+  {
+    CTG_PRINT(F("Length garland: "));
+    CTG_PRINTLN(numLeds);
+  }
+
+  LEDS.show();
+}
+
+#if CAN_CHANGE_NUMLEDS
 void setLengthOfGarland()
 {
   CTG_PRINTLN(F("Mode for changing the length of the garland"));
 
-  LEDS.setBrightness(10);
   fill_solid_garland();
 
   _start_mode(btn2);
@@ -222,8 +269,25 @@ void setLengthOfGarland()
       write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(numLeds) >> 8);
 #endif
     }
+
+#if BUTTONS_NUM > 2
+    if (btn2.getButtonState() == BTN_DOWN)
+    {
+      // смена цвета заливки фона
+      if (++bgrColorIndex > 2)
+      {
+        bgrColorIndex = 0;
+      }
+      write_eeprom_8(EEPROM_INDEX_FOR_BGRCOLOR, bgrColorIndex);
+      fill_solid_garland(false);
+
+      print_bgr_color();
+    }
+
+#endif
   }
 }
+#endif
 #endif
 
 #if !defined(EORDER) && BUTTONS_NUM > 0
@@ -243,8 +307,8 @@ void set_eorder()
 
   _start_mode(btn1);
 
-  eorder_index = 0;
-  write_eeprom_8(EEPROM_INDEX_FOR_EORDER, eorder_index);
+  eorderIndex = 0;
+  write_eeprom_8(EEPROM_INDEX_FOR_EORDER, eorderIndex);
   fill_solid(leds, MAX_LEDS, CRGB::Black);
   show_rgb();
 
@@ -253,11 +317,11 @@ void set_eorder()
   {
     if (btn1.getButtonState() == BTN_DOWN)
     {
-      if (++eorder_index > 5)
+      if (++eorderIndex > 5)
       {
-        eorder_index = 0;
+        eorderIndex = 0;
       }
-      write_eeprom_8(EEPROM_INDEX_FOR_EORDER, eorder_index);
+      write_eeprom_8(EEPROM_INDEX_FOR_EORDER, eorderIndex);
       print_eorder();
       show_rgb();
     }
@@ -281,7 +345,7 @@ static void save_length()
 static void print_top_color()
 {
   CTG_PRINT(F("Top color: "));
-  switch (topColor)
+  switch (topColorIndex)
   {
   case 0:
     CTG_PRINTLN(F("Red"));
@@ -307,6 +371,9 @@ static void print_top_color()
   case 7:
     CTG_PRINTLN(F("White"));
     break;
+  default:
+    CTG_PRINTLN(F("Unknown"));
+    break;
   }
 }
 
@@ -314,7 +381,7 @@ void set_top_setting()
 {
   CTG_PRINTLN(F("Mode for changing the setting for top of the garland"));
 
-  addBackground();
+  fill_solid_garland(false);
   top();
   LEDS.show();
 
@@ -352,28 +419,42 @@ void set_top_setting()
     {
     // тип заливки вершины - сплошной, сверху вниз, снизу вверх или случайное мерцание
     case BTN_ONECLICK:
-      if (++topEffect > 3)
+      if (++topEffectIndex > 3)
       {
-        topEffect = 0;
+        topEffectIndex = 0;
       }
-      write_eeprom_8(EEPROM_INDEX_FOR_TOPEFFECT, topEffect);
+      write_eeprom_8(EEPROM_INDEX_FOR_TOPEFFECT, topEffectIndex);
 
       CTG_PRINT(F("Top effect: "));
-      CTG_PRINTLN(topEffect);
+      CTG_PRINTLN(topEffectIndex);
       break;
     // цвет заливки вершины
     case BTN_LONGCLICK:
-      if (++topColor > 7)
+      if (++topColorIndex > 7)
       {
-        topColor = 0;
+        topColorIndex = 0;
       }
-      write_eeprom_8(EEPROM_INDEX_FOR_TOPCOLOR, topColor);
+      write_eeprom_8(EEPROM_INDEX_FOR_TOPCOLOR, topColorIndex);
 
       print_top_color();
       break;
     }
 
-    addBackground();
+#if BUTTONS_NUM > 3
+    if (btn3.getButtonState() == BTN_DOWN)
+    {
+      // смена цвета заливки фона
+      if (++bgrColorIndex > 2)
+      {
+        bgrColorIndex = 0;
+      }
+      write_eeprom_8(EEPROM_INDEX_FOR_BGRCOLOR, bgrColorIndex);
+      fill_solid_garland(false);
+
+      print_bgr_color();
+    }
+#endif
+
     top();
     LEDS.show();
   }

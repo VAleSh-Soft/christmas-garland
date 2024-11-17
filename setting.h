@@ -164,11 +164,11 @@
 
 #define BLACKSTART 1 // Первый запуск
                      /* 0 - начинать с эффекта,
-                      * 1- начинать с черного экрана */
+                      * 1 - начинать с черного экрана */
 
 #define GLITER_ON 1 // Включить блеск
                     /* 0 - блеск отключен,
-                     * 1- блеск включен */
+                     * 1 - блеск включен */
 
 #define CANDLE_KOL 5 /* если больше 0 то будут включена имитация свечей,     \
                       * число задает через какое расстояние друг от друга \
@@ -248,20 +248,6 @@
 #define PROG_RUN_FIRE PROG_0, PROG_1, PROG_2, PROG_3, PROG_4, PROG_5, PROG_6, PROG_7, PROG_8, PROG_9 // Все программы эффектов бегущего огня через запятую
 
 // ---- Параметры кнопок ------------------------
-
-#if BUTTONS_NUM
-#include <shButton.h> // https://github.com/VAleSh-Soft/shButton
-shButton btn1(BTN1_PIN);
-#if BUTTONS_NUM > 1
-shButton btn2(BTN2_PIN);
-#endif
-#if BUTTONS_NUM > 2
-shButton btn3(BTN3_PIN);
-#endif
-#if BUTTONS_NUM > 3
-shButton btn4(BTN4_PIN);
-#endif
-#endif
 
 // Команды связанные с действиями кнопки, менять не надо, просто используем
 #define BTN1_1 1000     // кнопка 1, клик

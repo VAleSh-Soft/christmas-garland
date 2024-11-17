@@ -6,6 +6,7 @@
 
 #include "setting.h"
 #include "src/_leds.h"
+#include "src/function.h"
 
 // ===================================================
 
@@ -56,30 +57,15 @@ void ledsFlash(uint8_t led_idx, uint8_t &count);
 
 void setup()
 {
-#if BUTTONS_NUM > 0
-  btn1.setVirtualClickOn(true);
-  btn1.setLongClickMode(LCM_CLICKSERIES);
-#if BUTTONS_NUM > 1
-  btn2.setVirtualClickOn(true);
-#endif
-#if BUTTONS_NUM > 2
-  btn3.setVirtualClickOn(true);
-#endif
-#if BUTTONS_NUM > 3
-  btn4.setVirtualClickOn(true);
-#endif
-#if BUTTONS_NUM == 2
-  btn2.setLongClickMode(LCM_CLICKSERIES);
-#elif BUTTONS_NUM == 3
-  btn3.setLongClickMode(LCM_CLICKSERIES);
+// ==== инициализация кнопок =========================
+#if BUTTONS_NUM == 3
   btn2.setLongClickMode(LCM_ONLYONCE);
 #elif BUTTONS_NUM > 3
-  btn4.setLongClickMode(LCM_CLICKSERIES);
   btn2.setLongClickMode(LCM_ONLYONCE);
   btn3.setLongClickMode(LCM_ONLYONCE);
 #endif
-#endif
 
+// ==== индикаторные светодиоды ======================
 #if LED_ON > 0
   pinMode(LED1_PIN, OUTPUT); // пин первого светодиода
 #if LED_ON > 1
@@ -88,6 +74,7 @@ void setup()
   LED1_On; // Включим светодиод
 #endif
 
+// ==== вывод отладки ================================
 #if LOG_ON
   Serial.begin(SERIAL_BAUDRATE); // Setup serial baud rate
 #endif
@@ -95,6 +82,7 @@ void setup()
   CTG_PRINTLN(F(" "));
   CTG_PRINTLN(F("---SETTING UP---"));
 
+// ==== инициализация настроек =======================
 #if SAVE_EEPROM
   // если задано сохранение настроек в EEPROM
   eeprom_init();
@@ -131,11 +119,14 @@ void setup()
     numLeds = (topLength + 1); // Проверка
   }
 
+  // ==== инициализация гирлянды =====================
   fastled_init();
 
+  // =================================================
   random16_set_seed(4832); // Рандомайзер
   random16_add_entropy(analogRead(2));
 
+  // =================================================
   CTG_PRINT(F("Initial delay: "));
   CTG_PRINT(meshdelay * 100);
   CTG_PRINTLN(F("ms delay."));
@@ -157,6 +148,7 @@ void setup()
   else
     CTG_PRINTLN(F("Candle Off"));
 
+// ===================================================
 #if BLACKSTART == 1
   solid = CRGB::Black; // Запуск с пустого поля
 #if CHANGE_ON == 1
@@ -243,8 +235,8 @@ void loop()
   EVERY_N_MILLIS_I(thistimer, thisdelay)
   {                                 // Sets the original delay time.
     thistimer.setPeriod(thisdelay); // This is how you update the delay value on the fly.
-    kolLeds = numLeds - topLength; // Выводим Эффект на все светодиоды
-    strobeMode(ledMode, 0);        // отобразить эффект;
+    kolLeds = numLeds - topLength;  // Выводим Эффект на все светодиоды
+    strobeMode(ledMode, 0);         // отобразить эффект;
 #if CHANGE_ON == 1
     if ((stepMode < (numLeds - topLength)) && ((ledMode < 220) || (ledMode >= 230)))
     {                     // требуется наложить новый эффект
@@ -262,7 +254,7 @@ void loop()
 
 #if CHANGE_ON == 1 // Включена плавная смена эффектов
   if (stepMode < (numLeds - topLength))
-  {                                                                        // есть шаги, исполняем
+  {                                                                       // есть шаги, исполняем
     uint16_t change_time = (1000L * CHANGE_TIME) / (numLeds - topLength); // время в мСек на каждый светодиод
     if (change_time < 20)
     {

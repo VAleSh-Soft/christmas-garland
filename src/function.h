@@ -1,7 +1,43 @@
 #pragma once
 
 #include <FastLED.h>
+#include <shButton.h>
 #include "../setting.h"
+
+// ===================================================
+
+#if BUTTONS_NUM
+class cgButton : public shButton
+{
+private:
+  /* data */
+public:
+  cgButton(int8_t pin) : shButton(pin)
+  {
+    shButton::setVirtualClickOn(true);
+    shButton::setLongClickMode(LCM_CLICKSERIES);
+  }
+};
+
+#endif
+
+// ===================================================
+
+#if BUTTONS_NUM
+#include <shButton.h> // https://github.com/VAleSh-Soft/shButton
+cgButton btn1(BTN1_PIN);
+#if BUTTONS_NUM > 1
+cgButton btn2(BTN2_PIN);
+#endif
+#if BUTTONS_NUM > 2
+cgButton btn3(BTN3_PIN);
+#endif
+#if BUTTONS_NUM > 3
+cgButton btn4(BTN4_PIN);
+#endif
+#endif
+
+// ===================================================
 
 #if LED_ON
 // ==== Команды связанные со светодиодами ============
@@ -739,3 +775,4 @@ void btnHandler()
 #endif
 }
 #endif
+

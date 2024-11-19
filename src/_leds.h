@@ -34,7 +34,7 @@ void set_top_setting();
 void fastled_init()
 {
   LEDS.setBrightness(maxBright);
-  LEDS.setMaxPowerInVoltsAndMilliamps(5, 500);
+  LEDS.setMaxPowerInVoltsAndMilliamps(POWER_V, POWER_I);
 
 #if defined(EORDER)
 

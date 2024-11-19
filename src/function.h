@@ -306,7 +306,7 @@ void eeprom_init()
 #else
     write_eeprom_16(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
 #endif
-#if BUTTONS_NUM > 3
+#if BUTTONS_NUM > 2
     write_eeprom_8(EEPROM_INDEX_FOR_TOPCOLOR, topColorIndex);
     write_eeprom_8(EEPROM_INDEX_FOR_BGRCOLOR, bgrColorIndex);
 #endif
@@ -354,7 +354,7 @@ void eeprom_init()
     {
       topLength = TOP_LENGTH;
     }
-#if BUTTONS_NUM > 3
+#if BUTTONS_NUM > 2
     topColorIndex = read_eeprom_8(EEPROM_INDEX_FOR_TOPCOLOR);
     if (topColorIndex > 7)
     {
@@ -376,7 +376,7 @@ void top()
 {
   CRGB top_color;
 
-#if BUTTONS_NUM > 3
+#if BUTTONS_NUM > 2
   static const uint32_t PROGMEM color_of_number[] = {
       0xFF0000, // красный (Red)
       0xFF4500, // оранжевый (Orange)

@@ -330,7 +330,7 @@ void set_eorder()
 #endif
 
 #if BUTTONS_NUM > 2 && TOP_LENGTH
-static void save_length()
+static void save_top_length()
 {
 #if TOP_LENGTH < 255
   write_eeprom_8(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
@@ -404,15 +404,15 @@ void set_top_setting()
         if (topLength < TOP_LENGTH)
         {
           topLength++;
-          save_length();
+          save_top_length();
         }
       }
       else if (topLength > 0)
       {
         topLength--;
-        save_length();
+        save_top_length();
       }
-      fill_solid(leds, numLeds, CRGB::Black);
+      fill_solid_garland(false);
     }
 
     switch (btn2.getButtonState())

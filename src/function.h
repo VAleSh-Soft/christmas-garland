@@ -136,7 +136,7 @@ uint16_t topLength = TOP_LENGTH;
 uint8_t topEffectIndex = TOP_EFFECT;
 #endif
 
-#if BUTTONS_NUM > 3
+#if BUTTONS_NUM > 2
 uint8_t topColorIndex = 0;
 uint8_t bgrColorIndex = 0;
 #endif

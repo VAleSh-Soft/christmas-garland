@@ -312,9 +312,8 @@
 #define Command_Next_mode_Demo BTN1_1        // Следующий эффект. Оставляет демонстрационный режим
 #define Command_Glitter BTN1_2               // Включить/выключить сверкание
 #define Command_Brightness_plus_R BTN1_PRESS // Увеличить максимальную яркость, при достижения максимума начать с минимума
-#endif
 
-#if BUTTONS_NUM == 2
+#elif BUTTONS_NUM == 2
 // ---- для двух кнопок (BTN1, BTN2) --------
 
 #define Command_Next_mode_Demo BTN1_1      // Следующий эффект. Оставляет демонстрационный режим
@@ -324,9 +323,8 @@
 #define Command_Previous_mode_Demo BTN2_1   // Предыдущий эффект. Оставляет демонстрационный режим
 #define Command_Glitter BTN2_2              // Включить/выключить сверкание
 #define Command_Brightness_minus BTN2_PRESS // Уменьшить максимальную яркость и остановится если достигли минимума
-#endif
+#elif BUTTONS_NUM == 3
 
-#if BUTTONS_NUM == 3
 // ---- для трех кнопок (BTN1 .. BTN3) ------
 
 #define Command_Next_mode_Demo BTN1_1      // Следующий эффект. Оставляет демонстрационный режим
@@ -338,9 +336,8 @@
 
 #define Command_Previous_mode_Demo BTN3_1   // Предыдущий эффект. Оставляет демонстрационный режим
 #define Command_Brightness_minus BTN3_PRESS // Уменьшить максимальную яркость и остановится если достигли минимума
-#endif
+#elif BUTTONS_NUM > 3
 
-#if BUTTONS_NUM > 3
 // ---- для четырех кнопок (BTN1 .. BTN4) ---
 
 #define Command_Next_mode_Demo BTN1_1      // Следующий эффект. Оставляет демонстрационный режим

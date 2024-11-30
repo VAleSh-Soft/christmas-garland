@@ -374,6 +374,11 @@ void eeprom_init()
 #if TOP_LENGTH > 0
 void top()
 {
+  if (topLength == 0)
+  {
+    return;
+  }
+
   CRGB top_color;
 
 #if BUTTONS_NUM > 2
@@ -775,4 +780,3 @@ void btnHandler()
 #endif
 }
 #endif
-

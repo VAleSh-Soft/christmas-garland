@@ -82,6 +82,10 @@ void fastled_init()
     set_top_setting();
   }
 #endif
+
+#if BUTTONS_NUM > 3
+
+#endif
 }
 
 void print_eorder()
@@ -405,9 +409,9 @@ void set_top_setting()
     btn_down->getButtonState();
 
     // размер вершины
-    if (btn1.getLastState() == BTN_ONECLICK || btn_down->getLastState() == BTN_ONECLICK)
+    if (btn1.getLastState() == BTN_DOWN || btn_down->getLastState() == BTN_DOWN)
     {
-      if (btn1.getLastState() == BTN_ONECLICK)
+      if (btn1.getLastState() == BTN_DOWN)
       {
         if (topLength < TOP_LENGTH)
         {

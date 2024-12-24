@@ -145,7 +145,7 @@ void _start_mode(shButton &btn)
    * момент удерживается нажатой, но ее отслеживание пока не началось, т.к.
    * мы по сути еще не вышли из функции setup()) будет зафиксировано состяние
    * BTN_DOWN, что может привести к несанкционированному изменению параметра;
-   * вот это событие мы здесь и ждем перед тем, как запустить код, собственно,
+   * вот это событие мы здесь и ждем перед тем, как запустить код собственно
    * настройки параметра
    */
   while (btn.getButtonState() != BTN_DOWN)
@@ -401,10 +401,13 @@ void set_top_setting()
     shButton *btn_down = &btn4;
 #endif
 
+    btn1.getButtonState();
+    btn_down->getButtonState();
+
     // размер вершины
-    if (btn1.getButtonState() == BTN_DOWN || btn_down->getButtonState() == BTN_DOWN)
+    if (btn1.getLastState() == BTN_ONECLICK || btn_down->getLastState() == BTN_ONECLICK)
     {
-      if (btn1.getLastState() == BTN_DOWN)
+      if (btn1.getLastState() == BTN_ONECLICK)
       {
         if (topLength < TOP_LENGTH)
         {
@@ -417,7 +420,13 @@ void set_top_setting()
         topLength--;
         save_top_length();
       }
+
+      // сразу заполним вершину текущим цветом для наглядности
       fill_solid_garland(false);
+      uint8_t x = topEffectIndex;
+      topEffectIndex = 0;
+      top();
+      topEffectIndex = x;
     }
 
     switch (btn2.getButtonState())

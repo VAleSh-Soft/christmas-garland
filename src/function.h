@@ -322,20 +322,24 @@ void eeprom_init()
     if (eorderIndex > 5)
     {
       eorderIndex = 0;
+      write_eeprom_8(EEPROM_INDEX_FOR_EORDER, eorderIndex);
     }
 #endif
     ledMode = read_eeprom_8(EEPROM_INDEX_FOR_STARTMODE);
     numLeds = read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN);
 #if MAX_LEDS < 255
     if (read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1))
-      // Если почему-то светодиодов больше чем размер переменной
+    { // Если почему-то светодиодов больше чем размер переменной
       numLeds = MAX_LEDS;
+      write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, numLeds);
+    }
 #else
     numLeds += (uint16_t)read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1) << 8;
 #endif
     if (numLeds > MAX_LEDS)
     {
       numLeds = MAX_LEDS;
+      write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, numLeds);
     }
 
     meshdelay = read_eeprom_8(EEPROM_INDEX_FOR_STRANDEL);
@@ -343,7 +347,8 @@ void eeprom_init()
     topEffectIndex = read_eeprom_8(EEPROM_INDEX_FOR_TOPEFFECT);
     if (topEffectIndex > 3)
     {
-      topEffectIndex = 0;
+      topEffectIndex = TOP_EFFECT;
+      write_eeprom_8(EEPROM_INDEX_FOR_TOPEFFECT, topEffectIndex);
     }
 #if TOP_LENGTH < 255
     topLength = read_eeprom_8(EEPROM_INDEX_FOR_TOPLENGTH);
@@ -353,17 +358,24 @@ void eeprom_init()
     if (topLength > TOP_LENGTH)
     {
       topLength = TOP_LENGTH;
+#if TOP_LENGTH < 255
+      write_eeprom_8(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
+#else
+      write_eeprom_16(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
+#endif
     }
 #if BUTTONS_NUM > 2
     topColorIndex = read_eeprom_8(EEPROM_INDEX_FOR_TOPCOLOR);
     if (topColorIndex > 7)
     {
-      topColorIndex = 0;
+      topColorIndex = TOP_COLOR;
+      write_eeprom_8(EEPROM_INDEX_FOR_TOPCOLOR, topColorIndex);
     }
     bgrColorIndex = read_eeprom_8(EEPROM_INDEX_FOR_BGRCOLOR);
     if (bgrColorIndex > 2)
     {
       bgrColorIndex = 0;
+      write_eeprom_8(EEPROM_INDEX_FOR_BGRCOLOR, bgrColorIndex);
     }
 #endif
 #endif
@@ -602,9 +614,9 @@ void addGlitter(fract8 chanceOfGlitter)
   if (random8() < chanceOfGlitter)
   {
 #if MAX_LEDS < 255
-    leds[random8(numLeds)] += CRGB::White;
+    leds[random8(numLeds - topLength)] += CRGB::White;
 #else
-    leds[random16(numLeds)] += CRGB::White;
+    leds[random16(numLeds - topLength)] += CRGB::White;
 #endif
   }
 }

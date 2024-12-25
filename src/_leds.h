@@ -245,7 +245,7 @@ void setLengthOfGarland()
     shButton *btn_down = &btn2;
 #elif BUTTONS_NUM == 3
     shButton *btn_down = &btn3;
-#elif BUTTONS_NUM == 4
+#elif BUTTONS_NUM > 3
     shButton *btn_down = &btn4;
 #endif
     switch (btn_down->getButtonState())
@@ -401,7 +401,7 @@ void set_top_setting()
   {
 #if BUTTONS_NUM == 3
     shButton *btn_down = &btn3;
-#elif BUTTONS_NUM == 4
+#elif BUTTONS_NUM > 3
     shButton *btn_down = &btn4;
 #endif
 

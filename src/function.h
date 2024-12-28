@@ -47,17 +47,21 @@ cgButton btn4(BTN4_PIN);
 #define LED1_FleshH(x) led1Flesh = 4 * x          // Мигнуть быстро x раз 1 светодиодом    (1-15)
 #define LED1_Flesh(x) led1Flesh = 64 + (8 * x)    // Мигнуть x раз 1 светодиодом           (1-7)
 #define LED1_FleshL(x) led1Flesh = 128 + (16 * x) // Мигнуть медленно x раз 1 светодиодом  (1-7)
-#define LED2_On digitalWrite(LED2_PIN, HIGH)      // Включить светодиод 2
-#define LED2_Off digitalWrite(LED2_PIN, LOW)      // Выключить светодиод 2
-#define LED2_FleshH(x) led2Flesh = 4 * x          // Мигнуть быстро x раз 2 светодиодом    (1-15)
-#define LED2_Flesh(x) led2Flesh = 64 + 8 * x      // Мигнуть x раз 2 светодиодом           (1-7)
-#define LED2_FleshL(x) led2Flesh = 128 + 16 * x   // Мигнуть медленно x раз 2 светодиодом  (1-7)
 #else
 #define LED1_On
 #define LED1_Off
 #define LED1_FleshH(x)
 #define LED1_Flesh(x)
 #define LED1_FleshL(x)
+#endif
+
+#if LED_ON > 1
+#define LED2_On digitalWrite(LED2_PIN, HIGH)    // Включить светодиод 2
+#define LED2_Off digitalWrite(LED2_PIN, LOW)    // Выключить светодиод 2
+#define LED2_FleshH(x) led2Flesh = 4 * x        // Мигнуть быстро x раз 2 светодиодом    (1-15)
+#define LED2_Flesh(x) led2Flesh = 64 + 8 * x    // Мигнуть x раз 2 светодиодом           (1-7)
+#define LED2_FleshL(x) led2Flesh = 128 + 16 * x // Мигнуть медленно x раз 2 светодиодом  (1-7)
+#else
 #define LED2_On
 #define LED2_Off
 #define LED2_FleshH(x)
@@ -105,6 +109,15 @@ void addGlitter(fract8 chanceOfGlitter);
 void sparkler(uint8_t n);
 // обработчик нажатий кнопок
 void btnHandler();
+#if LED_ON > 0
+void ledsFlash(uint8_t led_idx, uint8_t &count);
+#endif
+#if SAVE_EEPROM
+// чтение длины нити из EEPROM
+void readStrandLen();
+// сохранение длины нити в EEPROM
+void writeStrandLen();
+#endif
 
 // ===================================================
 
@@ -273,7 +286,7 @@ int qsuba(size_t x, size_t b)
 #if SAVE_EEPROM
 void eeprom_init()
 {
-  numLeds = read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN);
+  readStrandLen();
   ledMode = read_eeprom_8(EEPROM_INDEX_FOR_STARTMODE);
 
   // проверка правильности в EEPROM байта корректности записи
@@ -282,12 +295,7 @@ void eeprom_init()
       ((ledMode > MAX_MODE) && (ledMode != 100)))
   { // Не корректен
     write_eeprom_8(EEPROM_INDEX_FOR_STARTMODE, INITMODE);
-#if MAX_LEDS < 255
-    write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, INITLEN);
-#else
-    write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(INITLEN) & 0x00ff);
-    write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(INITLEN) >> 8);
-#endif
+    writeStrandLen();
     write_eeprom_8(EEPROM_INDEX_FOR_STRANDEL, INITDEL);
 
     extFlag.Glitter = GLITER_ON;
@@ -333,21 +341,7 @@ void eeprom_init()
     }
 #endif
     ledMode = read_eeprom_8(EEPROM_INDEX_FOR_STARTMODE);
-    numLeds = read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN);
-#if MAX_LEDS < 255
-    if (read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1))
-    { // Если почему-то светодиодов больше чем размер переменной
-      numLeds = MAX_LEDS;
-      write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, numLeds);
-    }
-#else
-    numLeds += (uint16_t)read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1) << 8;
-#endif
-    if (numLeds > MAX_LEDS)
-    {
-      numLeds = MAX_LEDS;
-      write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, numLeds);
-    }
+    readStrandLen();
 
     meshdelay = read_eeprom_8(EEPROM_INDEX_FOR_STRANDEL);
 #if TOP_LENGTH
@@ -810,6 +804,99 @@ void btnHandler()
   }
 #endif
 #endif
+#endif
+}
+#endif
+
+#if LED_ON > 0
+// мигание индикаторным светодиодом
+void ledsFlash(uint8_t led_idx, uint8_t &count)
+{
+#if LED_ON == 1
+  if (led_idx > 1)
+  {
+    return;
+  }
+#endif
+  if (led_idx > 2 || led_idx == 0)
+  {
+    return;
+  }
+
+  uint8_t _pin = (led_idx == 1) ? LED1_PIN : LED2_PIN;
+
+  if (count > 0)
+  {
+    count--;
+    if (count >= 128)
+    {
+      if (count & 8)
+      {
+        digitalWrite(_pin, HIGH);
+      }
+      else
+      {
+        digitalWrite(_pin, LOW);
+      }
+      if (count == 128)
+        count = 0;
+    }
+    else if (count >= 64)
+    {
+      if (count & 4)
+      {
+        digitalWrite(_pin, HIGH);
+      }
+      else
+      {
+        digitalWrite(_pin, LOW);
+      }
+      if (count == 64)
+        count = 0;
+    }
+    else
+    {
+      if (count & 2)
+      {
+        digitalWrite(_pin, HIGH);
+      }
+      else
+      {
+        digitalWrite(_pin, LOW);
+      }
+    }
+  }
+}
+#endif
+
+#if SAVE_EEPROM
+void readStrandLen()
+{
+  numLeds = read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN);
+#if MAX_LEDS < 255
+  if (read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1))
+  { // Если почему-то светодиодов больше чем размер переменной
+    numLeds = MAX_LEDS;
+    writeStrandLen();
+  }
+#else
+  numLeds += (uint16_t)read_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1) << 8;
+#endif
+  if (numLeds > MAX_LEDS)
+  {
+    numLeds = MAX_LEDS;
+    writeStrandLen();
+  }
+}
+
+void writeStrandLen()
+{
+#if MAX_LEDS < 255
+  write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, numLeds);
+  write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, 0);
+#else
+  write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(numLeds) & 0x00ff);
+  write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(numLeds) >> 8);
 #endif
 }
 #endif

@@ -49,10 +49,6 @@
 void strobeMode(uint8_t newMode, bool mc);
 void demoCheck();
 
-#if LED_ON > 0
-void ledsFlash(uint8_t led_idx, uint8_t &count);
-#endif
-
 // ===================================================
 
 void setup()
@@ -949,63 +945,3 @@ void demoCheck()
   }
 }
 
-#if LED_ON > 0
-// мигание индикаторным светодиодом
-void ledsFlash(uint8_t led_idx, uint8_t &count)
-{
-#if LED_ON == 1
-  if (led_idx > 1)
-  {
-    return;
-  }
-#endif
-  if (led_idx > 2 || led_idx == 0)
-  {
-    return;
-  }
-
-  uint8_t _pin = (led_idx == 1) ? LED1_PIN : LED2_PIN;
-
-  if (count > 0)
-  {
-    count--;
-    if (count >= 128)
-    {
-      if (count & 8)
-      {
-        digitalWrite(_pin, HIGH);
-      }
-      else
-      {
-        digitalWrite(_pin, LOW);
-      }
-      if (count == 128)
-        count = 0;
-    }
-    else if (count >= 64)
-    {
-      if (count & 4)
-      {
-        digitalWrite(_pin, HIGH);
-      }
-      else
-      {
-        digitalWrite(_pin, LOW);
-      }
-      if (count == 64)
-        count = 0;
-    }
-    else
-    {
-      if (count & 2)
-      {
-        digitalWrite(_pin, HIGH);
-      }
-      else
-      {
-        digitalWrite(_pin, LOW);
-      }
-    }
-  }
-}
-#endif

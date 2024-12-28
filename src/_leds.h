@@ -17,6 +17,7 @@
 void fastled_init();
 // вывод цветности гирлянды в Сериал
 void print_eorder();
+#if SAVE_EEPROM
 #if BUTTONS_NUM > 1 && CAN_CHANGE_NUMLEDS
 // установка количества светодиодов в гирлянде
 void setLengthOfGarland();
@@ -27,6 +28,7 @@ void set_eorder();
 #endif
 #if BUTTONS_NUM > 2 && TOP_LENGTH
 void set_top_setting();
+#endif
 #endif
 
 // ===================================================
@@ -41,30 +43,42 @@ void fastled_init()
   }
 #endif
 
+  int num_leds = numLeds;
+#if BUTTONS_NUM > 1 && CAN_CHANGE_NUMLEDS
+  if (!digitalRead(BTN2_PIN))
+  {
+    /* на максимально возможное количество светодиодов гирлянду инициализируем
+     * только если сейчас будем настраивать ее длину; иначе инициализируем на
+     * сохраненное количество - экономим память, на всякий случай )) */
+    num_leds = MAX_LEDS;
+  }
+#endif
+
 #if defined(EORDER)
 
 #if defined(LED_CLK_PIN)
-  LEDS.addLeds<CHIPSET, LED_DATA_PIN, LED_CLK_PIN, EORDER>(leds, MAX_LEDS);
+  LEDS.addLeds<CHIPSET, LED_DATA_PIN, LED_CLK_PIN, EORDER>(leds, num_leds);
 #else
-  LEDS.addLeds<CHIPSET, LED_DATA_PIN, EORDER>(leds, MAX_LEDS);
+  LEDS.addLeds<CHIPSET, LED_DATA_PIN, EORDER>(leds, num_leds);
 #endif
 
 #else
 
 #if defined(LED_CLK_PIN)
-  LEDS.addLeds<CHIPSET, LED_DATA_PIN, LED_CLK_PIN, RGB>(leds, MAX_LEDS);
+  LEDS.addLeds<CHIPSET, LED_DATA_PIN, LED_CLK_PIN, RGB>(leds, num_leds);
 #else
-  LEDS.addLeds<CHIPSET, LED_DATA_PIN, RGB>(leds, MAX_LEDS);
+  LEDS.addLeds<CHIPSET, LED_DATA_PIN, RGB>(leds, num_leds);
 #endif
 
+#endif
+
+#if SAVE_EEPROM
 #if BUTTONS_NUM > 0
   // настройка следования цветов при зажатой кнопке 1
   if (!digitalRead(BTN1_PIN))
   {
     set_eorder();
   }
-
-#endif
 
 #endif
 
@@ -85,6 +99,7 @@ void fastled_init()
 
 #if BUTTONS_NUM > 3
 
+#endif
 #endif
 }
 
@@ -140,6 +155,8 @@ void print_eorder()
   }
 #endif
 }
+
+#if SAVE_EEPROM
 
 #if BUTTONS_NUM && (TOP_LENGTH || CAN_CHANGE_NUMLEDS || !defined(EORDER))
 void _start_mode(shButton &btn)
@@ -285,13 +302,7 @@ void setLengthOfGarland()
     if (btn1.getLastState() == BTN_UP ||
         btn_down->getLastState() == BTN_UP)
     {
-#if MAX_LEDS < 255
-      write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, numLeds);
-      write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, 0);
-#else
-      write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(numLeds) & 0x00ff);
-      write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(numLeds) >> 8);
-#endif
+      writeStrandLen();
     }
 
 #if BUTTONS_NUM > 2
@@ -547,4 +558,5 @@ void set_top_setting()
     LEDS.show();
   }
 }
+#endif
 #endif

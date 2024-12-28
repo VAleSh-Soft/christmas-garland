@@ -843,13 +843,7 @@ void getCommand()
                                           // ledMode = newMode;
                                           // setOn(demorun);
 #if SAVE_EEPROM
-#if MAX_LEDS < 255
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, numLeds); // Сохранить в память
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, 0);   // Сохранить в память
-#else
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN, (uint16_t)(numLeds) & 0x00ff); // Сохранить в память
-        write_eeprom_8(EEPROM_INDEX_FOR_STRANDLEN + 1, (uint16_t)(numLeds) >> 8); // Сохранить в память
-#endif
+        writeStrandLen();
 
         write_eeprom_8(EEPROM_INDEX_FOR_EXTFLAG, extFlag.Byte); // сохраним в EPROM расширенные настройки
 #endif

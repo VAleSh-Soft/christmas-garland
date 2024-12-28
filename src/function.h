@@ -1,8 +1,10 @@
 #pragma once
 
 #include <FastLED.h>
-#include <shButton.h>
 #include "../setting.h"
+#if BUTTONS_NUM
+#include <shButton.h> // https://github.com/VAleSh-Soft/shButton
+#endif
 
 // ===================================================
 
@@ -24,7 +26,6 @@ public:
 // ===================================================
 
 #if BUTTONS_NUM
-#include <shButton.h> // https://github.com/VAleSh-Soft/shButton
 cgButton btn1(BTN1_PIN);
 #if BUTTONS_NUM > 1
 cgButton btn2(BTN2_PIN);
@@ -134,6 +135,8 @@ uint8_t topLength = TOP_LENGTH;
 uint16_t topLength = TOP_LENGTH;
 #endif
 uint8_t topEffectIndex = TOP_EFFECT;
+uint8_t topDelay = TOP_DELAY;
+uint8_t topFading = TOP_FADING;
 #endif
 
 #if BUTTONS_NUM > 2
@@ -310,6 +313,10 @@ void eeprom_init()
     write_eeprom_8(EEPROM_INDEX_FOR_TOPCOLOR, topColorIndex);
     write_eeprom_8(EEPROM_INDEX_FOR_BGRCOLOR, bgrColorIndex);
 #endif
+#if BUTTONS_NUM > 3
+    write_eeprom_8(EEPROM_INDEX_FOR_TOPDELAY, topDelay);
+    write_eeprom_8(EEPROM_INDEX_FOR_TOPFADING, topFading);
+#endif
 #endif
   }
   else
@@ -378,6 +385,20 @@ void eeprom_init()
       write_eeprom_8(EEPROM_INDEX_FOR_BGRCOLOR, bgrColorIndex);
     }
 #endif
+#if BUTTONS_NUM > 3
+    topDelay = read_eeprom_8(EEPROM_INDEX_FOR_TOPDELAY);
+    if (topDelay > 250 || topDelay < 5)
+    {
+      topDelay = TOP_DELAY;
+      write_eeprom_8(EEPROM_INDEX_FOR_TOPDELAY, topDelay);
+    }
+    topFading = read_eeprom_8(EEPROM_INDEX_FOR_TOPFADING);
+    if (topFading == 0 || topFading > 50)
+    {
+      topFading = TOP_FADING;
+      write_eeprom_8(EEPROM_INDEX_FOR_TOPFADING, topFading);
+    }
+#endif
 #endif
   }
 }
@@ -422,8 +443,8 @@ void top()
     static uint16_t x;
 #endif
 
-    fadeToBlackBy(&leds[numLeds - topLength], topLength, TOP_FADING); // Затухание к черному
-    EVERY_N_MILLIS_I(toptimer, TOP_DELAY)
+    fadeToBlackBy(&leds[numLeds - topLength], topLength, topFading); // Затухание к черному
+    EVERY_N_MILLIS_I(toptimer, topDelay)
     { // Sets the original delay time.
 
       switch (topEffectIndex)

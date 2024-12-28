@@ -212,9 +212,20 @@ static void fill_solid_garland(bool can_print = true)
 }
 
 #if CAN_CHANGE_NUMLEDS
+static void print_length_of_garland()
+{
+  CTG_PRINT(F("Length garland: "));
+  CTG_PRINTLN(numLeds);
+}
+
 void setLengthOfGarland()
 {
   CTG_PRINTLN(F("Mode for changing the length of the garland"));
+  print_length_of_garland();
+#if BUTTONS_NUM > 2
+  void print_bgr_color();
+#endif
+  CTG_PRINTLN();
 
   fill_solid_garland();
 
@@ -230,6 +241,7 @@ void setLengthOfGarland()
       {
         numLeds++;
         fill_solid_garland();
+        print_length_of_garland();
       }
       break;
     case BTN_LONGCLICK:
@@ -237,6 +249,7 @@ void setLengthOfGarland()
       {
         numLeds += 10;
         fill_solid_garland();
+        print_length_of_garland();
       }
       break;
     }
@@ -255,6 +268,7 @@ void setLengthOfGarland()
       {
         numLeds--;
         fill_solid_garland();
+        print_length_of_garland();
       }
       break;
     case BTN_LONGCLICK:
@@ -262,6 +276,7 @@ void setLengthOfGarland()
       {
         numLeds -= 10;
         fill_solid_garland();
+        print_length_of_garland();
       }
       break;
     }
@@ -339,6 +354,12 @@ void set_eorder()
 #endif
 
 #if BUTTONS_NUM > 2 && TOP_LENGTH
+static void print_top_length()
+{
+  CTG_PRINT(F("Top length: "));
+  CTG_PRINTLN(topLength);
+}
+
 static void save_top_length()
 {
 #if TOP_LENGTH < 255
@@ -347,8 +368,19 @@ static void save_top_length()
   write_eeprom_16(EEPROM_INDEX_FOR_TOPLENGTH, topLength);
 #endif
 
-  CTG_PRINT(F("Top length: "));
-  CTG_PRINTLN(topLength);
+  print_top_length();
+}
+
+static void print_top_delay()
+{
+  CTG_PRINT(F("Top delay: "));
+  CTG_PRINTLN(topDelay);
+}
+
+static void print_top_fading()
+{
+  CTG_PRINT(F("Top fading: "));
+  CTG_PRINTLN(topFading);
 }
 
 static void print_top_color()
@@ -389,6 +421,11 @@ static void print_top_color()
 void set_top_setting()
 {
   CTG_PRINTLN(F("Mode for changing the setting for top of the garland"));
+  print_top_length();
+  print_top_color();
+  print_top_delay();
+  print_top_fading();
+  CTG_PRINTLN();
 
   fill_solid_garland(false);
   top();
@@ -459,17 +496,50 @@ void set_top_setting()
     }
 
 #if BUTTONS_NUM > 3
-    if (btn3.getButtonState() == BTN_DOWN)
-    {
-      // смена цвета заливки фона
-      if (++bgrColorIndex > 2)
-      {
-        bgrColorIndex = 0;
-      }
-      write_eeprom_8(EEPROM_INDEX_FOR_BGRCOLOR, bgrColorIndex);
-      fill_solid_garland(false);
+    // изменение величины затухания вершины (topFading)
+    static bool flag = false;
+    static bool to_up = false;
+    static bool start = false;
 
-      print_bgr_color();
+    btn3.setLongClickMode(LCM_CLICKSERIES);
+    btn3.setTimeoutOfLongClick(500);
+
+    switch (btn3.getButtonState())
+    {
+    case BTN_LONGCLICK:
+      if (start)
+      {
+        flag = true;
+        if (to_up)
+        {
+          if (topFading <= 40)
+          {
+            topFading++;
+            write_eeprom_8(EEPROM_INDEX_FOR_TOPFADING, topFading);
+            print_top_fading();
+          }
+        }
+        else
+        {
+          if (topFading > 1)
+          {
+            topFading--;
+            write_eeprom_8(EEPROM_INDEX_FOR_TOPFADING, topFading);
+            print_top_fading();
+          }
+        }
+      }
+      break;
+    case BTN_UP:
+      // устанавливаем флаг начала изменений
+      start = true;
+      // при отпускании кнопки меняем флаг направления изменения только при условии, что было удержание кнопки, а не просто клик
+      if (flag)
+      {
+        flag = false;
+        to_up = !to_up;
+      }
+      break;
     }
 #endif
 

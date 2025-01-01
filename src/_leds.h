@@ -251,7 +251,20 @@ void setLengthOfGarland()
   // опрос кнопок
   while (true)
   {
-    switch (btn1.getButtonState())
+    btn1.getButtonState();
+#if BUTTONS_NUM == 2
+    shButton *btn_down = &btn2;
+#elif BUTTONS_NUM == 3
+    btn2.getButtonState();
+    shButton *btn_down = &btn3;
+#elif BUTTONS_NUM > 3
+    btn2.getButtonState();
+    btn3.getButtonState();
+    shButton *btn_down = &btn4;
+#endif
+    btn_down->getButtonState();
+
+    switch (btn1.getLastState())
     {
     case BTN_DOWN:
       if (numLeds < MAX_LEDS)
@@ -271,14 +284,7 @@ void setLengthOfGarland()
       break;
     }
 
-#if BUTTONS_NUM == 2
-    shButton *btn_down = &btn2;
-#elif BUTTONS_NUM == 3
-    shButton *btn_down = &btn3;
-#elif BUTTONS_NUM > 3
-    shButton *btn_down = &btn4;
-#endif
-    switch (btn_down->getButtonState())
+    switch (btn_down->getLastState())
     {
     case BTN_DOWN:
       if (numLeds > 1)
@@ -306,7 +312,7 @@ void setLengthOfGarland()
     }
 
 #if BUTTONS_NUM > 2
-    if (btn2.getButtonState() == BTN_DOWN)
+    if (btn2.getLastState() == BTN_DOWN)
     {
       // смена цвета заливки фона
       if (++bgrColorIndex > 2)
@@ -442,18 +448,24 @@ void set_top_setting()
   top();
   LEDS.show();
 
+#if BUTTONS_NUM > 3
+  btn3.setLongClickMode(LCM_CLICKSERIES);
+  btn3.setTimeoutOfLongClick(500);
+#endif
+
   _start_mode(btn3);
 
   // опрос кнопок
   while (true)
   {
+    btn1.getButtonState();
+    btn2.getButtonState();
 #if BUTTONS_NUM == 3
     shButton *btn_down = &btn3;
 #elif BUTTONS_NUM > 3
+    btn3.getButtonState();
     shButton *btn_down = &btn4;
 #endif
-
-    btn1.getButtonState();
     btn_down->getButtonState();
 
     // размер вершины
@@ -481,7 +493,7 @@ void set_top_setting()
       topEffectIndex = x;
     }
 
-    switch (btn2.getButtonState())
+    switch (btn2.getLastState())
     {
     // тип заливки вершины - сплошной, сверху вниз, снизу вверх или случайное мерцание
     case BTN_ONECLICK:
@@ -507,50 +519,50 @@ void set_top_setting()
     }
 
 #if BUTTONS_NUM > 3
-    // изменение величины затухания вершины (topFading)
-    static bool flag = false;
-    static bool to_up = false;
-    static bool start = false;
-
-    btn3.setLongClickMode(LCM_CLICKSERIES);
-    btn3.setTimeoutOfLongClick(500);
-
-    switch (btn3.getButtonState())
+    // изменение величины затухания вершины (topFading); работает только если не задана сплошная заливка вершины
+    if (topEffectIndex > 0)
     {
-    case BTN_LONGCLICK:
-      if (start)
+      static bool flag = false;
+      static bool to_up = false;
+      static bool start = false;
+
+      switch (btn3.getLastState())
       {
-        flag = true;
-        if (to_up)
+      case BTN_LONGCLICK:
+        if (start)
         {
-          if (topFading <= 40)
+          flag = true;
+          if (to_up)
           {
-            topFading++;
-            write_eeprom_8(EEPROM_INDEX_FOR_TOPFADING, topFading);
-            print_top_fading();
+            if (topFading <= 40)
+            {
+              topFading++;
+              write_eeprom_8(EEPROM_INDEX_FOR_TOPFADING, topFading);
+              print_top_fading();
+            }
+          }
+          else
+          {
+            if (topFading > 1)
+            {
+              topFading--;
+              write_eeprom_8(EEPROM_INDEX_FOR_TOPFADING, topFading);
+              print_top_fading();
+            }
           }
         }
-        else
+        break;
+      case BTN_UP:
+        // устанавливаем флаг начала изменений
+        start = true;
+        // при отпускании кнопки меняем флаг направления изменения только при условии, что было удержание кнопки, а не просто клик
+        if (flag)
         {
-          if (topFading > 1)
-          {
-            topFading--;
-            write_eeprom_8(EEPROM_INDEX_FOR_TOPFADING, topFading);
-            print_top_fading();
-          }
+          flag = false;
+          to_up = !to_up;
         }
+        break;
       }
-      break;
-    case BTN_UP:
-      // устанавливаем флаг начала изменений
-      start = true;
-      // при отпускании кнопки меняем флаг направления изменения только при условии, что было удержание кнопки, а не просто клик
-      if (flag)
-      {
-        flag = false;
-        to_up = !to_up;
-      }
-      break;
     }
 #endif
 

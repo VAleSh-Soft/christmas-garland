@@ -30,6 +30,9 @@ void set_eorder();
 #if BUTTONS_NUM > 2 && TOP_LENGTH
 void set_top_setting();
 #endif
+#if BUTTONS_NUM > 3 && POWER_I && POWER_V
+void setMaxPowerConsumption();
+#endif
 #endif
 
 // ===================================================
@@ -50,7 +53,7 @@ void fastled_init()
   {
     /* на максимально возможное количество светодиодов гирлянду инициализируем
      * только если сейчас будем настраивать ее длину; иначе инициализируем на
-     * сохраненное количество - экономим память, на всякий случай )) */
+     * сохраненное количество - экономим память, меньше шансов зависнуть )) */
     num_leds = MAX_LEDS;
   }
 #endif
@@ -92,14 +95,19 @@ void fastled_init()
 #endif
 
 #if BUTTONS_NUM > 2 && TOP_LENGTH
+  // если кнопок больше двух, доступна настройка вершины гирлянды
   if (!digitalRead(BTN3_PIN))
   {
     set_top_setting();
   }
 #endif
 
-#if BUTTONS_NUM > 3
-
+#if BUTTONS_NUM > 3 && POWER_I && POWER_V
+  // если кнопок четыре, доступна настройка потребляемой мощности
+  if (!digitalRead(BTN4_PIN))
+  {
+    ;
+  }
 #endif
 #endif
 }
@@ -277,6 +285,7 @@ void setLengthOfGarland()
     switch (btn1.getLastState())
     {
     case BTN_DOWN:
+    case BTN_DBLCLICK:
       if (numLeds < MAX_LEDS)
       {
         numLeds++;
@@ -299,6 +308,7 @@ void setLengthOfGarland()
     switch (btn_down->getLastState())
     {
     case BTN_DOWN:
+    case BTN_DBLCLICK:
       if (numLeds > 1)
       {
         numLeds--;
@@ -326,8 +336,10 @@ void setLengthOfGarland()
     }
 
 #if BUTTONS_NUM > 2
-    if (btn2.getLastState() == BTN_DOWN)
+    switch (btn2.getLastState())
     {
+    case BTN_DOWN:
+    case BTN_DBLCLICK:
       // смена цвета заливки фона
       if (++bgrColorIndex > 2)
       {
@@ -371,8 +383,10 @@ void set_eorder()
   // опрос кнопок
   while (true)
   {
-    if (btn1.getButtonState() == BTN_DOWN)
+    switch (btn1.getButtonState())
     {
+    case BTN_DOWN:
+    case BTN_DBLCLICK:
       if (++eorderIndex > 5)
       {
         eorderIndex = 0;
@@ -460,6 +474,14 @@ void fill_solid_for_top()
   topEffectIndex = x;
 }
 
+void _set_top_length(bool to_up)
+{
+  (to_up) ? topLength++ : topLength--;
+  led2_blink();
+  save_top_length();
+  fill_solid_for_top();
+}
+
 void set_top_setting()
 {
   CTG_PRINTLN(F("Mode for changing the setting for top of the garland"));
@@ -473,8 +495,10 @@ void set_top_setting()
   LEDS.show();
 
 #if BUTTONS_NUM > 3
+  btn1.setIntervalOfSerial(500);
   btn3.setLongClickMode(LCM_CLICKSERIES);
-  btn3.setTimeoutOfLongClick(500);
+  btn3.setIntervalOfSerial(500);
+  btn4.setIntervalOfSerial(500);
 #endif
 
   _start_mode(btn3);
@@ -492,31 +516,87 @@ void set_top_setting()
 #endif
     btn_down->getButtonState();
 
-    // размер вершины
-    if (btn1.getLastState() == BTN_DOWN || btn_down->getLastState() == BTN_DOWN)
+#if BUTTONS_NUM == 3
+    static bool td_start = false;
+#endif
+    static bool td_btn_up = false;
+    static bool td_btn_down = false;
+
+    switch (btn1.getLastState())
     {
-      led2_blink();
-      if (btn1.getLastState() == BTN_DOWN)
+    case BTN_UP:
+      // размер вершины - увеличение
+      if (!td_btn_up)
       {
         if (topLength < TOP_LENGTH)
         {
-          topLength++;
-          save_top_length();
+          _set_top_length(true);
         }
       }
-      else if (topLength > 0)
+      td_btn_up = false;
+      break;
+#if BUTTONS_NUM > 3
+    case BTN_LONGCLICK:
+      // задержка вершины - ускорение
+      if (topEffectIndex > 0)
       {
-        topLength--;
-        save_top_length();
+        if (topDelay > 20)
+        {
+          topDelay -= 5;
+          led2_blink();
+          write_eeprom_8(EEPROM_INDEX_FOR_TOPDELAY, topDelay);
+        }
       }
+      td_btn_up = true;
+      break;
+#endif
+    }
 
-      fill_solid_for_top();
+    switch (btn_down->getLastState())
+    {
+    case BTN_UP:
+#if BUTTONS_NUM == 3
+      if (td_start)
+      {
+#endif
+        // размер вершины - уменьшение
+        if (!td_btn_down)
+        {
+          if (topLength > 0)
+          {
+            _set_top_length(false);
+          }
+        }
+        td_btn_down = false;
+#if BUTTONS_NUM == 3
+      }
+      else
+      {
+        td_start = true;
+      }
+#endif
+      break;
+#if BUTTONS_NUM > 3
+    case BTN_LONGCLICK:
+      // задержка вершины - замедление
+      if (topEffectIndex > 0)
+      {
+        if (topDelay < 250)
+        {
+          topDelay += 5;
+          led2_blink();
+          write_eeprom_8(EEPROM_INDEX_FOR_TOPDELAY, topDelay);
+        }
+      }
+      td_btn_down = true;
+      break;
+#endif
     }
 
     switch (btn2.getLastState())
     {
-    // тип заливки вершины - сплошной, сверху вниз, снизу вверх или случайное мерцание
     case BTN_ONECLICK:
+      // тип заливки вершины - сплошной, сверху вниз, снизу вверх или случайное мерцание
       if (++topEffectIndex > 3)
       {
         topEffectIndex = 0;
@@ -527,8 +607,8 @@ void set_top_setting()
       CTG_PRINT(F("Top effect: "));
       CTG_PRINTLN(topEffectIndex);
       break;
-    // цвет заливки вершины
     case BTN_LONGCLICK:
+      // цвет заливки вершины
       if (++topColorIndex > 7)
       {
         topColorIndex = 0;
@@ -544,32 +624,31 @@ void set_top_setting()
     // изменение величины затухания вершины (topFading); работает только если не задана сплошная заливка вершины
     if (topEffectIndex > 0)
     {
-      static bool flag = false;
-      static bool to_up = false;
-      static bool start = false;
+      static bool tf_flag = false;
+      static bool tf_to_up = false;
+      static bool tf_start = false;
 
       switch (btn3.getLastState())
       {
       case BTN_LONGCLICK:
-        led2_blink();
-        if (start)
+        if (tf_start)
         {
-          flag = true;
-          if (to_up)
+          tf_flag = true;
+          if (tf_to_up)
           {
-            if (topFading <= 40)
+            if (topFading <= 50)
             {
-              topFading++;
-              write_eeprom_8(EEPROM_INDEX_FOR_TOPFADING, topFading);
+              led2_blink();
+              topFading += 5;
               print_top_fading();
             }
           }
           else
           {
-            if (topFading > 1)
+            if (topFading >= 10)
             {
-              topFading--;
-              write_eeprom_8(EEPROM_INDEX_FOR_TOPFADING, topFading);
+              led2_blink();
+              topFading -= 5;
               print_top_fading();
             }
           }
@@ -577,13 +656,15 @@ void set_top_setting()
         break;
       case BTN_UP:
         // устанавливаем флаг начала изменений
-        start = true;
+        tf_start = true;
         // при отпускании кнопки меняем флаг направления изменения только при условии, что было удержание кнопки, а не просто клик
-        if (flag)
+        if (tf_flag)
         {
-          flag = false;
-          to_up = !to_up;
+          tf_flag = false;
+          tf_to_up = !tf_to_up;
         }
+        // и сохраняем изменения
+        write_eeprom_8(EEPROM_INDEX_FOR_TOPFADING, topFading);
         break;
       }
     }
@@ -594,4 +675,12 @@ void set_top_setting()
   }
 }
 #endif
+
+#if BUTTONS_NUM > 3 && POWER_I && POWER_V
+void setMaxPowerConsumption()
+{
+  ;
+}
+#endif
+
 #endif

@@ -438,8 +438,12 @@ void top()
 #endif
 
     fadeToBlackBy(&leds[numLeds - topLength], topLength, topFading); // Затухание к черному
-    EVERY_N_MILLIS_I(toptimer, topDelay)
-    { // Sets the original delay time.
+    
+    static unsigned long toptimer = 0;
+
+    if (millis() - toptimer >= topDelay)
+    {
+      toptimer = millis();
 
       switch (topEffectIndex)
       {

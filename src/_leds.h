@@ -41,9 +41,9 @@ void fastled_init()
 {
   LEDS.setBrightness(maxBright);
 #if (defined(POWER_I) && defined(POWER_V))
-  if (POWER_I > 0)
+  if (powerI > 0)
   {
-    LEDS.setMaxPowerInVoltsAndMilliamps(POWER_V, POWER_I);
+    LEDS.setMaxPowerInVoltsAndMilliamps(powerV, powerI * 100ul);
   }
 #endif
 
@@ -106,7 +106,7 @@ void fastled_init()
   // если кнопок четыре, доступна настройка потребляемой мощности
   if (!digitalRead(BTN4_PIN))
   {
-    ;
+    setMaxPowerConsumption();
   }
 #endif
 #endif
@@ -253,6 +253,14 @@ static void print_length_of_garland()
   CTG_PRINTLN(numLeds);
 }
 
+void _set_num_leds(bool to_up, uint8_t step = 1)
+{
+  numLeds += (to_up) ? step : -step;
+  led2_blink();
+  fill_solid_garland();
+  print_length_of_garland();
+}
+
 void setLengthOfGarland()
 {
   CTG_PRINTLN(F("Mode for changing the length of the garland"));
@@ -288,19 +296,13 @@ void setLengthOfGarland()
     case BTN_DBLCLICK:
       if (numLeds < MAX_LEDS)
       {
-        numLeds++;
-        led2_blink();
-        fill_solid_garland();
-        print_length_of_garland();
+        _set_num_leds(true);
       }
       break;
     case BTN_LONGCLICK:
       if (numLeds < MAX_LEDS - 10)
       {
-        numLeds += 10;
-        led2_blink();
-        fill_solid_garland();
-        print_length_of_garland();
+        _set_num_leds(true, 10);
       }
       break;
     }
@@ -311,19 +313,13 @@ void setLengthOfGarland()
     case BTN_DBLCLICK:
       if (numLeds > 1)
       {
-        numLeds--;
-        led2_blink();
-        fill_solid_garland();
-        print_length_of_garland();
+        _set_num_leds(false);
       }
       break;
     case BTN_LONGCLICK:
       if (numLeds > 10)
       {
-        numLeds -= 10;
-        led2_blink();
-        fill_solid_garland();
-        print_length_of_garland();
+        _set_num_leds(false, 10);
       }
       break;
     }
@@ -482,8 +478,17 @@ void _set_top_length(bool to_up)
   fill_solid_for_top();
 }
 
+void _set_top_delay(bool to_up)
+{
+  topDelay += (to_up) ? 5 : -5;
+  led2_blink();
+  write_eeprom_8(EEPROM_INDEX_FOR_TOPDELAY, topDelay);
+  print_top_delay();
+}
+
 void set_top_setting()
 {
+  LEDS.setBrightness(10);
   CTG_PRINTLN(F("Mode for changing the setting for top of the garland"));
   print_top_length();
   print_top_color();
@@ -542,9 +547,7 @@ void set_top_setting()
       {
         if (topDelay > 20)
         {
-          topDelay -= 5;
-          led2_blink();
-          write_eeprom_8(EEPROM_INDEX_FOR_TOPDELAY, topDelay);
+          _set_top_delay(false);
         }
       }
       td_btn_up = true;
@@ -583,9 +586,7 @@ void set_top_setting()
       {
         if (topDelay < 250)
         {
-          topDelay += 5;
-          led2_blink();
-          write_eeprom_8(EEPROM_INDEX_FOR_TOPDELAY, topDelay);
+          _set_top_delay(true);
         }
       }
       td_btn_down = true;
@@ -677,9 +678,138 @@ void set_top_setting()
 #endif
 
 #if BUTTONS_NUM > 3 && POWER_I && POWER_V
+
+void print_voltage()
+{
+  CTG_PRINT(F("Garland supply voltage: "));
+  CTG_PRINT(powerV);
+  CTG_PRINTLN(F("V"));
+}
+
+void print_current()
+{
+  CTG_PRINT(F("Maximum current consumption: "));
+  CTG_PRINT(powerI * 100ul);
+  CTG_PRINTLN(F("mA"));
+}
+
+void fill_power_data(uint8_t mode)
+{
+  fill_solid(leds, MAX_LEDS, CRGB::Black);
+  if (mode)
+  {
+    fill_solid(leds, powerV, set_new_eorder(CRGB::Red));
+  }
+  else
+  {
+    fill_solid(leds, powerI, set_new_eorder(CRGB::Blue));
+  }
+}
+
+void _set_power_data(uint8_t mode, bool to_up, uint8_t step = 1)
+{
+  if (mode)
+  {
+    powerV += (to_up) ? step : -step;
+    print_voltage();
+  }
+  else
+  {
+    powerI += (to_up) ? step : -step;
+    print_current();
+  }
+  led2_blink();
+}
+
 void setMaxPowerConsumption()
 {
-  ;
+  btn1.setIntervalOfSerial(500);
+  btn4.setIntervalOfSerial(500);
+
+  LEDS.setBrightness(10);
+  CTG_PRINTLN(F("Maximum power consumption setting mode"));
+  print_voltage();
+  print_current();
+  CTG_PRINTLN();
+
+  _start_mode(btn4);
+
+  fill_power_data(0);
+  LEDS.show();
+
+  uint8_t cur_mode = 0;
+
+  // опрос кнопок
+  while (true)
+  {
+
+    btn1.getButtonState();
+    btn2.getButtonState();
+    btn3.getButtonState();
+    btn4.getButtonState();
+
+    if (btn2.getLastState() == BTN_DOWN || btn2.getLastState() == BTN_DBLCLICK)
+    {
+      cur_mode = 0;
+      led2_blink();
+    }
+    if (btn3.getLastState() == BTN_DOWN || btn3.getLastState() == BTN_DBLCLICK)
+    {
+      cur_mode = 1;
+      led2_blink();
+    }
+
+    switch (btn1.getLastState())
+    {
+    case BTN_DOWN:
+    case BTN_DBLCLICK:
+      if ((cur_mode && powerV < 15) || (!cur_mode && powerI < 1000))
+      {
+        _set_power_data(cur_mode, true);
+      }
+      break;
+    case BTN_LONGCLICK:
+      if ((cur_mode && powerV < 10) || (!cur_mode && powerI < 995))
+      {
+        _set_power_data(cur_mode, true, 5);
+      }
+      break;
+    case BTN_UP:
+      (cur_mode) ? write_eeprom_8(EEPROM_INDEX_FOR_POWER_V, powerV)
+                 : write_eeprom_16(EEPROM_INDEX_FOR_POWER_I, powerI);
+      break;
+    }
+
+    static bool start = false;
+
+    switch (btn4.getLastState())
+    {
+    case BTN_DOWN:
+    case BTN_DBLCLICK:
+      if ((cur_mode && powerV > 3) || (!cur_mode && powerI > 0))
+      {
+        _set_power_data(cur_mode, false);
+      }
+      break;
+    case BTN_LONGCLICK:
+      if (start)
+      {
+        if ((cur_mode && powerV > 8) || (!cur_mode && powerI > 5))
+        {
+          _set_power_data(cur_mode, false, 5);
+        }
+      }
+      break;
+    case BTN_UP:
+      start = true;
+      (cur_mode) ? write_eeprom_8(EEPROM_INDEX_FOR_POWER_V, powerV)
+                 : write_eeprom_16(EEPROM_INDEX_FOR_POWER_I, powerI);
+      break;
+    }
+
+    fill_power_data(cur_mode);
+    LEDS.show();
+  }
 }
 #endif
 

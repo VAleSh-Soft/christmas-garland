@@ -1,7 +1,7 @@
 #include <FastLED.h> // https://github.com/FastLED/FastLED
 
 #if FASTLED_VERSION < 3001000
-#error "Requires FastLED 3.1 or later; check github for latest code."
+#error "Requires FastLED 3.1 or later; check github for latest code: https://github.com/FastLED/FastLED"
 #endif
 
 #include "setting.h"

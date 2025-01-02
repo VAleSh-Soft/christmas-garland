@@ -152,6 +152,11 @@ uint8_t topDelay = TOP_DELAY;
 uint8_t topFading = TOP_FADING;
 #endif
 
+#if (defined(POWER_I) && defined(POWER_V))
+uint16_t powerI = POWER_I / 100;
+uint8_t powerV = POWER_V;
+#endif
+
 #if BUTTONS_NUM > 2
 uint8_t topColorIndex = 0;
 uint8_t bgrColorIndex = 0;
@@ -326,6 +331,10 @@ void eeprom_init()
     write_eeprom_8(EEPROM_INDEX_FOR_TOPFADING, topFading);
 #endif
 #endif
+#if BUTTONS_NUM > 3 && (defined(POWER_I) && defined(POWER_V))
+    write_eeprom_16(EEPROM_INDEX_FOR_POWER_I, POWER_I);
+    write_eeprom_8(EEPROM_INDEX_FOR_POWER_V, POWER_V);
+#endif
   }
   else
   {
@@ -394,6 +403,20 @@ void eeprom_init()
     }
 #endif
 #endif
+#if BUTTONS_NUM > 3 && (defined(POWER_I) && defined(POWER_V))
+    powerV = read_eeprom_8(EEPROM_INDEX_FOR_POWER_V);
+    if (powerV < 3 || powerV > 15)
+    {
+      powerV = POWER_V;
+      write_eeprom_8(EEPROM_INDEX_FOR_POWER_V, powerV);
+    }
+    powerI = read_eeprom_16(EEPROM_INDEX_FOR_POWER_I);
+    if (powerI > 1000)
+    {
+      powerI = POWER_I / 100;
+      write_eeprom_16(EEPROM_INDEX_FOR_POWER_I, powerI);
+    }
+#endif
   }
 }
 #endif
@@ -438,7 +461,7 @@ void top()
 #endif
 
     fadeToBlackBy(&leds[numLeds - topLength], topLength, topFading); // Затухание к черному
-    
+
     static unsigned long toptimer = 0;
 
     if (millis() - toptimer >= topDelay)

@@ -18,6 +18,7 @@ void fastled_init();
 // вывод цветности гирлянды в Сериал
 void print_eorder();
 #if SAVE_EEPROM
+void led2_blink();
 #if BUTTONS_NUM > 1 && CAN_CHANGE_NUMLEDS
 // установка количества светодиодов в гирлянде
 void setLengthOfGarland();
@@ -158,6 +159,15 @@ void print_eorder()
 
 #if SAVE_EEPROM
 
+void led2_blink()
+{
+#if LED_ON > 1
+  digitalWrite(LED2_PIN, HIGH);
+  delay(5);
+  digitalWrite(LED2_PIN, LOW);
+#endif
+}
+
 #if BUTTONS_NUM && (TOP_LENGTH || CAN_CHANGE_NUMLEDS || !defined(EORDER))
 void _start_mode(shButton &btn)
 {
@@ -270,6 +280,7 @@ void setLengthOfGarland()
       if (numLeds < MAX_LEDS)
       {
         numLeds++;
+        led2_blink();
         fill_solid_garland();
         print_length_of_garland();
       }
@@ -278,6 +289,7 @@ void setLengthOfGarland()
       if (numLeds < MAX_LEDS - 10)
       {
         numLeds += 10;
+        led2_blink();
         fill_solid_garland();
         print_length_of_garland();
       }
@@ -290,6 +302,7 @@ void setLengthOfGarland()
       if (numLeds > 1)
       {
         numLeds--;
+        led2_blink();
         fill_solid_garland();
         print_length_of_garland();
       }
@@ -298,6 +311,7 @@ void setLengthOfGarland()
       if (numLeds > 10)
       {
         numLeds -= 10;
+        led2_blink();
         fill_solid_garland();
         print_length_of_garland();
       }
@@ -319,6 +333,7 @@ void setLengthOfGarland()
       {
         bgrColorIndex = 0;
       }
+      led2_blink();
       write_eeprom_8(EEPROM_INDEX_FOR_BGRCOLOR, bgrColorIndex);
       fill_solid_garland(false);
 
@@ -362,6 +377,7 @@ void set_eorder()
       {
         eorderIndex = 0;
       }
+      led2_blink();
       write_eeprom_8(EEPROM_INDEX_FOR_EORDER, eorderIndex);
       print_eorder();
       show_rgb();
@@ -435,6 +451,15 @@ static void print_top_color()
   }
 }
 
+void fill_solid_for_top()
+{
+  fill_solid_garland(false);
+  uint8_t x = topEffectIndex;
+  topEffectIndex = 0;
+  top();
+  topEffectIndex = x;
+}
+
 void set_top_setting()
 {
   CTG_PRINTLN(F("Mode for changing the setting for top of the garland"));
@@ -444,8 +469,7 @@ void set_top_setting()
   print_top_fading();
   CTG_PRINTLN();
 
-  fill_solid_garland(false);
-  top();
+  fill_solid_for_top();
   LEDS.show();
 
 #if BUTTONS_NUM > 3
@@ -471,6 +495,7 @@ void set_top_setting()
     // размер вершины
     if (btn1.getLastState() == BTN_DOWN || btn_down->getLastState() == BTN_DOWN)
     {
+      led2_blink();
       if (btn1.getLastState() == BTN_DOWN)
       {
         if (topLength < TOP_LENGTH)
@@ -485,12 +510,7 @@ void set_top_setting()
         save_top_length();
       }
 
-      // сразу заполним вершину текущим цветом для наглядности
-      fill_solid_garland(false);
-      uint8_t x = topEffectIndex;
-      topEffectIndex = 0;
-      top();
-      topEffectIndex = x;
+      fill_solid_for_top();
     }
 
     switch (btn2.getLastState())
@@ -501,6 +521,7 @@ void set_top_setting()
       {
         topEffectIndex = 0;
       }
+      led2_blink();
       write_eeprom_8(EEPROM_INDEX_FOR_TOPEFFECT, topEffectIndex);
 
       CTG_PRINT(F("Top effect: "));
@@ -512,6 +533,7 @@ void set_top_setting()
       {
         topColorIndex = 0;
       }
+      led2_blink();
       write_eeprom_8(EEPROM_INDEX_FOR_TOPCOLOR, topColorIndex);
 
       print_top_color();
@@ -529,6 +551,7 @@ void set_top_setting()
       switch (btn3.getLastState())
       {
       case BTN_LONGCLICK:
+        led2_blink();
         if (start)
         {
           flag = true;

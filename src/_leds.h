@@ -77,7 +77,7 @@ void fastled_init()
 #endif
 
 #if SAVE_EEPROM
-#if BUTTONS_NUM > 0
+#if BUTTONS_NUM > 0 && !defined(EORDER)
   // настройка следования цветов при зажатой кнопке 1
   if (!digitalRead(BTN1_PIN))
   {

@@ -499,6 +499,8 @@ void set_top_setting()
   fill_solid_for_top();
   LEDS.show();
 
+  btn2.setLongClickMode(LCM_CLICKSERIES);
+  btn2.setIntervalOfSerial(500);
 #if BUTTONS_NUM > 3
   btn1.setIntervalOfSerial(500);
   btn3.setLongClickMode(LCM_CLICKSERIES);
